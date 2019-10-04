@@ -24,6 +24,7 @@ setup(name='pymagnum',
       license="BSD",
       url='https://github.com/CharlesGodwin/pymagnum',
       packages=packages,
+      scripts=['magnum/tools/testrs485.py'],
       classifiers=[
           "Programming Language :: Python :: 3",
           "License :: OSI Approved :: BSD License",
@@ -31,5 +32,5 @@ setup(name='pymagnum',
       ],
       install_requires=['pyserial'],
       python_requires='>=3.4',
-      keywords = 'Magnum Energy Renewable Solar Network RS485'
+      keywords='Magnum Energy Renewable Solar Network RS485'
       )
