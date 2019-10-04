@@ -10,3 +10,4 @@ install.log
 magnum.egg-info
 pymagnum.egg-info
 pymagnum.code-workspace
+*.bak

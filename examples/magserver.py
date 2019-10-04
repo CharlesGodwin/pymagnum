@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
+# This code is provided as an example of a REST API server
+# run the program with --help for details of options.
 import argparse
 import json
 import time

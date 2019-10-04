@@ -3,7 +3,45 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
-#
+# This code is provided as an example of a JSON logger
+# run the program with --help for details of options.
+# By default consectutive duplicate data records are not logged.
+# Each device is a seperate JSON record new-line delimited
+# The JSON Record is like this:
+    # datetime is a timestamp for local time
+    # timestamp is the same time but as a Unix Epoch second as UTC time - this is useful for time series software
+    # the data object is pertiement to each model
+    # The curent models are INVERTER, REMOTE, AGS, BMK, and PT100
+# {
+# 	"datetime": "2019-09-30 15:59:03-04:00",
+# 	"timestamp": 1569873543,
+# 	"model": "INVERTER",
+# 	"data": {
+# 		"revision": "5.1",
+# 		"mode": 64,
+# 		"mode_text": "INVERT",
+# 		"fault": 0,
+# 		"fault_text": "None",
+# 		"vdc": 24.6,
+# 		"adc": 2,
+# 		"VACout": 120,
+# 		"VACin": 0,
+# 		"invled": 1,
+# 		"invled_text": "On",
+# 		"chgled": 0,
+# 		"chgled_text": "Off",
+# 		"bat": 17,
+# 		"tfmr": 36,
+# 		"fet": 30,
+# 		"model": 107,
+# 		"model_text": "MS4024PAE",
+# 		"stackmode": 0,
+# 		"stackmode_text": "Stand Alone",
+# 		"AACin": 0,
+# 		"AACout": 1,
+# 		"Hz": 60.0
+# 	}
+# }
 import argparse
 import json
 import time
