@@ -3,6 +3,10 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
+#  This module tests the functonality of the serial interface
+#  by attempting to read 50 packets of def and parsing them
+#  The results are dumped to the terminal
+#
 import argparse
 import json
 import traceback
@@ -37,7 +41,7 @@ def main():
     try:
         reader = magnum.Magnum(device=args.device, packets=args.packets,
                             timeout=args.timeout, cleanpackets=args.cleanpackets)
-    except Exception as e:
+    except:
         print("Error detected attempting to open serial device")
         traceback.print_exc()
         exit(2)
@@ -60,7 +64,7 @@ def main():
         if args.showjson:
             try:
                 models = reader.getModels(packets)
-            except Exception as e:
+            except:
                 print("Error detected attempting to extract models")
                 traceback.print_exc()
                 exit(2)
@@ -70,7 +74,7 @@ def main():
         format2 = "Packets:{0} in {3:2.2f} seconds"
         format = format1 if unknown > 0 else format2
         print(format.format(len(packets), args.packets, unknown, duration))
-    except Exception as e:
+    except:
         print("Error detected attempting to read network data - test failed")
         traceback.print_exc()
         exit(2)

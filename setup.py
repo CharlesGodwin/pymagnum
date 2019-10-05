@@ -7,15 +7,13 @@
 #
 from distutils.core import setup
 import setuptools
+import magnum
 
 with open("README.md", "r") as file:
     long_description = file.read()
 
-packages = setuptools.find_packages()
-print("Found packages:{}".format(packages))
-
 setup(name='pymagnum',
-      version='0.1.6',
+      version=magnum.__version__,
       description='Magnum Energy Network Interface (read-only)',
       author='Charles Godwin',
       author_email='magnum@godwin.ca',
@@ -23,8 +21,7 @@ setup(name='pymagnum',
       long_description_content_type="text/markdown",
       license="BSD",
       url='https://github.com/CharlesGodwin/pymagnum',
-      packages=packages,
-      scripts=['magnum/tools/testrs485.py'],
+      packages=setuptools.find_packages(),
       classifiers=[
           "Programming Language :: Python :: 3",
           "License :: OSI Approved :: BSD License",

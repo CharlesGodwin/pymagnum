@@ -1,0 +1,10 @@
+include README.md
+include setup.py
+
+include examples/maglogger.py
+include examples/magsample.py
+include examples/magserver.py
+include examples/write_packets.py
+
+include testdata/packets.txt
+include testdata/test.json
