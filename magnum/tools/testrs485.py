@@ -15,7 +15,7 @@ import time
 from magnum import magnum
 def main():
     parser = argparse.ArgumentParser(description="Magnum RS485 Reader Test", fromfile_prefix_chars='@',
-                                    prog="magtest", epilog="\nIf neither --showpackets or --showjson enabled, default is --showpackets")
+                                     prog="magtest", epilog="If neither --showpackets or --showjson enabled, default is --showpackets")
     parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
                         help="Serial device name (default: %(default)s)")
     parser.add_argument("-p", "--showpackets", action="store_true",
@@ -27,7 +27,7 @@ def main():
                         help="Number of packets to generate (default: %(default)s)")
     group.add_argument("-t", "--timeout", default=0.001, type=float,
                         help="Timeout for serial read - float between 0 and 1 second (default: %(default)s)")
-    group.add_argument("-nc", "--nocleanup", action="store_false",
+    group.add_argument("-nc", "--nocleanup", action="store_true",
                         help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
 
     args = parser.parse_args()
@@ -37,6 +37,7 @@ def main():
         parser.error("argument -n/--packets: must be greater than 0.")
     if not args.showpackets and not args.showjson:
         args.showpackets = True
+    args.cleanpackets = not args.cleanpackets
     print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
     try:
         reader = magnum.Magnum(device=args.device, packets=args.packets,
@@ -49,7 +50,6 @@ def main():
         start = time.time()
         packets = reader.getPackets()
         duration = time.time() - start
-
         unknown = 0
         if args.showpackets:
             print("Packets")

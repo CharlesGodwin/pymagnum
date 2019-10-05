@@ -19,60 +19,63 @@ BMK = "BMK"
 PT100 = "PT100"
 RTR = "RTR"
 
-AGS_A1 = "AGS_A1"
-AGS_A2 = "AGS_A2"
-BMK_81 = "BMK_81"
-INV = "INVERTER"
-PT_C1 = "PT_C1"
-PT_C2 = "PT_C2"
-PT_C3 = "PT_C3"
-PT_C4 = "PT_C4"
-REMOTE_00 = "REMOTE_00"
-REMOTE_11 = "REMOTE_11"
-REMOTE_80 = "REMOTE_80"
-REMOTE_A0 = "REMOTE_A0"
-REMOTE_A1 = "REMOTE_A1"
-REMOTE_A2 = "REMOTE_A2"
-REMOTE_A3 = "REMOTE_A3"
-REMOTE_A4 = "REMOTE_A4"
-REMOTE_C0 = "REMOTE_C0"
-REMOTE_C1 = "REMOTE_C1"
-REMOTE_C2 = "REMOTE_C2"
-REMOTE_C3 = "REMOTE_C3"
-REMOTE_D0 = "REMOTE_D0"
-RTR_91 = "RTR_91"
-sevenzeros = bytes([0, 0, 0, 0, 0, 0, 0])
-#
-# refer to struct.unpack for format description
-#
-default_remote = 'BBBBBbBBBBBBBB'
-formats = {
-    AGS_A1: 'BbBbBB',
-    AGS_A2: 'BBBHB',
-    BMK_81:  'BbHhHHhHHBB',
-    INV: 'BBhhBBbbBBBBBBBBhb',
-    PT_C1: 'BbBBHhhbbbbbb',
-    PT_C2: 'BbBHBbBBBB',
-    PT_C3: 'BH11B',
-    PT_C4: '7B',
-    REMOTE_00: default_remote + '7B',
-    REMOTE_11: default_remote + '7B',  # just the first 2 bytes count
-    REMOTE_80: default_remote + 'bbbb3B',
-    REMOTE_A0: default_remote + 'BBBbBBB',
-    REMOTE_A1: default_remote + '7B',
-    REMOTE_A2: default_remote + 'bb5B',
-    REMOTE_A3: default_remote + '7B',
-    REMOTE_A4: default_remote + '7B',
-    REMOTE_C0: default_remote + 'bbbbHB',
-    REMOTE_C1: default_remote + 'BBbbbbB',
-    REMOTE_C2: default_remote + 'BBbbBbB',
-    REMOTE_C3: default_remote + 'BBBBBbB',
-    REMOTE_D0: default_remote + '7B',
-    RTR_91: 'BB',
-    UNKNOWN: ''
-}
-
 class Magnum:
+    #
+    #  Names of all the packet type
+    #
+    AGS_A1 = "AGS_A1"
+    AGS_A2 = "AGS_A2"
+    BMK_81 = "BMK_81"
+    INV = "INVERTER"
+    PT_C1 = "PT_C1"
+    PT_C2 = "PT_C2"
+    PT_C3 = "PT_C3"
+    PT_C4 = "PT_C4"
+    REMOTE_00 = "REMOTE_00"
+    REMOTE_11 = "REMOTE_11"
+    REMOTE_80 = "REMOTE_80"
+    REMOTE_A0 = "REMOTE_A0"
+    REMOTE_A1 = "REMOTE_A1"
+    REMOTE_A2 = "REMOTE_A2"
+    REMOTE_A3 = "REMOTE_A3"
+    REMOTE_A4 = "REMOTE_A4"
+    REMOTE_C0 = "REMOTE_C0"
+    REMOTE_C1 = "REMOTE_C1"
+    REMOTE_C2 = "REMOTE_C2"
+    REMOTE_C3 = "REMOTE_C3"
+    REMOTE_D0 = "REMOTE_D0"
+    RTR_91 = "RTR_91"
+    sevenzeros = bytes([0, 0, 0, 0, 0, 0, 0])
+    #
+    # refer to struct.unpack for format description
+    #
+    default_remote = 'BBBBBbBBBBBBBB'
+    formats = {
+        AGS_A1: 'BbBbBB',
+        AGS_A2: 'BBBHB',
+        BMK_81:  'BbHhHHhHHBB',
+        INV: 'BBhhBBbbBBBBBBBBhb',
+        PT_C1: 'BbBBHhhbbbbbb',
+        PT_C2: 'BbBHBbBBBB',
+        PT_C3: 'BH11B',
+        PT_C4: '7B',
+        REMOTE_00: default_remote + '7B',
+        REMOTE_11: default_remote + '7B',  # just the first 2 bytes count
+        REMOTE_80: default_remote + 'bbbb3B',
+        REMOTE_A0: default_remote + 'BBBbBBB',
+        REMOTE_A1: default_remote + '7B',
+        REMOTE_A2: default_remote + 'bb5B',
+        REMOTE_A3: default_remote + '7B',
+        REMOTE_A4: default_remote + '7B',
+        REMOTE_C0: default_remote + 'bbbbHB',
+        REMOTE_C1: default_remote + 'BBbbbbB',
+        REMOTE_C2: default_remote + 'BBbbBbB',
+        REMOTE_C3: default_remote + 'BBBBBbB',
+        REMOTE_D0: default_remote + '7B',
+        RTR_91: 'BB',
+        UNKNOWN: ''
+    }
+
     multiplier = 1
     def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, id=None, cleanpackets=True):
         self.packetcount = packets
@@ -96,25 +99,33 @@ class Magnum:
         self.inverter_revision = -1
         self.inverter_model = -1
     #
-    # returns a list of tupples of message type, bytes of packet, and unpacked packet values
+    # returns a list of tupples of {message type, bytes of packet, and tupple of {unpacked packet values)}
     #
-
     def getPackets(self):
         packet = bytearray()
         packets = []
+        #
+        # open port every time
+        #
         self.reader.open()
+        #
+        # wait to see if there is any traffic on the device
+        #
         time.sleep(0.25)
         if self.reader.inWaiting() == 0:
             raise ConnectionError("There doesn't seem to be a network")
         packetsleft = self.packetcount
         self.reader.flushInput()
         #
-        # Start of packet reads
+        # Start of packet reads into a list of bytearray()
         # This is a tight loop
         #
         while packetsleft > 0:
             readbytes = self.reader.read(self.reader.in_waiting or 1)
             packet += readbytes
+            #
+            # assumes an empty read is an inter packet gap
+            #
             if len(readbytes) == 0 and len(packet) != 0:
                 packets.append(packet)
                 packetsleft -= 1
@@ -130,10 +141,18 @@ class Magnum:
             if message[0] == UNKNOWN:
                 unknown += 1
             messages.append(message)
+        #
+        # if there at least 2 UNKNOWN packets
+        # attemtp to clean them up
+        #
         if unknown > 1 and self.cleanpackets:
             messages = self.cleanup(messages)
         return messages
 
+    #
+    # based on what we know from ME doucmentation
+    # attempt to build a know packet and unpack its data into values
+    #
     def parsePacket(self, packet):
         if len(packet) == 22:
             packet = packet[:21]
@@ -144,79 +163,78 @@ class Magnum:
             lastbyte = packet[-1]
             if packetLen == 2:
                 if firstbyte == 0x91:
-                    packetType = RTR_91
+                    packetType = Magnum.RTR_91
             elif packetLen == 6:
                 if firstbyte == 0xa1:
-                    packetType = AGS_A1
+                    packetType = Magnum.AGS_A1
                 elif firstbyte == 0xa2:
-                    packetType = AGS_A2
+                    packetType = Magnum.AGS_A2
             elif packetLen == 8:
                 if firstbyte == 0xC4:
-                    packetType = PT_C4
+                    packetType = Magnum.PT_C4
             elif packetLen == 13:
                 if firstbyte == 0xC2:
-                    packetType = PT_C2
+                    packetType = Magnum.PT_C2
             elif packetLen == 14:
                 if firstbyte == 0xC3:
-                    packetType = PT_C3
+                    packetType = Magnum.PT_C3
             elif packetLen == 16:
                 if firstbyte == 0xC1:
-                    packetType = PT_C1
+                    packetType = Magnum.PT_C1
             elif packetLen == 18:
                 if firstbyte == 0x81:
-                    packetType = BMK_81
+                    packetType = Magnum.BMK_81
             elif packetLen == 21:
                 version = packet[10]
                 model = packet[14]
                 if lastbyte == 0 and firstbyte == 0:
                     #
-                    #  There is an undocumented Remote message generated with seven 0x00 bytes at
-                    #  the end. This code distinguishes it from a Inverter record with status byte 0  = 0x00
-
+                    #  There is an undocumented Remote message generated with seven 0x00 bytes a
+                    #  the end. This code distinguishes it from a Inverter record with status byte 0  = 0x0
+                    #
                     #  Also the ME-ARC sends a spurious record with a zero end byte
                     #
-
-                    if packet[:14] == sevenzeros:
-                        packetType = REMOTE_00
+                    if packet[:14] == Magnum.sevenzeros:
+                        packetType = Magnum.REMOTE_00
                     else:
                         if version == (self.inverter_revision and model == self.inverter_model) or self.inverter_revision == -1:
-                            packetType = INV
+                            packetType = Magnum.INV
                         else:
-                            packetType = REMOTE_00
+                            packetType = Magnum.REMOTE_00
                 else:
                     if lastbyte == 0:
                         if version == (self.inverter_revision and model == self.inverter_model) or self.inverter_revision == -1:
-                            packetType = INV
+                            packetType = Magnum.INV
                             if self.inverter_revision == -1:
                                 self.inverter_revision = version
                                 self.inverter_model = model
                         else:
-                            packetType = REMOTE_00
+                            packetType = Magnum.REMOTE_00
                     elif lastbyte == 0xa0:
-                        packetType = REMOTE_A0
+                        packetType = Magnum.REMOTE_A0
                     elif lastbyte == 0xa1:
-                        packetType = REMOTE_A1
+                        packetType = Magnum.REMOTE_A1
                     elif lastbyte == 0xa2:
-                        packetType = REMOTE_A2
+                        packetType = Magnum.REMOTE_A2
                     elif lastbyte == 0xa3:
-                        packetType = REMOTE_A3
+                        packetType = Magnum.REMOTE_A3
                     elif lastbyte == 0xa4:
-                        packetType = REMOTE_A4
+                        packetType = Magnum.REMOTE_A4
                     elif lastbyte == 0x80:
-                        packetType = REMOTE_80
+                        packetType = Magnum.REMOTE_80
                     elif lastbyte == 0xC0:
-                        packetType = REMOTE_C0
+                        packetType = Magnum.REMOTE_C0
                     elif lastbyte == 0xC1:
-                        packetType = REMOTE_C1
+                        packetType = Magnum.REMOTE_C1
                     elif lastbyte == 0xC2:
-                        packetType = REMOTE_C2
+                        packetType = Magnum.REMOTE_C2
                     elif lastbyte == 0xC3:
-                        packetType = REMOTE_C3
+                        packetType = Magnum.REMOTE_C3
                     elif lastbyte == 0x11:
-                        packetType = REMOTE_11
+                        packetType = Magnum.REMOTE_11
                     elif lastbyte == 0xD0:
-                        packetType = REMOTE_D0
-            mask = ">" + formats[packetType]
+                        packetType = Magnum.REMOTE_D0
+            mask = ">" + Magnum.formats[packetType]
             if len(mask) > 1:
                 try:
                     fields = unpack(mask, packet)
@@ -228,6 +246,10 @@ class Magnum:
                 fields = {}
             return([packetType, packet, fields])
 
+    #
+    # cleanup looks for consecutive UNKNOWN packet pairs and concatenates the pair
+    # and attempts to parse the result. It has reasonable success
+    #
     def cleanup(self, messages):
         cleaned = []
         lastone = len(messages) - 2
@@ -247,38 +269,57 @@ class Magnum:
                     cleaned.append(newmessage)
         return cleaned
     #
-    #     returns an array of device orderded dictionary
+    #     returns an array of device ordered dictionary
     #
-
+    #  Each class is instantiated only once per run time execution
+    #  This allows an oblect to reflect the latest CUMULATIVE value for the packets.
+    # This is useful for PT100 and AGS packets which are not too numerous
+    #
     def getModels(self, packets=None):
         workpackets = packets if packets else self.getPackets()
+        # pass all the packets to the correct object
         for packet in workpackets:
             packetType = packet[0]
-            if packetType == INV:
+            if packetType == Magnum.INV:
                 if self.inverter == None:
                     self.inverter = InverterDevice(id=self.id)
                 self.inverter.parse(packet)
-            elif packetType in (REMOTE_00, REMOTE_11, REMOTE_80, REMOTE_A0, REMOTE_A1, REMOTE_A2, REMOTE_A3, REMOTE_A4, REMOTE_C0, REMOTE_C1, REMOTE_C2, REMOTE_C3, REMOTE_D0):
+            elif packetType in (Magnum.REMOTE_00, 
+                                Magnum.REMOTE_11, 
+                                Magnum.REMOTE_80, 
+                                Magnum.REMOTE_A0, 
+                                Magnum.REMOTE_A1, 
+                                Magnum.REMOTE_A2, 
+                                Magnum.REMOTE_A3, 
+                                Magnum.REMOTE_A4, 
+                                Magnum.REMOTE_C0, 
+                                Magnum.REMOTE_C1, 
+                                Magnum.REMOTE_C2, 
+                                Magnum.REMOTE_C3, 
+                                Magnum.REMOTE_D0):
                 if self.remote == None:
                     self.remote = RemoteDevice(id=self.id)
                 self.remote.parse(packet)
-            elif packetType == BMK_81:
+            elif packetType == Magnum.BMK_81:
                 if self.bmk == None:
                     self.bmk = BMKDevice(id=self.id)
                 self.bmk.parse(packet)
-            elif packetType in (AGS_A1, AGS_A2):
+            elif packetType in (Magnum.AGS_A1, Magnum.AGS_A2):
                 if self.ags == None:
                     self.ags = AGSDevice(id=self.id)
                 self.ags.parse(packet)
-            elif packetType == RTR_91:
+            elif packetType == Magnum.RTR_91:
                 if self.rtr == None:
                     self.rtr = RTRDevice(id=self.id)
                 self.rtr.parse(packet)
-            elif packetType in (PT_C1, PT_C2, PT_C3, PT_C4):
+            elif packetType in (Magnum.PT_C1, Magnum.PT_C2, Magnum.PT_C3, Magnum.PT_C4):
                 if self.pt100 == None:
                     self.pt100 = PT100Device(id=self.id)
                 self.pt100.parse(packet)
         if self.remote:
+            #
+            # remove extraneous REMOTE fields if corresponding device is not present
+            #
             if self.bmk == None:
                 self.remote.removeBMK()
             if self.ags == None:
@@ -288,9 +329,9 @@ class Magnum:
         models = []
         for model in [self.inverter, self.remote, self.bmk, self.ags, self.rtr, self.pt100]:
             if model:
-                modeldict = model.getModel()
-                if modeldict:
-                    models.append(modeldict)
+                modelinfo = model.getModel()
+                if modelinfo:
+                    models.append(modelinfo)
         return models
 
 #
@@ -321,7 +362,7 @@ class AGSDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
-        if packetType == AGS_A1:
+        if packetType == Magnum.AGS_A1:
             self.data["status"] = unpacked[1]
             self.data["revision"] = str(round(unpacked[2] / 10, 1))
             self.data["temp"] = unpacked[3]
@@ -331,7 +372,7 @@ class AGSDevice:
             self.setStatusText()
             self.data["vdc"] = round(unpacked[5] / 10 * Magnum.multiplier, 2)
             self.setRunning()
-        elif packetType == AGS_A2:
+        elif packetType == Magnum.AGS_A2:
             self.data["gen_last_run"] = unpacked[1]
             self.data["last_full_soc"] = unpacked[2]
             self.data["gen_total_run"] = unpacked[3]
@@ -427,7 +468,7 @@ class BMKDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
-        if packetType == BMK_81:
+        if packetType == Magnum.BMK_81:
             self.data["soc"] = unpacked[1]
             self.data["vdc"] = round(unpacked[2] / 100, 2)
             self.data["adc"] = round(unpacked[3] / 10, 2)
@@ -483,7 +524,7 @@ class InverterDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
-        if packetType == INV:
+        if packetType == Magnum.INV:
             self.data["mode"] = unpacked[0]
             self.data["fault"] = unpacked[1]
             self.data["vdc"] = unpacked[2] / 10
@@ -761,7 +802,7 @@ class PT100Device:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
-        if packetType == PT_C1:
+        if packetType == Magnum.PT_C1:
             #  skip header
             self.data['address'] = unpacked[1] >> 5
             byte_value = unpacked[2]
@@ -861,7 +902,7 @@ class PT100Device:
                 self.data['fault_text'] = "High Battery Temp Fault"
             else:
                 self.data['fault_text'] = "unknown"
-        elif packetType == PT_C2:
+        elif packetType == Magnum.PT_C2:
             self.data['address'] = unpacked[1] >> 5
             self.data['lifetime_kwhrs'] = unpacked[2] * 10
             self.data['resettable_kwhrs'] = unpacked[3] / 10
@@ -873,7 +914,7 @@ class PT100Device:
             self.data['model'] = unpacked[7]
             self.data['output_current_rating'] = unpacked[8]
             self.data['input_voltage_rating'] = unpacked[9]
-        elif packetType == PT_C3:
+        elif packetType == Magnum.PT_C3:
             short_value = unpacked[1]
             self.data['address'] = ((short_value & 0xE000) >> 13)
             self.data['record'] = (short_value & 0x1ffffff)
@@ -888,7 +929,7 @@ class PT100Device:
             self.data['daily_amp_hours'] = unpacked[10]
             self.data['peak_daily_power'] = unpacked[11]
             self.data['peak_daily_power_time'] = unpacked[12] / 10
-        elif packetType == PT_C4:
+        elif packetType == Magnum.PT_C4:
             byte_value = unpacked[1]
             self.data['address'] = ((byte_value & 0xE0) >> 5)
             self.data['fault_number'] = (byte_value & 0x1f)
@@ -1042,19 +1083,19 @@ class RemoteDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
-        if packetType == REMOTE_00:
+        if packetType == Magnum.REMOTE_00:
             self.setBaseValues(unpacked)
-        elif packetType == REMOTE_11:
+        elif packetType == Magnum.REMOTE_11:
             self.setBaseValues(unpacked)
             self.data["mshinputamps"] = unpacked[14]
             self.data["mshcutoutvoltage"] = unpacked[15]
-        elif packetType == REMOTE_80:
+        elif packetType == Magnum.REMOTE_80:
             self.setBaseValues(unpacked)
             self.data["remotetimehours"] = unpacked[14]
             self.data["remotetimemins"] = unpacked[15]
             self.data["batteryefficiency"] = unpacked[16]
             self.data["resetbmk"] = unpacked[17]
-        elif packetType == REMOTE_A0:
+        elif packetType == Magnum.REMOTE_A0:
             self.setBaseValues(unpacked)
             self.data["remotetimehours"] = unpacked[14]
             self.data["remotetimemins"] = unpacked[15]
@@ -1065,7 +1106,7 @@ class RemoteDevice:
             value = unpacked[18] * Magnum.multiplier
             self.data["startvdc"] = value / 10
             self.data["quiettime"] = unpacked[19]
-        elif packetType == REMOTE_A1:
+        elif packetType == Magnum.REMOTE_A1:
             self.setBaseValues(unpacked)
             minutes = unpacked[14] * 15
             self.data["begintime"] = ((minutes // 60) * 100) + (minutes % 60)
@@ -1082,7 +1123,7 @@ class RemoteDevice:
                 self.data["voltstopdelay"] = (
                     self.data["voltstopdelay"] & 0x0f) * 60
             self.data["maxrun"] = unpacked[19] / 10
-        elif packetType == REMOTE_A2:
+        elif packetType == Magnum.REMOTE_A2:
             self.setBaseValues(unpacked)
             self.data["socstart"] = unpacked[14]
             self.data["socstop"] = unpacked[15]
@@ -1096,7 +1137,7 @@ class RemoteDevice:
             if self.data["ampsstopdelay"] > 127:
                 self.data["ampsstopdelay"] = (
                     self.data["ampsstopdelay"] & 0x0f) * 60
-        elif packetType == REMOTE_A3:
+        elif packetType == Magnum.REMOTE_A3:
             self.setBaseValues(unpacked)
             minutes = unpacked[14] * 15
             self.data["quietbegintime"] = (
@@ -1109,7 +1150,7 @@ class RemoteDevice:
                 (minutes // 60) * 100) + (minutes % 60)
             self.data["runtime"] = unpacked[17] / 10
             self.data["topoff"] = unpacked[18]
-        elif packetType == REMOTE_A4:
+        elif packetType == Magnum.REMOTE_A4:
             self.setBaseValues(unpacked)
             self.data["warmup"] = unpacked[14]
             if self.data["warmup"] > 127:
@@ -1117,7 +1158,7 @@ class RemoteDevice:
             self.data["cool"] = unpacked[15]
             if self.data["cool"] > 127:
                 self.data["cool"] = (self.data["cool"] & 0x0f) * 60
-        elif packetType == REMOTE_C0:
+        elif packetType == Magnum.REMOTE_C0:
             self.setBaseValues(unpacked)
             self.data["forcechgode"] = unpacked[14] & 0x03
             byte_value = unpacked[15]
@@ -1128,7 +1169,7 @@ class RemoteDevice:
             self.data["address"] = byte_value >> 5
             self.data["packet"] = byte_value & 0x1f
             self.data["lognumber"] = unpacked[18]
-        elif packetType == REMOTE_C1:
+        elif packetType == Magnum.REMOTE_C1:
             self.setBaseValues(unpacked)
             self.data["relayonvdc"] = unpacked[14] / 10 * Magnum.multiplier
             self.data["relayoffvdc"] = unpacked[15] / 10 * Magnum.multiplier
@@ -1142,7 +1183,7 @@ class RemoteDevice:
                     60 * (0 - self.data["relaydelayoffseconds"]))
             self.data["batterytempcomp"] = unpacked[18]
             self.data["powersavetime"] = unpacked[19] >> 2
-        elif packetType == REMOTE_C2:
+        elif packetType == Magnum.REMOTE_C2:
             self.setBaseValues(unpacked)
             self.data["alarmonvdc"] = unpacked[14] / 10 * Magnum.multiplier
             self.data["alarmoffvdc"] = unpacked[15] / 10 * Magnum.multiplier
@@ -1158,7 +1199,7 @@ class RemoteDevice:
             byte_value = unpacked[19]
             self.data["chargerate"] = (byte_value & 0xFE) >> 1
             self.data["rebulkonsunup"] = byte_value & 0x01
-        elif packetType == REMOTE_C3:
+        elif packetType == Magnum.REMOTE_C3:
             self.setBaseValues(unpacked)
             self.data["AbsorbVoltage"] = unpacked[14] / 10 * Magnum.multiplier
             self.data["FloatVoltage"] = unpacked[15] / 10 * Magnum.multiplier
@@ -1168,7 +1209,7 @@ class RemoteDevice:
             # akip a  byte"]
             self.data["RebulkVoltage"] = unpacked[19] / 10 * Magnum.multiplier
             self.data["BatteryTemperatureCompensation"] = unpacked[20]
-        elif packetType == REMOTE_D0:
+        elif packetType == Magnum.REMOTE_D0:
             self.setBaseValues(unpacked)
             # I have no idea what a D0 is
 
@@ -1207,7 +1248,7 @@ class RTRDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
-        if packetType == RTR_91:
+        if packetType == Magnum.RTR_91:
             self.data["revision"] = str(round(unpacked[1] / 10))
 
     def getModel(self):
