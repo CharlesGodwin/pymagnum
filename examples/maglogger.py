@@ -59,16 +59,18 @@ parser.add_argument("-s", "--server", default="localhost",
                     help="The IP address or URL of Magnum Server (default: %(default)s)")
 parser.add_argument("-p", "--port", type=int, default=17223,
                     help="The port on the server (default: %(default)s)")
-parser.add_argument("-t", "--time", default=60, type=int, dest='interval',
-                    help="Seconds between logging (default: %(default)s)")
+parser.add_argument("-i", "--interval", default=60, type=int, dest='interval',
+                    help="Interval, in seconds, between logging (default: %(default)s)")
 group = parser.add_argument_group("seldom used arguments")
 group.add_argument("-d", "--duplicates", action="store_true",
                    help="Log duplicate entries (default: %(default)s)", dest="allowduplicates")
+group.add_argument("--trace", action="store_false", help="Add packet info to JSON data (default: %(default)s)")
+                   
 args = parser.parse_args()
 args.logfile.close()
 if args.interval < 10 or args.interval > (60*60):
     parser.error(
-        "argument -t/--time: must be between 10 seconds and 3600 (1 hour)")
+        "argument -i/--iinterval: must be between 10 seconds and 3600 (1 hour)")
 print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
 url = "http://{0}:{1}".format(args.server, args.port)
 print("Logging to:{0} Every:{2} seconds Using: {1} ".format(

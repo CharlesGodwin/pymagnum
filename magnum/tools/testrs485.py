@@ -29,7 +29,7 @@ def main():
                         help="Timeout for serial read - float between 0 and 1 second (default: %(default)s)")
     group.add_argument("-nc", "--nocleanup", action="store_true",
                         help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
-
+    group.add_argument("--trace", action="store_true", help="Add packet info to JSON data (default: %(default)s)")
     args = parser.parse_args()
     if args.timeout < 0 or args.timeout > 1.0:
         parser.error("argument -t/--timeout: must be a number (float) between 0 and 1")
@@ -41,7 +41,7 @@ def main():
     print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
     try:
         reader = magnum.Magnum(device=args.device, packets=args.packets,
-                            timeout=args.timeout, cleanpackets=args.cleanpackets)
+                            timeout=args.timeout, cleanpackets=args.cleanpackets, trace=args.trace)
     except:
         print("Error detected attempting to open serial device")
         traceback.print_exc()

@@ -77,11 +77,12 @@ class Magnum:
     }
 
     multiplier = 1
-    def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, id=None, cleanpackets=True):
+    def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, id=None, cleanpackets=True, trace=False):
         self.packetcount = packets
         self.timeout = timeout
         self.id = id
         self.cleanpackets = cleanpackets
+        self.trace = trace
         self.reader = serial.serial_for_url(device,
                                             baudrate=19200,
                                             bytesize=8,
@@ -282,7 +283,7 @@ class Magnum:
             packetType = packet[0]
             if packetType == Magnum.INV:
                 if self.inverter == None:
-                    self.inverter = InverterDevice(id=self.id)
+                    self.inverter = InverterDevice(id=self.id, trace=self.trace)
                 self.inverter.parse(packet)
             elif packetType in (Magnum.REMOTE_00, 
                                 Magnum.REMOTE_11, 
@@ -298,23 +299,23 @@ class Magnum:
                                 Magnum.REMOTE_C3, 
                                 Magnum.REMOTE_D0):
                 if self.remote == None:
-                    self.remote = RemoteDevice(id=self.id)
+                    self.remote = RemoteDevice(id=self.id, trace=self.trace)
                 self.remote.parse(packet)
             elif packetType == Magnum.BMK_81:
                 if self.bmk == None:
-                    self.bmk = BMKDevice(id=self.id)
+                    self.bmk = BMKDevice(id=self.id, trace=self.trace)
                 self.bmk.parse(packet)
             elif packetType in (Magnum.AGS_A1, Magnum.AGS_A2):
                 if self.ags == None:
-                    self.ags = AGSDevice(id=self.id)
+                    self.ags = AGSDevice(id=self.id, trace=self.trace)
                 self.ags.parse(packet)
             elif packetType == Magnum.RTR_91:
                 if self.rtr == None:
-                    self.rtr = RTRDevice(id=self.id)
+                    self.rtr = RTRDevice(id=self.id, trace=self.trace)
                 self.rtr.parse(packet)
             elif packetType in (Magnum.PT_C1, Magnum.PT_C2, Magnum.PT_C3, Magnum.PT_C4):
                 if self.pt100 == None:
-                    self.pt100 = PT100Device(id=self.id)
+                    self.pt100 = PT100Device(id=self.id, trace=self.trace)
                 self.pt100.parse(packet)
         if self.remote:
             #
@@ -340,8 +341,8 @@ class Magnum:
 
 class AGSDevice:
 
-    def __init__(self, id=None):
-
+    def __init__(self, id=None, trace=False):
+        self.trace = trace
         self.data = OrderedDict()
         self.model = OrderedDict()
         self.model["model"] = AGS
@@ -362,6 +363,8 @@ class AGSDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
+        if self.trace:
+            self.data[packetType] = packet[1].hex().upper()
         if packetType == Magnum.AGS_A1:
             self.data["status"] = unpacked[1]
             self.data["revision"] = str(round(unpacked[2] / 10, 1))
@@ -445,8 +448,8 @@ class AGSDevice:
         return self.model
 
 class BMKDevice:
-    def __init__(self, id=None):
-
+    def __init__(self, id=None, trace=False):
+        self.trace = trace
         self.data = OrderedDict()
         self.model = OrderedDict()
         self.model["model"] = BMK
@@ -468,6 +471,8 @@ class BMKDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
+        if self.trace:
+            self.data[packetType] = packet[1].hex().upper()
         if packetType == Magnum.BMK_81:
             self.data["soc"] = unpacked[1]
             self.data["vdc"] = round(unpacked[2] / 100, 2)
@@ -490,7 +495,8 @@ class BMKDevice:
         return self.model
 
 class InverterDevice:
-    def __init__(self, id=None):
+    def __init__(self, id=None, trace=False):
+        self.trace = trace
         self.data = OrderedDict()
         self.model = OrderedDict()
         self.model["model"] = INVERTER
@@ -524,6 +530,8 @@ class InverterDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
+        if self.trace:
+            self.data[packetType] = packet[1].hex().upper()
         if packetType == Magnum.INV:
             self.data["mode"] = unpacked[0]
             self.data["fault"] = unpacked[1]
@@ -747,7 +755,8 @@ class InverterDevice:
         return self.model
 
 class PT100Device:
-    def __init__(self, id=None):
+    def __init__(self, id=None, trace=False):
+        self.trace = trace
         self.data = OrderedDict()
         self.model = OrderedDict()
         self.model["model"] = PT100
@@ -802,6 +811,8 @@ class PT100Device:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
+        if self.trace:
+            self.data[packetType] = packet[1].hex().upper()
         if packetType == Magnum.PT_C1:
             #  skip header
             self.data['address'] = unpacked[1] >> 5
@@ -959,7 +970,8 @@ class RemoteDevice:
                "rebulkonsunup", "AbsorbVoltage", "FloatVoltage", "EqualizeVoltage", "AbsorbTime",
                "RebulkVoltage", "BatteryTemperatureCompensation"]
 
-    def __init__(self, id=None):
+    def __init__(self, id=None, trace=False):
+        self.trace = trace
         self.data = OrderedDict()
         self.model = OrderedDict()
         self.model["model"] = REMOTE
@@ -1083,6 +1095,8 @@ class RemoteDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
+        if self.trace:
+            self.data[packetType] = packet[1].hex().upper()
         if packetType == Magnum.REMOTE_00:
             self.setBaseValues(unpacked)
         elif packetType == Magnum.REMOTE_11:
@@ -1236,7 +1250,8 @@ class RemoteDevice:
         return self.model
 
 class RTRDevice:
-    def __init__(self, id=None):
+    def __init__(self, id=None, trace=False):
+        self.trace = trace
         self.data = OrderedDict()
         self.model = OrderedDict()
         self.model["model"] = RTR
@@ -1248,6 +1263,8 @@ class RTRDevice:
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
+        if self.trace:
+            self.data[packetType] = packet[1].hex().upper()
         if packetType == Magnum.RTR_91:
             self.data["revision"] = str(round(unpacked[1] / 10))
 
