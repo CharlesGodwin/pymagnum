@@ -17,8 +17,8 @@ In order to use this software you need to have a RS485 adaptor connected to a Ma
 You will need pip3 installed. On a Pi use:  
 `sudo apt install python3-pip`
 
-Then install the sftware package using:  
-`sudo pip3 install -i https://test.pypi.org/simple/ pymagnum`
+Then install or update the software package using:  
+`sudo pip3 install --upgrade  -i https://test.pypi.org/simple/ pymagnum`
 
 Once this software is installed test the interconnect hardware:
 
@@ -44,12 +44,10 @@ Packets:45 in 1.10 seconds
 </pre>
 If nothing happens or you get a lot of UNKNOWN try reversing your two wires and repeating the test. If that fails contact the author
 
-## Update or remove software
+## Remove software
 If you want to remove the software use:  
 `sudo pip3 uninstall pymagnum`
 
-If you need to update to a newer version, use:  
-`sudo pip3 install --upgrade -i https://test.pypi.org/simple/ pymagnum`
 
 ## Usage
 There are several example programs available on the git site.
@@ -63,7 +61,7 @@ models = reader.getModels()
 print(models)
 </pre>
 
-You need to import the magnum module, instantiate the class with optional parameters (mode documentation soon) and then get an instance of the models for processing. If you need a time series just loop around the getModels() function/ method.
+You need to import the magnum module, instantiate the class with optional parameters (more documentation soon) and then get an instance of the models for processing. If you need a time series just loop around the getModels() method.
 
 Copyright (c) 2018-2019 Charles Godwin <magnum@godwin.ca>
 
