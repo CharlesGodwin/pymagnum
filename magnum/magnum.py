@@ -338,7 +338,6 @@ class Magnum:
 #
 # All the device classes
 #
-
 class AGSDevice:
 
     def __init__(self, id=None, trace=False):
