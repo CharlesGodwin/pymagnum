@@ -16,7 +16,6 @@
 # payload
 # {
 # 	"datetime": "2019-10-08 12:49:14-04:00",
-# 	"timestamp": 1570553354,
 # 	"model": "INVERTER",
 # 	"data": {
 # 		"revision": "5.1",
@@ -52,39 +51,34 @@ import uuid
 from collections import OrderedDict
 from datetime import datetime
 
-# from magnum import magnum
+import paho.mqtt.client as mqtt
+
 import magnum
 
-try:
-    import paho.mqtt.client as mqtt
-except:
-    print("You need to install MQTT support. Use 'sudo pip install paho-mqtt'")
-    print("\tRefer to https://pypi.org/project/paho-mqtt/")
-    exit(2)
-
-parser = argparse.ArgumentParser(description="Magnum Data Logger")
-logger = parser.add_argument_group("Logger arguments")
-reader = parser.add_argument_group("Magnum Reader arguments")
-logger.add_argument("-i", "--interval", default=60, type=int, dest='interval',
-                    help="Interval, in seconds, between logging (default: %(default)s)")
-logger.add_argument("-b", "--broker", default='localhost',
-                    help="MQTT Broker address (default: %(default)s)")
-logger.add_argument("-p", "--port", default=1883, type=int,
-                    help="Broker port (default: %(default)s)")
+parser = argparse.ArgumentParser(description="Magnum Data MQTT Publisher",
+                                 epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
+logger = parser.add_argument_group("MQTT publish")
+reader = parser.add_argument_group("Magnum reader")
+seldom = parser.add_argument_group("Seldom used")
 logger.add_argument("-t", "--topic", default='magnum/',
                     help="Topic prefix (default: %(default)s)")
-reader.add_argument("-d", "--device", default="/dev/ttyUSB0",
-                    help="Serial device name (default: %(default)s)")
+logger.add_argument("-b", "--broker", default='localhost',
+                    help="MQTT Broker address (default: %(default)s)")
+seldom.add_argument("-p", "--port", default=1883, type=int,
+                    help="Broker port (default: %(default)s)")
+logger.add_argument("-i", "--interval", default=60, type=int, dest='interval',
+                    help="Interval, in seconds, between publishing (default: %(default)s)")
 logger.add_argument("--duplicates", action="store_true",
                     help="Log duplicate entries (default: %(default)s)", dest="allowduplicates")
-# seldom_used = parser.add_argument_group("seldom used arguments")
-reader.add_argument("--packets", default=50, type=int,
-                    help="Number of packets to generate (default: %(default)s)")
-reader.add_argument("--timeout", default=0.005, type=float,
+reader.add_argument("-d", "--device", default="/dev/ttyUSB0",
+                    help="Serial device name (default: %(default)s)")
+seldom.add_argument("--packets", default=50, type=int,
+                    help="Number of packets to generate in reader (default: %(default)s)")
+seldom.add_argument("--timeout", default=0.005, type=float,
                     help="Timeout for serial read (default: %(default)s)")
-reader.add_argument("--trace", action="store_false",
-                    help="Add packet info to JSON data (default: %(default)s)")
-reader.add_argument("-nc", "--nocleanup", action="store_false",
+seldom.add_argument("--trace", action="store_false",
+                    help="Add raw packet info to data (default: %(default)s)")
+seldom.add_argument("-nc", "--nocleanup", action="store_false",
                     help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
 
 args = parser.parse_args()
@@ -94,10 +88,12 @@ if args.interval < 10 or args.interval > (60*60):
 if args.topic[-1] != "/":
     args.topic += "/"
 print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
-magnumReader = magnum.Magnum(device=args.device, packets=args.packets,
-                             timeout=args.timeout, cleanpackets=args.cleanpackets)
-print("Publishing to broker:{0} Every:{2} seconds Using: {1} ".format(
-    args.broker, args.device, args.interval))
+# following added to remove warning in vs code
+# pylint: disable=locally-disabled, not-callable
+magnumReader = magnum.Magnum(device=args.device, packets=args.packets, 
+                             timeout=args.timeout, cleanpackets=args.cleanpackets)  
+print("Publishing to broker:{0} Every:{2} seconds with {3}duplicates. Using: {1} ".format(
+    args.broker, args.device, args.interval, "no " if args.cleanpackets else ""))
 uuidstr = str(uuid.uuid1())
 client = mqtt.Client(client_id=uuidstr, clean_session=False)
 savedmodels = {}
@@ -109,31 +105,24 @@ while True:
             client.connect(args.broker)
             data = OrderedDict()
             now = int(time.time())
-            data["datetime"] = str(
-                datetime.fromtimestamp(now).astimezone())
-            data["timestamp"] = now
+            data["datetime"] = str(datetime.fromtimestamp(now).astimezone())
             for model in models:
                 topic = args.topic + model["model"].lower()
                 data["model"] = model["model"]
-                if "id" in model:
-                    data["id"] = model["id"]
-                    savedkey = data["model"]+str(data["id"]).lower()
-                    topic += "/" + model["id"]
-                else:
-                    savedkey = data["model"]
+                savedkey = data["model"]
                 duplicate = False
                 if not args.allowduplicates:
                     if savedkey in savedmodels:
                         if model["model"] == magnum.REMOTE:
-                            # normalize time of day for equal test
+                            # normalize time of day in remote data for equal test
                             for key in ["remotetimehours", "remotetimemins"]:
                                 savedmodels[savedkey][key] = model["data"][key]
                         if savedmodels[savedkey] == model["data"]:
                             duplicate = True
-                    savedmodels[savedkey] = model["data"]
                 if not duplicate:
+                    savedmodels[savedkey] = model["data"]
                     data["data"] = model["data"]
-                    client.publish(topic, payload=json.dumps(data))
+                    client.publish(topic, payload=json.dumps(data, indent=None, ensure_ascii=True, allow_nan=True, separators="`(',', ':')"))
             client.disconnect()
         except:
             traceback.print_exc()

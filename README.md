@@ -44,6 +44,34 @@ Packets:45 in 1.10 seconds
 </pre>
 If nothing happens or you get a lot of UNKNOWN try reversing your two wires and repeating the test. If that fails contact the author
 
+## Available Tools
+Tools will be added as they are developed. Tools are implemented as Python moduels and can be invloked with this generalized command:
+`python3 -m <tool name> --help`
+Currently the tools avaiable are:
+
+### testrs495
+This tool is described in the installation instructions.
+## mqttlogger
+This is a long running program that will send MQTT messages for each device in your system at the designated interval. Refer to thse links for information on implementing and using MQTT services.  
+http://mqtt.org
+https://mosquitto.org
+
+The regular options to set with this service are:
+<pre>
+MQTT publish:
+  -t TOPIC, --topic TOPIC
+                        Topic prefix (default: magnum/)
+  -b BROKER, --broker BROKER
+                        MQTT Broker address (default: localhost)
+  -i INTERVAL, --interval INTERVAL
+                        Interval, in seconds, between publishing (default: 60)
+  --duplicates          Log duplicate entries (default: False)
+
+Magnum reader:
+  -d DEVICE, --device DEVICE
+                        Serial device name (default: /dev/ttyUSB0)
+</pre>
+
 ## Remove software
 If you want to remove the software use:  
 `sudo pip3 uninstall pymagnum`

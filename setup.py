@@ -28,7 +28,7 @@ setup(name='pymagnum',
           "Operating System :: OS Independent",
           "Topic:: Home Automation",
       ],
-      install_requires=['pyserial'],
+      install_requires=['pyserial', 'paho-mqtt'],
       python_requires='>=3.4',
-      keywords='Magnum Energy Renewable Solar Network RS485'
+      keywords='Magnum Energy Renewable Solar Network RS485 IoT'
       )
