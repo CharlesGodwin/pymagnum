@@ -46,16 +46,19 @@ If nothing happens or you get a lot of UNKNOWN try reversing your two wires and 
 
 ## Available Tools
 Tools will be added as they are developed. Tools are implemented as Python moduels and can be invloked with this generalized command:
-`python3 -m <tool name> --help`
+`python3 -m magnum.tools.<tool name> --help`
 Currently the tools avaiable are:
 
 ### testrs495
 This tool is described in the installation instructions.
+`python3 -m magnum.tools.testrs485 --help`
+
 ## mqttlogger
 This is a long running program that will send MQTT messages for each device in your system at the designated interval. Refer to thse links for information on implementing and using MQTT services.  
 http://mqtt.org
 https://mosquitto.org
 
+`python3 -m magnum.tools.mqttlogger --help`
 The regular options to set with this service are:
 <pre>
 MQTT publish:

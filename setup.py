@@ -25,8 +25,7 @@ setup(name='pymagnum',
       classifiers=[
           "Programming Language :: Python :: 3 :: Only",
           "License :: OSI Approved :: BSD License",
-          "Operating System :: OS Independent",
-          "Topic:: Home Automation",
+          "Operating System :: OS Independent"
       ],
       install_requires=['pyserial', 'paho-mqtt'],
       python_requires='>=3.4',
