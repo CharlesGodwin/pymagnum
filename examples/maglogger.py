@@ -88,22 +88,18 @@ while True:
         data["timestamp"] = models["timestamp"]
         for model in models["models"]:
             data["model"] = model["model"]
-            if "id" in model:
-                data["id"] = model["id"]
-                savedkey = data["model"]+data["id"]
-            else:
-                savedkey = data["model"]
             duplicate = False
+            key = data["model"]
             if not args.allowduplicates:
-                if savedkey in savedmodels:
+                if key in savedmodels:
                     if model["model"] == magnum.REMOTE:
                         # normalize time of day for equal test
-                        for key in ["remotetimehours", "remotetimemins"]:
-                            savedmodels[savedkey][key] = model["data"][key]
-                    if savedmodels[savedkey] == model["data"]:
+                        for value in ["remotetimehours", "remotetimemins"]:
+                            savedmodels[key][value] = model["data"][value]
+                    if savedmodels[key] == model["data"]:
                         duplicate = True
-                savedmodels[savedkey] = model["data"]
             if not duplicate:
+                savedmodels[key] = model["data"]:
                 data["data"] = model["data"]
                 logfile.write(json.dumps(data))
                 logfile.write("\n")

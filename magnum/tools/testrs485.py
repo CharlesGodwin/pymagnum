@@ -9,13 +9,14 @@
 #
 import argparse
 import json
-import traceback
 import time
+import traceback
 
 from magnum import magnum
+
 def main():
     parser = argparse.ArgumentParser(description="Magnum RS485 Reader Test", fromfile_prefix_chars='@',
-                                     prog="magtest", epilog="If neither --showpackets or --showjson enabled, default is --showpackets")
+                                     prog="MagnumTest", epilog="If neither --showpackets or --showjson enabled, default is --showpackets")
     parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
                         help="Serial device name (default: %(default)s)")
     parser.add_argument("-p", "--showpackets", action="store_true",

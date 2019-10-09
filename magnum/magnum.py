@@ -4,6 +4,7 @@
 # SPDX-License-Identifier:    BSD-3-Clause
 #
 import time
+from copy import deepcopy
 from collections import OrderedDict
 from struct import calcsize
 from struct import error as unpack_error
@@ -77,10 +78,9 @@ class Magnum:
     }
 
     multiplier = 1
-    def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, id=None, cleanpackets=True, trace=False):
+    def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, cleanpackets=True, trace=False):
         self.packetcount = packets
         self.timeout = timeout
-        self.id = id
         self.cleanpackets = cleanpackets
         self.trace = trace
         self.reader = serial.serial_for_url(device,
@@ -274,16 +274,18 @@ class Magnum:
     #
     #  Each class is instantiated only once per run time execution
     #  This allows an oblect to reflect the latest CUMULATIVE value for the packets.
-    # This is useful for PT100 and AGS packets which are not too numerous
+    #  This is useful for PT100 and AGS packets which are not too numerous
     #
-    def getModels(self, packets=None):
+    #  returns a deepcopy of the device data collections
+    #
+    def getDevices(self, packets=None):
         workpackets = packets if packets else self.getPackets()
         # pass all the packets to the correct object
         for packet in workpackets:
             packetType = packet[0]
             if packetType == Magnum.INV:
                 if self.inverter == None:
-                    self.inverter = InverterDevice(id=self.id, trace=self.trace)
+                    self.inverter = InverterDevice(trace=self.trace)
                 self.inverter.parse(packet)
             elif packetType in (Magnum.REMOTE_00, 
                                 Magnum.REMOTE_11, 
@@ -299,23 +301,23 @@ class Magnum:
                                 Magnum.REMOTE_C3, 
                                 Magnum.REMOTE_D0):
                 if self.remote == None:
-                    self.remote = RemoteDevice(id=self.id, trace=self.trace)
+                    self.remote = RemoteDevice(trace=self.trace)
                 self.remote.parse(packet)
             elif packetType == Magnum.BMK_81:
                 if self.bmk == None:
-                    self.bmk = BMKDevice(id=self.id, trace=self.trace)
+                    self.bmk = BMKDevice(trace=self.trace)
                 self.bmk.parse(packet)
             elif packetType in (Magnum.AGS_A1, Magnum.AGS_A2):
                 if self.ags == None:
-                    self.ags = AGSDevice(id=self.id, trace=self.trace)
+                    self.ags = AGSDevice(trace=self.trace)
                 self.ags.parse(packet)
             elif packetType == Magnum.RTR_91:
                 if self.rtr == None:
-                    self.rtr = RTRDevice(id=self.id, trace=self.trace)
+                    self.rtr = RTRDevice(trace=self.trace)
                 self.rtr.parse(packet)
             elif packetType in (Magnum.PT_C1, Magnum.PT_C2, Magnum.PT_C3, Magnum.PT_C4):
                 if self.pt100 == None:
-                    self.pt100 = PT100Device(id=self.id, trace=self.trace)
+                    self.pt100 = PT100Device(trace=self.trace)
                 self.pt100.parse(packet)
         if self.remote:
             #
@@ -327,27 +329,25 @@ class Magnum:
                 self.remote.removeAGS()
             if self.pt100 == None:
                 self.remote.removePT100()
-        models = []
-        for model in [self.inverter, self.remote, self.bmk, self.ags, self.rtr, self.pt100]:
-            if model:
-                modelinfo = model.getModel()
-                if modelinfo:
-                    models.append(modelinfo)
-        return models
+        devices = []
+        for device in [self.inverter, self.remote, self.bmk, self.ags, self.rtr, self.pt100]:
+            if device:
+                deviceinfo = device.getDevice()
+                if deviceinfo:
+                    devices.append(deviceinfo)
+        return deepcopy(devices)
 
 #
 # All the device classes
 #
 class AGSDevice:
 
-    def __init__(self, id=None, trace=False):
+    def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.model = OrderedDict()
-        self.model["model"] = AGS
-        if id:
-            self.model["id"] = str(id)
-        self.model["data"] = self.data
+        self.device = OrderedDict()
+        self.device["device"] = AGS
+        self.device["data"] = self.data
         self.data["revision"] = 0.0
         self.data["status"] = 0
         self.data["status_text"] = ""
@@ -386,75 +386,49 @@ class AGSDevice:
             self.data["running"] = False
 
     def setStatusText(self):
-        if self.data["status"] == 0:
-            self.data["status_text"] = "Not Connected"
-        elif self.data["status"] == 1:
-            self.data["status_text"] = "Off"
-        elif self.data["status"] == 2:
-            self.data["status_text"] = "Ready"
-        elif self.data["status"] == 3:
-            self.data["status_text"] = "Manual Run"
-        elif self.data["status"] == 4:
-            self.data["status_text"] = "AC In"
-        elif self.data["status"] == 5:
-            self.data["status_text"] = "In quiet time"
-        elif self.data["status"] == 6:
-            self.data["status_text"] = "Start in test mode"
-        elif self.data["status"] == 7:
-            self.data["status_text"] = "Start on temperature"
-        elif self.data["status"] == 8:
-            self.data["status_text"] = "Start on voltage"
-        elif self.data["status"] == 9:
-            self.data["status_text"] = "Fault start on test"
-        elif self.data["status"] == 10:
-            self.data["status_text"] = "Fault start on temp"
-        elif self.data["status"] == 11:
-            self.data["status_text"] = "Fault start on voltage"
-        elif self.data["status"] == 12:
-            self.data["status_text"] = "Start TOD"
-        elif self.data["status"] == 13:
-            self.data["status_text"] = "Start SOC"
-        elif self.data["status"] == 14:
-            self.data["status_text"] = "Start Exercise"
-        elif self.data["status"] == 15:
-            self.data["status_text"] = "Fault start TOD"
-        elif self.data["status"] == 16:
-            self.data["status_text"] = "Fault start SOC"
-        elif self.data["status"] == 17:
-            self.data["status_text"] = "Fault start Exercise"
-        elif self.data["status"] == 18:
-            self.data["status_text"] = "Start on Amp"
-        elif self.data["status"] == 19:
-            self.data["status_text"] = "Start on Topoff"
-        elif self.data["status"] == 20:
-            self.data["status_text"] = "Not used"
-        elif self.data["status"] == 21:
-            self.data["status_text"] = "Fault start on Amp"
-        elif self.data["status"] == 22:
-            self.data["status_text"] = "Fault on Topoff"
-        elif self.data["status"] == 23:
-            self.data["status_text"] = "Not used"
-        elif self.data["status"] == 24:
-            self.data["status_text"] = "Fault max run"
-        elif self.data["status"] == 25:
-            self.data["status_text"] = "Gen Run Fault"
-        elif self.data["status"] == 26:
-            self.data["status_text"] = "Gen in Warm up"
-        elif self.data["status"] == 27:
-            self.data["status_text"] = "Gen in Cool down"
+        status = {
+            0: "Not Connected",
+            1: "Off",
+            2: "Ready",
+            3: "Manual Run",
+            4: "AC In",
+            5: "In quiet time",
+            6: "Start in test mode",
+            7: "Start on temperature",
+            8: "Start on voltage",
+            9: "Fault start on test",
+            10: "Fault start on temp",
+            11: "Fault start on voltage",
+            12: "Start TOD",
+            13: "Start SOC",
+            14: "Start Exercise",
+            15: "Fault start TOD",
+            16: "Fault start SOC",
+            17: "Fault start Exercise",
+            18: "Start on Amp",
+            19: "Start on Topoff",
+            20: "Not used",
+            21: "Fault start on Amp",
+            22: "Fault on Topoff",
+            23: "Not used",
+            24: "Fault max run",
+            25: "Gen Run Fault",
+            26: "Gen in Warm up",
+            27: "Gen in Cool down"
+        }
+        if self.data["status"] in status:
+            self.data["status_text"] = status[self.data["status"]]
 
-    def getModel(self):
-        return self.model
+    def getDevice(self):
+        return self.device
 
 class BMKDevice:
-    def __init__(self, id=None, trace=False):
+    def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.model = OrderedDict()
-        self.model["model"] = BMK
-        if id:
-            self.model["id"] = str(id)
-        self.model["data"] = self.data
+        self.device = OrderedDict()
+        self.device["device"] = BMK
+        self.device["data"] = self.data
         self.data["revision"] = ""
         self.data["soc"] = 0
         self.data["vdc"] = 0
@@ -490,18 +464,16 @@ class BMKDevice:
             elif self.data["Fault"] == 2:
                 self.data["Fault_Text"] = "Fault Start"
 
-    def getModel(self):
-        return self.model
+    def getDevice(self):
+        return self.device
 
 class InverterDevice:
-    def __init__(self, id=None, trace=False):
+    def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.model = OrderedDict()
-        self.model["model"] = INVERTER
-        if id:
-            self.model["id"] = str(id)
-        self.model["data"] = self.data
+        self.device = OrderedDict()
+        self.device["device"] = INVERTER
+        self.device["data"] = self.data
         self.data["revision"] = str(0.0)
         self.data["mode"] = 0
         self.data["mode_text"] = ""
@@ -571,197 +543,128 @@ class InverterDevice:
             self.set_stackmode_text()
 
     def set_fault_text(self):
-        if self.data["fault"] == 0x00:
-            self.data["fault_text"] = "None"
-        elif self.data["fault"] == 0x01:
-            self.data["fault_text"] = "STUCK RELAY"
-        elif self.data["fault"] == 0x02:
-            self.data["fault_text"] = "DC OVERLOAD"
-        elif self.data["fault"] == 0x03:
-            self.data["fault_text"] = "AC OVERLOAD"
-        elif self.data["fault"] == 0x04:
-            self.data["fault_text"] = "DEAD BAT"
-        elif self.data["fault"] == 0x05:
-            self.data["fault_text"] = "BACKFEED"
-        elif self.data["fault"] == 0x08:
-            self.data["fault_text"] = "LOW BAT"
-        elif self.data["fault"] == 0x09:
-            self.data["fault_text"] = "HIGH BAT"
-        elif self.data["fault"] == 0x0A:
-            self.data["fault_text"] = "HIGH AC VOLTS"
-        elif self.data["fault"] == 0x10:
-            self.data["fault_text"] = "BAD_BRIDGE"
-        elif self.data["fault"] == 0x12:
-            self.data["fault_text"] = "NTC_FAULT"
-        elif self.data["fault"] == 0x13:
-            self.data["fault_text"] = "FET_OVERLOAD"
-        elif self.data["fault"] == 0x14:
-            self.data["fault_text"] = "INTERNAL_FAULT4"
-        elif self.data["fault"] == 0x16:
-            self.data["fault_text"] = "STACKER MODE FAULT"
-        elif self.data["fault"] == 0x18:
-            self.data["fault_text"] = "STACKER CLK PH FAULT"
-        elif self.data["fault"] == 0x17:
-            self.data["fault_text"] = "STACKER NO CLK FAULT"
-        elif self.data["fault"] == 0x19:
-            self.data["fault_text"] = "STACKER PH LOSS FAULT"
-        elif self.data["fault"] == 0x20:
-            self.data["fault_text"] = "OVER TEMP"
-        elif self.data["fault"] == 0x21:
-            self.data["fault_text"] = "RELAY FAULT"
-        elif self.data["fault"] == 0x80:
-            self.data["fault_text"] = "CHARGER_FAULT"
-        elif self.data["fault"] == 0x81:
-            self.data["fault_text"] = "High Battery Temp"
-        elif self.data["fault"] == 0x90:
-            self.data["fault_text"] = "OPEN SELCO TCO"
-        elif self.data["fault"] == 0x91:
-            self.data["fault_text"] = "CB3 OPEN FAULT"
+        faults = {
+            0x00: "None",
+            0x01: "STUCK RELAY",
+            0x02: "DC OVERLOAD",
+            0x03: "AC OVERLOAD",
+            0x04: "DEAD BAT",
+            0x05: "BACKFEED",
+            0x08: "LOW BAT",
+            0x09: "HIGH BAT",
+            0x0A: "HIGH AC VOLTS",
+            0x10: "BAD_BRIDGE",
+            0x12: "NTC_FAULT",
+            0x13: "FET_OVERLOAD",
+            0x14: "INTERNAL_FAULT4",
+            0x16: "STACKER MODE FAULT",
+            0x18: "STACKER CLK PH FAULT",
+            0x17: "STACKER NO CLK FAULT",
+            0x19: "STACKER PH LOSS FAULT",
+            0x20: "OVER TEMP",
+            0x21: "RELAY FAULT",
+            0x80: "CHARGER_FAULT",
+            0x81: "High Battery Temp",
+            0x90: "OPEN SELCO TCO",
+            0x91: "CB3 OPEN FAULT"
+        }
+        if self.data["fault"] in faults:
+            self.data["fault_text"] = faults[self.data["fault"]]
 
-    def set_chgled_text(self):
-        if self.data["chgled"] == 0:
-            self.data["chgled_text"] = "Off"
-        else:
-            self.data["chgled_text"] = "On"
+    def set_chgled_text(self):    
+            self.data["chgled_text"] = "Off" if self.data["chgled"] == 0 else "On"
 
     def set_invled_text(self):
-        if self.data["invled"] == 0:
-            self.data["invled_text"] = "Off"
-        else:
-            self.data["invled_text"] = "On"
+        self.data["invled_text"] = "Off" if self.data["invled"] == 0 else "On"
 
     def set_mode_text(self):
-        if self.data["mode"] == 0x00:
-            self.data["mode_text"] = "Standby"
-        elif self.data["mode"] == 0x01:
-            self.data["mode_text"] = "EQ"
-        elif self.data["mode"] == 0x02:
-            self.data["mode_text"] = "FLOAT"
-        elif self.data["mode"] == 0x04:
-            self.data["mode_text"] = "ABSORB"
-        elif self.data["mode"] == 0x08:
-            self.data["mode_text"] = "BULK"
-        elif self.data["mode"] == 0x09:
-            self.data["mode_text"] = "BATSAVER"
-        elif self.data["mode"] == 0x10:
-            self.data["mode_text"] = "CHARGE"
-        elif self.data["mode"] == 0x20:
-            self.data["mode_text"] = "Off"
-        elif self.data["mode"] == 0x40:
-            self.data["mode_text"] = "INVERT"
-        elif self.data["mode"] == 0x50:
-            self.data["mode_text"] = "Inverter_Standby"
-        elif self.data["mode"] == 0x80:
-            self.data["mode_text"] = "SEARCH"
+        modes = {
+            0x00:   "Standby",
+            0x01:   "EQ",
+            0x02:   "FLOAT",
+            0x04:   "ABSORB",
+            0x08:   "BULK",
+            0x09:   "BATSAVER",
+            0x10:   "CHARGE",
+            0x20:   "Off",
+            0x40:   "INVERT",
+            0x50:   "Inverter_Standby",
+            0x80:   "SEARCH"
+        }
+        if self.data["mode"] in modes:
+            self.data["mode_text"] = modes[self.data["mode"]]
         else:
             self.data["mode_text"] = "??"
 
     def set_model_text(self):
-        if self.data["model"] == 6:
-            self.data["model_text"] = "MM612"
-        elif self.data["model"] == 7:
-            self.data["model_text"] = "MM612-AE"
-        elif self.data["model"] == 8:
-            self.data["model_text"] = "MM1212"
-        elif self.data["model"] == 9:
-            self.data["model_text"] = "MMS1012"
-        elif self.data["model"] == 10:
-            self.data["model_text"] = "MM1012E"
-        elif self.data["model"] == 11:
-            self.data["model_text"] = "MM1512"
-        elif self.data["model"] == 12:
-            self.data["model_text"] = "MMS912E"
-        elif self.data["model"] == 15:
-            self.data["model_text"] = "ME1512"
-        elif self.data["model"] == 20:
-            self.data["model_text"] = "ME2012"
-        elif self.data["model"] == 21:
-            self.data["model_text"] = "RD2212"
-        elif self.data["model"] == 25:
-            self.data["model_text"] = "ME2512"
-        elif self.data["model"] == 30:
-            self.data["model_text"] = "ME3112"
-        elif self.data["model"] == 35:
-            self.data["model_text"] = "MS2012"
-        elif self.data["model"] == 36:
-            self.data["model_text"] = "MS1512E"
-        elif self.data["model"] == 40:
-            self.data["model_text"] = "MS2012E"
-        elif self.data["model"] == 44:
-            self.data["model_text"] = "MSH3012M"
-        elif self.data["model"] == 45:
-            self.data["model_text"] = "MS2812"
-        elif self.data["model"] == 47:
-            self.data["model_text"] = "MS2712E"
-        elif self.data["model"] == 53:
-            self.data["model_text"] = "MM1324E"
-        elif self.data["model"] == 54:
-            self.data["model_text"] = "MM1524"
-        elif self.data["model"] == 55:
-            self.data["model_text"] = "RD1824"
-        elif self.data["model"] == 59:
-            self.data["model_text"] = "RD2624E"
-        elif self.data["model"] == 63:
-            self.data["model_text"] = "RD2824"
-        elif self.data["model"] == 69:
-            self.data["model_text"] = "RD4024E"
-        elif self.data["model"] == 74:
-            self.data["model_text"] = "RD3924"
-        elif self.data["model"] == 90:
-            self.data["model_text"] = "MS4124E"
-        elif self.data["model"] == 91:
-            self.data["model_text"] = "MS2024"
-        elif self.data["model"] == 103:
-            self.data["model_text"] = "MSH4024M"
-        elif self.data["model"] == 104:
-            self.data["model_text"] = "MSH4024RE"
-        elif self.data["model"] == 105:
-            self.data["model_text"] = "MS4024"
-        elif self.data["model"] == 106:
-            self.data["model_text"] = "MS4024AE"
-        elif self.data["model"] == 107:
-            self.data["model_text"] = "MS4024PAE"
-        elif self.data["model"] == 111:
-            self.data["model_text"] = "MS4448AE"
-        elif self.data["model"] == 112:
-            self.data["model_text"] = "MS3748AEJ"
-        elif self.data["model"] == 114:
-            self.data["model_text"] = "MS4048"
-        elif self.data["model"] == 115:
-            self.data["model_text"] = "MS4448PAE"
-        elif self.data["model"] == 116:
-            self.data["model_text"] = "MS3748PAEJ"
-        elif self.data["model"] == 117:
-            self.data["model_text"] = "MS4348PE"
+        models = {
+            6: "MM612",
+            7: "MM612-AE",
+            8: "MM1212",
+            9: "MMS1012",
+            10: "MM1012E",
+            11: "MM1512",
+            12: "MMS912E",
+            15: "ME1512",
+            20: "ME2012",
+            21: "RD2212",
+            25: "ME2512",
+            30: "ME3112",
+            35: "MS2012",
+            36: "MS1512E",
+            40: "MS2012E",
+            44: "MSH3012M",
+            45: "MS2812",
+            47: "MS2712E",
+            53: "MM1324E",
+            54: "MM1524",
+            55: "RD1824",
+            59: "RD2624E",
+            63: "RD2824",
+            69: "RD4024E",
+            74: "RD3924",
+            90: "MS4124E",
+            91: "MS2024",
+            103: "MSH4024M",
+            104: "MSH4024RE",
+            105: "MS4024",
+            106: "MS4024AE",
+            107: "MS4024PAE",
+            111: "MS4448AE",
+            112: "MS3748AEJ",
+            114: "MS4048",
+            115: "MS4448PAE",
+            116: "MS3748PAEJ",
+            117: "MS4348PE"
+        }
+        if self.data["model"] in models:
+            self.data["model_text"] = models[self.data["model"]]
         else:
             self.data["model_text"] = "Unknown"
 
     def set_stackmode_text(self):
-        if self.data["stackmode"] == 0x00:
-            self.data["stackmode_text"] = "Stand Alone"
-        elif self.data["stackmode"] == 0x01:
-            self.data["stackmode_text"] = "Parallel stack - master"
-        elif self.data["stackmode"] == 0x02:
-            self.data["stackmode_text"] = "Parallel stack - slave"
-        elif self.data["stackmode"] == 0x04:
-            self.data["stackmode_text"] = "Series stack - master"
-        elif self.data["stackmode"] == 0x08:
-            self.data["stackmode_text"] = "Series stack - slave"
+        modes = {
+            0x00:  "Stand Alone",
+            0x01:  "Parallel stack - master",
+            0x02:  "Parallel stack - slave",
+            0x04:  "Series stack - master",
+            0x08:  "Series stack - slave"
+        }
+        if self.data["stackmode"] in modes:
+            self.data["stackmode_text"] = modes[self.data["stackmode"]]
         else:
             self.data["stackmode_text"] = "Unknown"
 
-    def getModel(self):
-        return self.model
+    def getDevice(self):
+        return self.device
 
 class PT100Device:
-    def __init__(self, id=None, trace=False):
+    def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.model = OrderedDict()
-        self.model["model"] = PT100
-        if id:
-            self.model["id"] = str(id)
-        self.model["data"] = self.data
+        self.device = OrderedDict()
+        self.device["device"] = PT100
+        self.device["data"] = self.data
         self.data["address"] = 0
         self.data["on_off"] = 0
         self.data["mode"] = 0
@@ -842,74 +745,55 @@ class PT100Device:
             self.data['inductor_temperature'] = byte_value
             byte_value = unpacked[12]
             self.data['fet_temperature'] = (byte_value)
-            if self.data['mode'] == 2:
-                self.data['mode_text'] = "Sleep"
-            elif self.data['mode'] == 3:
-                self.data['mode_text'] = "Float"
-            elif self.data['mode'] == 4:
-                self.data['mode_text'] = "Bulk"
-            elif self.data['mode'] == 5:
-                self.data['mode_text'] = "Absorb"
-            elif self.data['mode'] == 6:
-                self.data['mode_text'] = "EQ"
+            modes = {
+                2: "Sleep",
+                3: "Float",
+                4: "Bulk",
+                5: "Absorb",
+                6: "EQ"
+            }
+            if self.data['mode'] in modes:
+                self.data['mode_text'] = modes[self.data['mode']]
             else:
                 self.data['mode_text'] = "Unknown"
-            if self.data['regulation'] == 0:
-                self.data['regulation_text'] = "Off"
-            elif self.data['regulation'] == 1:
-                self.data['regulation_text'] = "Voltage"
-            elif self.data['regulation'] == 2:
-                self.data['regulation_text'] = "Current"
-            elif self.data['regulation'] == 3:
-                self.data['regulation_text'] = "Temperature"
-            elif self.data['regulation'] == 4:
-                self.data['regulation_text'] = "Hardware"
-            elif self.data['regulation'] == 5:
-                self.data['regulation_text'] = "Voltage Off Limit"
-            elif self.data['regulation'] == 6:
-                self.data['regulation_text'] = "PPT Limit"
-            elif self.data['regulation'] == 7:
-                self.data['regulation_text'] = "Fault Limit"
-            elif self.data['fault'] == 0:
-                self.data['fault_text'] = "No Fault"
-            elif self.data['fault'] == 1:
-                self.data['fault_text'] = "Input er Fault"
-            elif self.data['fault'] == 2:
-                self.data['fault_text'] = "Output er Fault"
-            elif self.data['fault'] == 3:
-                self.data['fault_text'] = "PV High Fault"
-            elif self.data['fault'] == 4:
-                self.data['fault_text'] = "Battery High Fault"
-            elif self.data['fault'] == 5:
-                self.data['fault_text'] = "BTS Shorted Fault"
-            elif self.data['fault'] == 6:
-                self.data['fault_text'] = "FET Overtemp Fault"
-            elif self.data['fault'] == 7:
-                self.data['fault_text'] = "Inductor Overtemp Fault"
-            elif self.data['fault'] == 8:
-                self.data['fault_text'] = "Over Current Fault"
-            elif self.data['fault'] == 9:
-                self.data['fault_text'] = "Internal Phase Fault"
-            elif self.data['fault'] == 10:
-                self.data['fault_text'] = "Repeated Internal Phase Fault"
-            elif self.data['fault'] == 11:
-                self.data['fault_text'] = "Internal Fault 1"
-            elif self.data['fault'] == 12:
-                self.data['fault_text'] = "GFP Fault"
-            elif self.data['fault'] == 13:
-                self.data['fault_text'] = "ARC Fault"
-            elif self.data['fault'] == 14:
-                self.data['fault_text'] = "NTC Fault"
-            elif self.data['fault'] == 15:
-                self.data['fault_text'] = "FET Overload Fault"
-            elif self.data['fault'] == 16:
-                self.data['fault_text'] = "Stack Fault 1"
-            elif self.data['fault'] == 17:
-                self.data['fault_text'] = "Stack Fault 2"
-            elif self.data['fault'] == 18:
-                self.data['fault_text'] = "Stack Fault 3"
-            elif self.data['fault'] == 19:
-                self.data['fault_text'] = "High Battery Temp Fault"
+            regulations = {
+                0: "Off",
+                1: "Voltage",
+                2: "Current",
+                3: "Temperature",
+                4: "Hardware",
+                5: "Voltage Off Limit",
+                6: "PPT Limit",
+                7: "Fault Limit",
+                }
+            if self.data['regulation']  in regulations:
+                self.data['regulation_text'] = regulations[self.data['regulation']]
+            else:
+                self.data['regulation_text'] = "Unknown"
+            faults =   {         
+                0: "No Fault",
+                1: "Input er Fault",
+                2: "Output er Fault",
+                3: "PV High Fault",
+                4: "Battery High Fault",
+                5: "BTS Shorted Fault",
+                6: "FET Overtemp Fault",
+                7: "Inductor Overtemp Fault",
+                8: "Over Current Fault",
+                9: "Internal Phase Fault",
+                10: "Repeated Internal Phase Fault",
+                11: "Internal Fault 1",
+                12: "GFP Fault",
+                13: "ARC Fault",
+                14: "NTC Fault",
+                15: "FET Overload Fault",
+                16: "Stack Fault 1",
+                17: "Stack Fault 2",
+                18: "Stack Fault 3",
+                19: "High Battery Temp Fault"
+                }
+            if self.data['fault'] in faults:
+                self.data['fault_text'] = faults[self.data['fault']]
             else:
                 self.data['fault_text'] = "unknown"
         elif packetType == Magnum.PT_C2:
@@ -949,8 +833,8 @@ class PT100Device:
             self.data['max_fet_temperature'] = unpacked[5]
             self.data['max_inductor_temperature'] = unpacked[6]
 
-    def getModel(self):
-        return self.model
+    def getDevice(self):
+        return self.device
 
 class RemoteDevice:
 
@@ -969,14 +853,12 @@ class RemoteDevice:
                "rebulkonsunup", "AbsorbVoltage", "FloatVoltage", "EqualizeVoltage", "AbsorbTime",
                "RebulkVoltage", "BatteryTemperatureCompensation"]
 
-    def __init__(self, id=None, trace=False):
+    def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.model = OrderedDict()
-        self.model["model"] = REMOTE
-        if id:
-            self.model["id"] = str(id)
-        self.model["data"] = self.data
+        self.device = OrderedDict()
+        self.device["device"] = REMOTE
+        self.device["data"] = self.data
         self.data["revision"] = "0.0"
         self.data["action"] = 0
         self.data["searchwatts"] = 0
@@ -1241,22 +1123,20 @@ class RemoteDevice:
             if item in self.data:
                 self.data.pop(item)
 
-    def getModel(self):
+    def getDevice(self):
         # remove MSH as it's not supported - yet
         for item in RemoteDevice.noMSH:
             if item in self.data:
                 self.data.pop(item)
-        return self.model
+        return self.device
 
 class RTRDevice:
-    def __init__(self, id=None, trace=False):
+    def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.model = OrderedDict()
-        self.model["model"] = RTR
-        if id:
-            self.model["id"] = str(id)
-        self.model["data"] = self.data
+        self.device = OrderedDict()
+        self.device["device"] = RTR
+        self.device["data"] = self.data
         self.data["revision"] = "0.0"
 
     def parse(self, packet):
@@ -1268,4 +1148,4 @@ class RTRDevice:
             self.data["revision"] = str(round(unpacked[1] / 10))
 
     def getModel(self):
-        return self.model
+        return self.device
