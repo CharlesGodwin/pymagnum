@@ -98,7 +98,7 @@ while True:
                     if saveddevices[key] == device["data"]:
                         duplicate = True
             if not duplicate:
-                saveddevices[key] = device["data"]:
+                saveddevices[key] = device["data"]
                 data["data"] = device["data"]
                 logfile.write(json.dumps(data))
                 logfile.write("\n")
