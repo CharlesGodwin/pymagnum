@@ -10,12 +10,12 @@
 # The JSON Record is like this:
     # datetime is a timestamp for local time
     # timestamp is the same time but as a Unix Epoch second as UTC time - this is useful for time series software
-    # the data object is pertiement to each model
-    # The curent models are INVERTER, REMOTE, AGS, BMK, and PT100
+    # the data object is pertiement to each device
+    # The curent devices are INVERTER, REMOTE, AGS, BMK, and PT100
 # {
 # 	"datetime": "2019-09-30 15:59:03-04:00",
 # 	"timestamp": 1569873543,
-# 	"model": "INVERTER",
+# 	"device": "INVERTER",
 # 	"data": {
 # 		"revision": "5.1",
 # 		"mode": 64,
@@ -75,32 +75,31 @@ print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
 url = "http://{0}:{1}".format(args.server, args.port)
 print("Logging to:{0} Every:{2} seconds Using: {1} ".format(
     abspath(args.logfile.name), url, args.interval))
-savedmodels = {}
+saveddevices = {}
 while True:
     start = time.time()
     response = requests.get(url)
     if response.status_code == HTTPStatus.OK:
         logfile = open(args.logfile.name, args.logfile.mode,
                        args.logfile._CHUNK_SIZE, args.logfile.encoding)
-        models = json.loads(response.text)
+        devices = json.loads(response.text)
         data = OrderedDict()
-        data["datetime"] = models["datetime"]
-        data["timestamp"] = models["timestamp"]
-        for model in models["models"]:
-            data["model"] = model["model"]
+        data["datetime"] = devices["datetime"]
+        for device in devices["devices"]:
+            data["device"] = device["device"]
             duplicate = False
-            key = data["model"]
+            key = data["device"]
             if not args.allowduplicates:
-                if key in savedmodels:
-                    if model["model"] == magnum.REMOTE:
+                if key in saveddevices:
+                    if device["device"] == magnum.REMOTE:
                         # normalize time of day for equal test
                         for value in ["remotetimehours", "remotetimemins"]:
-                            savedmodels[key][value] = model["data"][value]
-                    if savedmodels[key] == model["data"]:
+                            saveddevices[key][value] = device["data"][value]
+                    if saveddevices[key] == device["data"]:
                         duplicate = True
             if not duplicate:
-                savedmodels[key] = model["data"]:
-                data["data"] = model["data"]
+                saveddevices[key] = device["data"]:
+                data["data"] = device["data"]
                 logfile.write(json.dumps(data))
                 logfile.write("\n")
         logfile.close()

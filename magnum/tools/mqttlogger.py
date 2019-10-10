@@ -10,13 +10,13 @@
 # The JSON Record is like this:
 # datetime is a timestamp for local time
 # timestamp is the same time but as a Unix Epoch second as UTC time - this is useful for time series software
-# the data object is pertiement to each model
-# The curent models are INVERTER, REMOTE, AGS, BMK, and PT100
+# the data object is pertiement to each device
+# The curent devices are INVERTER, REMOTE, AGS, BMK, and PT100
 # topic =  magnum/inverter
 # payload
 # {
 # 	"datetime": "2019-10-08 12:49:14-04:00",
-# 	"model": "INVERTER",
+# 	"device": "INVERTER",
 # 	"data": {
 # 		"revision": "5.1",
 # 		"mode": 64,
@@ -96,32 +96,32 @@ print("Publishing to broker:{0} Every:{2} seconds with {3}duplicates. Using: {1}
     args.broker, args.device, args.interval, "no " if args.cleanpackets else ""))
 uuidstr = str(uuid.uuid1())
 client = mqtt.Client(client_id=uuidstr, clean_session=False)
-savedmodels = {}
+saveddevices = {}
 while True:
     start = time.time()
-    models = magnumReader.getModels()
-    if len(models) != 0:
+    devices = magnumReader.getDevices()
+    if len(devices) != 0:
         try:
             client.connect(args.broker)
             data = OrderedDict()
             now = int(time.time())
             data["datetime"] = str(datetime.fromtimestamp(now).astimezone())
-            for model in models:
-                topic = args.topic + model["model"].lower()
-                data["model"] = model["model"]
-                savedkey = data["model"]
+            for device in devices:
+                topic = args.topic + device["device"].lower()
+                data["device"] = device["device"]
+                savedkey = data["device"]
                 duplicate = False
                 if not args.allowduplicates:
-                    if savedkey in savedmodels:
-                        if model["model"] == magnum.REMOTE:
+                    if savedkey in saveddevices:
+                        if device["device"] == magnum.REMOTE:
                             # normalize time of day in remote data for equal test
                             for key in ["remotetimehours", "remotetimemins"]:
-                                savedmodels[savedkey][key] = model["data"][key]
-                        if savedmodels[savedkey] == model["data"]:
+                                saveddevices[savedkey][key] = device["data"][key]
+                        if saveddevices[savedkey] == device["data"]:
                             duplicate = True
                 if not duplicate:
-                    savedmodels[savedkey] = model["data"]
-                    data["data"] = model["data"]
+                    saveddevices[savedkey] = device["data"]
+                    data["data"] = device["data"]
                     client.publish(topic, payload=json.dumps(data, indent=None, ensure_ascii=True, allow_nan=True, separators="`(',', ':')"))
             client.disconnect()
         except:

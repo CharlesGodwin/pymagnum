@@ -4,7 +4,7 @@
 # SPDX-License-Identifier:    BSD-3-Clause
 #
 # This code is provided as an example of a simple program to display
-# model data every 60 seconds.
+# device data every 60 seconds.
 # run the program with --help for details of options.
 
 import argparse
@@ -22,8 +22,8 @@ args = parser.parse_args()
 reader = magnum.Magnum(device=args.device)
 while True: 
     start = time.time()
-    models = reader.getModels()
-    print(json.dumps(models, indent=2))
+    devices = reader.getDevices()
+    print(json.dumps(devices, indent=2))
     duration = time.time() - start
     delay = args.interval - duration
     if delay > 0:

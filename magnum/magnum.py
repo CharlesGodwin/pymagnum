@@ -1147,5 +1147,5 @@ class RTRDevice:
         if packetType == Magnum.RTR_91:
             self.data["revision"] = str(round(unpacked[1] / 10))
 
-    def getModel(self):
+    def getDevice(self):
         return self.device

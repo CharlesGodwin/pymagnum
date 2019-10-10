@@ -64,13 +64,13 @@ def main():
             print()
         if args.showjson:
             try:
-                models = reader.getModels(packets)
+                devices = reader.getDevices(packets)
             except:
-                print("Error detected attempting to extract models")
+                print("Error detected attempting to extract devices")
                 traceback.print_exc()
                 exit(2)
             print("Data")
-            print(json.dumps(models, indent=2))
+            print(json.dumps(devices, indent=2))
         format1 = "Packets:{0} of {1} with {2} UNKNOWN, in {3:2.2f} seconds"
         format2 = "Packets:{0} in {3:2.2f} seconds"
         format = format1 if unknown > 0 else format2

@@ -37,15 +37,15 @@ class magServer(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            models = magnumReader.getModels()
-            if len(models) != 0:
+            devices = magnumReader.getDevices()
+            if len(devices) != 0:
                 self._set_headers(contenttype="application/json")
                 data = OrderedDict()
                 now = int(time.time())
                 data["datetime"] = str(
                     datetime.fromtimestamp(now).astimezone())
                 data["timestamp"] = now
-                data["models"] = models
+                data["devices"] = devices
                 jsonString = json.dumps(data)
                 self.wfile.write(jsonString.encode("utf8"))
                 return

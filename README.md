@@ -76,9 +76,12 @@ Magnum reader:
 </pre>
 
 ## Remove software
+
+If you want to know what version is installed use:  
+`pip3 show pymagnum`
+
 If you want to remove the software use:  
 `sudo pip3 uninstall pymagnum`
-
 
 ## Usage
 There are several example programs available on the git site.
@@ -88,8 +91,8 @@ Typical usage is:
 from magnum import magnum
 
 reader = magnum.Magnum(device='/dev/ttyUSB0')
-models = reader.getModels()
-print(models)
+devices = reader.getDevices()
+print(devices)
 </pre>
 
 You need to import the magnum module, instantiate the class with optional parameters (more documentation soon) and then get an instance of the models for processing. If you need a time series just loop around the getModels() method.
