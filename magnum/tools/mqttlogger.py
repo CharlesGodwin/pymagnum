@@ -53,7 +53,7 @@ from datetime import datetime
 
 import paho.mqtt.client as mqtt
 
-import magnum
+from magnum import magnum
 
 parser = argparse.ArgumentParser(description="Magnum Data MQTT Publisher",
                                  epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
@@ -122,7 +122,9 @@ while True:
                 if not duplicate:
                     saveddevices[savedkey] = device["data"]
                     data["data"] = device["data"]
-                    client.publish(topic, payload=json.dumps(data, indent=None, ensure_ascii=True, allow_nan=True, separators="`(',', ':')"))
+                    payload = json.dumps(
+                        data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
+                    client.publish(topic, payload=payload)
             client.disconnect()
         except:
             traceback.print_exc()
