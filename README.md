@@ -8,11 +8,13 @@ Source site is: https://github.com/CharlesGodwin/pymagnum. This site is currentl
 
 publishing systemThe package software is also being hosted on a test publishing system. It will be migrated to the regular, public PyPi host when testing is complete.
 
-**This is untested software! It will not be publicly published until it has been tested with live equipment. Please report all success and failure to the author**
+**This is untested software! It will not be publicly published until it has been tested with live equipment. Please report all success and failure to the author. Thank you.**
 
 In order to use this software you need to have a RS485 adaptor connected to a Magnum Energy Network. Refer to this document (https://gitlab.com/Magnum_Energy/distribution/blob/master/Building_a_Magnum_Energy_Adaptor.pdf) for instructions.
 
 ## Installation
+
+Throughout this documentation Python and its installer pip are refered to using the default convention of raspberry Pi. The term `python3` and `pip3` refer to Python 3 versions of the programs. On other systems the default installation may be Python 3 so just use `python` and `pip` in those systems.
 
 You will need pip3 installed. On a Pi use:  
 `sudo apt install python3-pip`
@@ -27,7 +29,8 @@ first determine your serial device by running
 Normally a USB device will show up as /dev/ttyUSB0 and a HAT as /dev/ttyAMA0
 
 Next run the provided test program  
-`python3 -m magnum.tools.testrs485 --help`   will tell you choices.  
+`python3 -m magnum.tools.testrs485 --help`   will tell you choices.
+
 Usually just run  
 `python3 -m magnum.tools.testrs485 -d /dev/ttyUSB0` or other device name.  
 This should show up to 50 packets with names. such as
@@ -42,10 +45,10 @@ Length:21 REMOTE_00 =>400000F60002770001003311241E6B000001025800
 
 Packets:45 in 1.10 seconds
 </pre>
-If nothing happens or you get a lot of UNKNOWN try reversing your two wires and repeating the test. If that fails contact the author
+If nothing happens or you get a lot of UNKNOWN lines, try reversing the two wires on your setup and repeating the test. If that fails contact the author.
 
 ## Available Tools
-Tools will be added as they are developed. Tools are implemented as Python moduels and can be invloked with this generalized command:
+Tools will be added as they are developed. Tools are implemented as Python modules and can be invoked with this generalized command:
 `python3 -m magnum.tools.<tool name> --help`
 Currently the tools avaiable are:
 
@@ -53,26 +56,27 @@ Currently the tools avaiable are:
 This tool is described in the installation instructions.
 `python3 -m magnum.tools.testrs485 --help`
 
-## mqttlogger
-This is a long running program that will send MQTT messages for each device in your system at the designated interval. Refer to thse links for information on implementing and using MQTT services.  
-http://mqtt.org
-https://mosquitto.org
+## magdump
+This is a program that will dump a JSON string to the console for all available devices.  The default is to dump a string and exit. But if the interval is set to a number the prgoram will dump a string every <interval> seconds
 
-`python3 -m magnum.tools.mqttlogger --help`
-The regular options to set with this service are:
+
+`python3 -m magnum.tools.magdump --help`
+The regular options to set with this tool are:
 <pre>
-MQTT publish:
-  -t TOPIC, --topic TOPIC
-                        Topic prefix (default: magnum/)
-  -b BROKER, --broker BROKER
-                        MQTT Broker address (default: localhost)
-  -i INTERVAL, --interval INTERVAL
-                        Interval, in seconds, between publishing (default: 60)
-  --duplicates          Log duplicate entries (default: False)
+ -h, --help            show this help message and exit
+ -d DEVICE, --device DEVICE
+                       Serial device name (default: /dev/ttyUSB0)
+ -i INTERVAL, --interval INTERVAL
+                       Interval, in seconds, between dump records, in
+                       seconds. 0 means once and exit. (default: 0)
+ -v, --verbose         Display options at runtime (default: False)
 
-Magnum reader:
-  -d DEVICE, --device DEVICE
-                        Serial device name (default: /dev/ttyUSB0)
+eldom used:
+ --packets PACKETS     Number of packets to generate in reader (default: 50)
+ --timeout TIMEOUT     Timeout for serial read (default: 0.005)
+ --trace               Add most recent raw packet info to data (default:
+                       False)
+ -nc, --nocleanup      Suppress clean up of unknown packets (default: True)
 </pre>
 
 ## Remove software
@@ -95,7 +99,7 @@ devices = reader.getDevices()
 print(devices)
 </pre>
 
-You need to import the magnum module, instantiate the class with optional parameters (more documentation soon) and then get an instance of the models for processing. If you need a time series just loop around the getModels() method.
+You need to import the magnum module, instantiate the class with optional parameters (more documentation soon) and then get an instance of the models for processing. If you need a time series just loop around the getDevices() method.
 
 Copyright (c) 2018-2019 Charles Godwin <magnum@godwin.ca>
 

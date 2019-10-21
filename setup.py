@@ -27,7 +27,7 @@ setup(name='pymagnum',
           "License :: OSI Approved :: BSD License",
           "Operating System :: OS Independent"
       ],
-      install_requires=['pyserial', 'paho-mqtt'],
+      install_requires=['pyserial'],
       python_requires='>=3.4',
       keywords='Magnum Energy Renewable Solar Network RS485 IoT'
       )

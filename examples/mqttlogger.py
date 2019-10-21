@@ -76,7 +76,7 @@ seldom.add_argument("--packets", default=50, type=int,
                     help="Number of packets to generate in reader (default: %(default)s)")
 seldom.add_argument("--timeout", default=0.005, type=float,
                     help="Timeout for serial read (default: %(default)s)")
-seldom.add_argument("--trace", action="store_false",
+seldom.add_argument("--trace", action="store_true",
                     help="Add raw packet info to data (default: %(default)s)")
 seldom.add_argument("-nc", "--nocleanup", action="store_false",
                     help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
@@ -90,8 +90,8 @@ if args.topic[-1] != "/":
 print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
 # following added to remove warning in vs code
 # pylint: disable=locally-disabled, not-callable
-magnumReader = magnum.Magnum(device=args.device, packets=args.packets, 
-                             timeout=args.timeout, cleanpackets=args.cleanpackets)  
+magnumReader = magnum.Magnum(device=args.device, packets=args.packets,
+                             timeout=args.timeout, cleanpackets=args.cleanpackets)
 print("Publishing to broker:{0} Every:{2} seconds with {3}duplicates. Using: {1} ".format(
     args.broker, args.device, args.interval, "no " if args.cleanpackets else ""))
 uuidstr = str(uuid.uuid1())
