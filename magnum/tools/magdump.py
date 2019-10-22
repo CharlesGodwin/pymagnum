@@ -3,45 +3,123 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
-# This code is provided as an example of a JSON logger
+# This code is provided as an example of a JSON object
 # run the program with --help for details of options.
-# Each device is a seperate JSON record new-line delimited
-# The JSON Record is like this:
-# datetime is a timestamp for local time
-# timestamp is the same time but as a Unix Epoch second as UTC time - this is useful for time series software
-# the data object is pertiement to each device
-# The curent devices are INVERTER, REMOTE, AGS, BMK, and PT100
-# topic =  magnum/inverter
-# payload
 # {
-# 	"datetime": "2019-10-08 12:49:14-04:00",
-# 	"device": "INVERTER",
-# 	"data": {
-# 		"revision": "5.1",
-# 		"mode": 64,
-# 		"mode_text": "INVERT",
-# 		"fault": 0,
-# 		"fault_text": "None",
-# 		"vdc": 24.6,
-# 		"adc": 2,
-# 		"VACout": 119,
-# 		"VACin": 0,
-# 		"invled": 1,
-# 		"invled_text": "On",
-# 		"chgled": 0,
-# 		"chgled_text": "Off",
-# 		"bat": 17,
-# 		"tfmr": 36,
-# 		"fet": 30,
-# 		"model": 107,
-# 		"model_text": "MS4024PAE",
-# 		"stackmode": 0,
-# 		"stackmode_text": "Stand Alone",
-# 		"AACin": 0,
-# 		"AACout": 1,
-# 		"Hz": 60.0
-# 	}
+# 	"datetime": "2019-10-22 10:39:02-04:00",
+# 	"device": "MAGNUM",
+# 	"data": [
+# 		{
+# 			"device": "INVERTER",
+# 			"data": {
+# 				"revision": "5.1",
+# 				"mode": 64,
+# 				"mode_text": "INVERT",
+# 				"fault": 0,
+# 				"fault_text": "None",
+# 				"vdc": 24.6,
+# 				"adc": 2,
+# 				"VACout": 121,
+# 				"VACin": 0,
+# 				"invled": 1,
+# 				"invled_text": "On",
+# 				"chgled": 0,
+# 				"chgled_text": "Off",
+# 				"bat": 17,
+# 				"tfmr": 36,
+# 				"fet": 30,
+# 				"model": 107,
+# 				"model_text": "MS4024PAE",
+# 				"stackmode": 0,
+# 				"stackmode_text": "Stand Alone",
+# 				"AACin": 0,
+# 				"AACout": 1,
+# 				"Hz": 60.0
+# 			}
+# 		},
+# 		{
+# 			"device": "REMOTE",
+# 			"data": {
+# 				"revision": 2.3,
+# 				"action": 0,
+# 				"searchwatts": 0,
+# 				"batterysize": 320,
+# 				"battype": 4,
+# 				"absorb": 0,
+# 				"chargeramps": 80,
+# 				"ainput": 15,
+# 				"parallel": 60,
+# 				"force_charge": 0,
+# 				"genstart": 1,
+# 				"lbco": 20.0,
+# 				"vaccutout": 165,
+# 				"vsfloat": 26.8,
+# 				"vEQ": 0.1,
+# 				"absorbtime": 0.0,
+# 				"remotetimehours": 7,
+# 				"remotetimemins": 57,
+# 				"runtime": 3.6,
+# 				"starttemp": -17.8,
+# 				"startvdc": 22.0,
+# 				"quiettime": 0,
+# 				"begintime": 700,
+# 				"stoptime": 700,
+# 				"vdcstop": 27.0,
+# 				"voltstartdelay": 70,
+# 				"voltstopdelay": 29,
+# 				"maxrun": 2.0,
+# 				"socstart": 70,
+# 				"socstop": 80,
+# 				"ampstart": 0,
+# 				"ampsstartdelay": 120,
+# 				"ampstop": 20,
+# 				"ampsstopdelay": 120,
+# 				"quietbegintime": 2330,
+# 				"quietendtime": 2345,
+# 				"exercisedays": 0,
+# 				"exercisestart": 0,
+# 				"exerciseruntime": 0,
+# 				"topoff": 2,
+# 				"warmup": 30,
+# 				"cool": 30,
+# 				"batteryefficiency": 0,
+# 				"resetbmk": 0
+# 			}
+# 		},
+# 		{
+# 			"device": "BMK",
+# 			"data": {
+# 				"revision": "1.0",
+# 				"soc": 85,
+# 				"vdc": 24.5,
+# 				"adc": -6.6,
+# 				"vmin": 22.03,
+# 				"vmax": 31.91,
+# 				"amph": -65,
+# 				"amphtrip": 5761.9,
+# 				"amphout": 5700,
+# 				"Fault": 1,
+# 				"Fault_Text": "Normal"
+# 			}
+# 		},
+# 		{
+# 			"device": "AGS",
+# 			"data": {
+# 				"revision": "5.2",
+# 				"status": 2,
+# 				"status_text": "Ready",
+# 				"running": true,
+# 				"temp": 14.4,
+# 				"runtime": 0.0,
+# 				"gen_last_run": 2,
+# 				"last_full_soc": 0,
+# 				"gen_total_run": 0,
+# 				"vdc": 24.4
+# 			}
+# 		}
+# 	]
 # }
+#
 import argparse
 import json
 import time
@@ -82,17 +160,20 @@ while True:
     devices = magnumReader.getDevices()
     if len(devices) != 0:
         try:
-            magnumdata = []
             now = int(time.time())
+            alldata = OrderedDict()
+            alldata["datetime"] = str(
+                datetime.fromtimestamp(now).astimezone())
+            alldata["device"] = 'MAGNUM'
+            magnumdata = []
             for device in devices:
                 data = OrderedDict()
-                data["datetime"] = str(
-                    datetime.fromtimestamp(now).astimezone())
                 data["device"] = device["device"]
                 data["data"] = device["data"]
                 magnumdata.append(data)
+            alldata["data"] = magnumdata
             print(json.dumps(
-                magnumdata, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':')))
+                alldata, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':')))
         except:
             traceback.print_exc()
     if args.interval == 0:
