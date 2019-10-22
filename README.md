@@ -4,11 +4,11 @@ pymagnum is a Python 3 implementation of a read only interface to the Magnum Ene
 
 This software is not endorsed or supported by Magnum Energy, a product of Sensata Technologies https://www.magnum-dimensions.com/
 
-Source site is: https://github.com/CharlesGodwin/pymagnum. This site is currently private with access by request only. Contact the author for access.
+Source site is: https://github.com/CharlesGodwin/pymagnum.
 
 The package software is also being hosted on a test publishing system. It will be migrated to the regular, public PyPi host when testing is complete.
 
-**This is untested software! It will not be publicly published until it has been tested with live equipment. Please report all success and failure to the author. Thank you.**
+**This is untested software! It will not be publicly published until it has been tested with live equipment. Please report all success and failure to the [author](#feedback). Thank you.**
 
 In order to use this software you need to have a RS485 adaptor connected to a Magnum Energy Network. Refer to this document (https://gitlab.com/Magnum_Energy/distribution/blob/master/Building_a_Magnum_Energy_Adaptor.pdf) for instructions.
 
@@ -46,7 +46,7 @@ Length:21 REMOTE_00 =>400000F60002770001003311241E6B000001025800
 .
 Packets:45 in 1.10 seconds
 </pre>
-If nothing happens or you get a lot of UNKNOWN lines, try reversing the two wires on your setup and repeating the test. If that fails contact the author. Refer to Feedback at the bottom of this document.
+If nothing happens or you get a lot of UNKNOWN lines, try reversing the two wires on your setup and repeating the test. If that fails contact the [author](#feedback).
 
 ## Available Tools
 Tools will be added as they are developed. Tools are implemented as Python modules and can be invoked with this generalized command:
@@ -102,7 +102,7 @@ print(devices)
 You need to import the magnum module, instantiate the class with optional parameters (more documentation soon) and then get an instance of the models for processing. If you need a time series just loop around the getDevices() method.
 
 ## Feedback
-Your feedback is important. I want to hear the goood, the bad and the ugly. I would also  like to knoe of any enhancements you would like. The  way to provide open feed back is to create an issue at https://github.com/CharlesGodwin/pymagnum/issues
+Your feedback is important. I want to hear the good, the bad and the ugly. I would also  like to knoe of any enhancements you would like. The  way to provide open feed back is to create an issue at https://github.com/CharlesGodwin/pymagnum/issues
 
 Copyright (c) 2018-2019 Charles Godwin <magnum@godwin.ca>
 
