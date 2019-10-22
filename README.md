@@ -6,7 +6,7 @@ This software is not endorsed or supported by Magnum Energy, a product of Sensat
 
 Source site is: https://github.com/CharlesGodwin/pymagnum. This site is currently private with access by request only. Contact the author for access.
 
-publishing systemThe package software is also being hosted on a test publishing system. It will be migrated to the regular, public PyPi host when testing is complete.
+The package software is also being hosted on a test publishing system. It will be migrated to the regular, public PyPi host when testing is complete.
 
 **This is untested software! It will not be publicly published until it has been tested with live equipment. Please report all success and failure to the author. Thank you.**
 
@@ -14,26 +14,26 @@ In order to use this software you need to have a RS485 adaptor connected to a Ma
 
 ## Installation
 
-Throughout this documentation Python and its installer pip are refered to using the default convention of raspberry Pi. The term `python3` and `pip3` refer to Python 3 versions of the programs. On other systems the default installation may be Python 3 so just use `python` and `pip` in those systems.
+Throughout this documentation Python and its installer pip are refered to using the default convention of a Raspberry Pi. The term `python3` and `pip3` refer to Python 3 versions of the programs. On other systems the default installation may be Python 3 so just use `python` and `pip` in those systems.
 
 You will need pip3 installed. On a Pi use:  
 `sudo apt install python3-pip`
 
-Then install or update the software package using:  
+Then install or update this software package using:  
 `sudo pip3 install --upgrade  -i https://test.pypi.org/simple/ pymagnum`
 
 Once this software is installed test the interconnect hardware:
 
 first determine your serial device by running  
 `python3 -m serial.tools.list_ports`
-Normally a USB device will show up as /dev/ttyUSB0 and a HAT as /dev/ttyAMA0
+Normally a USB device will show up as `/dev/ttyUSB0` and a HAT as `/dev/ttyAMA0` or `/dev/ttyS0`
 
 Next run the provided test program  
 `python3 -m magnum.tools.testrs485 --help`   will tell you choices.
 
 Usually just run  
 `python3 -m magnum.tools.testrs485 -d /dev/ttyUSB0` or other device name.  
-This should show up to 50 packets with names. such as
+This should show up to 50 packets with names. such as:
 <pre>
 Length:21 REMOTE_A2 =>00003C04500F170601C8A5860100465000781478A2
 Length:18 BMK_81    =>81550992FFC0089B0C77FFBFE11300390A01
@@ -42,23 +42,23 @@ Length:21 REMOTE_A4 =>00003C04500F170601C8A58601001E1E00000000A4
 Length: 6 AGS_A1    =>A102343A007C
 Length:21 REMOTE_00 =>400000F60002770001003311241E6B000001025800
 Length:21 REMOTE_00 =>400000F60002770001003311241E6B000001025800
-
+.
+.
 Packets:45 in 1.10 seconds
 </pre>
-If nothing happens or you get a lot of UNKNOWN lines, try reversing the two wires on your setup and repeating the test. If that fails contact the author.
+If nothing happens or you get a lot of UNKNOWN lines, try reversing the two wires on your setup and repeating the test. If that fails contact the author. Refer to Feedback at the bottom of this document.
 
 ## Available Tools
 Tools will be added as they are developed. Tools are implemented as Python modules and can be invoked with this generalized command:
 `python3 -m magnum.tools.<tool name> --help`
 Currently the tools avaiable are:
 
-### testrs495
+### testrs485
 This tool is described in the installation instructions.
 `python3 -m magnum.tools.testrs485 --help`
 
 ## magdump
-This is a program that will dump a JSON string to the console for all available devices.  The default is to dump a string and exit. But if the interval is set to a number the prgoram will dump a string every <interval> seconds
-
+This is a program that will dump a JSON string to the console for all available devices.  The default is to dump a string and exit. But if the interval is set to a number the program will dump a string every <interval> seconds
 
 `python3 -m magnum.tools.magdump --help`
 The regular options to set with this tool are:
@@ -100,6 +100,9 @@ print(devices)
 </pre>
 
 You need to import the magnum module, instantiate the class with optional parameters (more documentation soon) and then get an instance of the models for processing. If you need a time series just loop around the getDevices() method.
+
+## Feedback
+Your feedback is important. I want to hear the goood, the bad and the ugly. I would also  like to knoe of any enhancements you would like. The  way to provide open feed back is to create an issue at https://github.com/CharlesGodwin/pymagnum/issues
 
 Copyright (c) 2018-2019 Charles Godwin <magnum@godwin.ca>
 
