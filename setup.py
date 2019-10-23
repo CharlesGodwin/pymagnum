@@ -28,6 +28,6 @@ setup(name='pymagnum',
           "Operating System :: OS Independent"
       ],
       install_requires=['pyserial'],
-      python_requires='>=3.4',
+      python_requires='>=3.5',
       keywords='Magnum Energy Renewable Solar Network RS485 IoT'
       )

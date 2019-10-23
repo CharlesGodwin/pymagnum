@@ -71,7 +71,7 @@ The regular options to set with this tool are:
                        seconds. 0 means once and exit. (default: 0)
  -v, --verbose         Display options at runtime (default: False)
 
-eldom used:
+seldom used:
  --packets PACKETS     Number of packets to generate in reader (default: 50)
  --timeout TIMEOUT     Timeout for serial read (default: 0.005)
  --trace               Add most recent raw packet info to data (default:

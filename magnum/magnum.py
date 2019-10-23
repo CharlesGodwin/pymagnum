@@ -21,6 +21,18 @@ PT100 = "PT100"
 RTR = "RTR"
 
 class Magnum:
+    '''
+    :param device: The serial device to connect to, defaults to /dev/ttyUSB0
+    :type device: str, optional
+    :param packets: How many packets to capture n one sample, defaults to 50
+    :type packets: int, optional
+    :param cleanpackets: Allow system to try to fixup adjacet packets by merging them, defaults to True
+    :type cleanpackets: boolean, optional
+    :param timeout: How much time delay, in fractions of second,  to trigger end of packet, defaults to 0.001 second
+    :type timeout: float, optional
+    :param trace: Enable adding last of every packet type processed. The packets, as HEX strings, are appended to to data object, Defaults to False
+    :type trace: boolean, optional
+    '''
     #
     #  Names of all the packet type
     #
@@ -103,6 +115,18 @@ class Magnum:
     # returns a list of tupples of {message type, bytes of packet, and tupple of {unpacked packet values)}
     #
     def getPackets(self):
+        '''
+        Retrieves the raw packets. This is not normally used.
+
+        :return: List of returned :class:`tupple` objects
+        :rtype: list
+        
+        **tupple**:
+
+        - name of packet
+        - bytes of packet
+        - tupple of unpacked values - Bassed on ME documentation
+        '''
         packet = bytearray()
         packets = []
         #
@@ -279,6 +303,18 @@ class Magnum:
     #  returns a deepcopy of the device data collections
     #
     def getDevices(self, packets=None):
+        '''
+        Get a list of all identified devices 
+
+        :param packets: a list of packets as returned by **getPackets**, Default is None
+        :type packets: list, optional
+        :return: List of device dictionaries 
+    
+        Each dictionary has two items:
+
+        - **device**  one of INVERTER, REMOTE, AGS, BMK and PT100  
+        - **data** contains a dictionary of values for the device.
+        '''
         workpackets = packets if packets else self.getPackets()
         # pass all the packets to the correct object
         for packet in workpackets:
@@ -287,18 +323,18 @@ class Magnum:
                 if self.inverter == None:
                     self.inverter = InverterDevice(trace=self.trace)
                 self.inverter.parse(packet)
-            elif packetType in (Magnum.REMOTE_00, 
-                                Magnum.REMOTE_11, 
-                                Magnum.REMOTE_80, 
-                                Magnum.REMOTE_A0, 
-                                Magnum.REMOTE_A1, 
-                                Magnum.REMOTE_A2, 
-                                Magnum.REMOTE_A3, 
-                                Magnum.REMOTE_A4, 
-                                Magnum.REMOTE_C0, 
-                                Magnum.REMOTE_C1, 
-                                Magnum.REMOTE_C2, 
-                                Magnum.REMOTE_C3, 
+            elif packetType in (Magnum.REMOTE_00,
+                                Magnum.REMOTE_11,
+                                Magnum.REMOTE_80,
+                                Magnum.REMOTE_A0,
+                                Magnum.REMOTE_A1,
+                                Magnum.REMOTE_A2,
+                                Magnum.REMOTE_A3,
+                                Magnum.REMOTE_A4,
+                                Magnum.REMOTE_C0,
+                                Magnum.REMOTE_C1,
+                                Magnum.REMOTE_C2,
+                                Magnum.REMOTE_C3,
                                 Magnum.REMOTE_D0):
                 if self.remote == None:
                     self.remote = RemoteDevice(trace=self.trace)
@@ -571,7 +607,7 @@ class InverterDevice:
         if self.data["fault"] in faults:
             self.data["fault_text"] = faults[self.data["fault"]]
 
-    def set_chgled_text(self):    
+    def set_chgled_text(self):
             self.data["chgled_text"] = "Off" if self.data["chgled"] == 0 else "On"
 
     def set_invled_text(self):
@@ -770,7 +806,7 @@ class PT100Device:
                 self.data['regulation_text'] = regulations[self.data['regulation']]
             else:
                 self.data['regulation_text'] = "Unknown"
-            faults =   {         
+            faults =   {
                 0: "No Fault",
                 1: "Input er Fault",
                 2: "Output er Fault",
