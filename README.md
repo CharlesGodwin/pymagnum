@@ -6,15 +6,13 @@ This software is not endorsed or supported by Magnum Energy, a product of Sensat
 
 Source site is: https://github.com/CharlesGodwin/pymagnum.
 
-The package software is also being hosted on a test publishing system. It will be migrated to the regular, public PyPi host when testing is complete.
-
-**This is untested software! It will not be publicly published until it has been tested with live equipment. Please report all success and failure to the [author](#feedback). Thank you.**
+**Although this software has been tested, it is new. Please report all success and failure to the [author](#feedback). Thank you.**
 
 In order to use this software you need to have a RS485 adaptor connected to a Magnum Energy Network. Refer to this document (https://gitlab.com/Magnum_Energy/distribution/blob/master/Building_a_Magnum_Energy_Adaptor.pdf) for instructions.
 
 ## Installation
 
-Throughout this documentation Python and its installer pip are refered to using the default convention of a Raspberry Pi. The term `python3` and `pip3` refer to Python 3 versions of the programs. On other systems the default installation may be Python 3 so just use `python` and `pip` in those systems.
+Throughout this documentation `python` and its installer `pip` are refered to using the default convention of a Raspberry Pi. The term `python3` and `pip3` refer to Python 3 versions of the programs. On other systems the default installation may be Python 3 so just use `python` and `pip` in those systems. This software requires at least version 3.5 of Python.
 
 You will need pip3 installed. On a Pi use:  
 `sudo apt install python3-pip`
@@ -47,6 +45,21 @@ Length:21 REMOTE_00 =>400000F60002770001003311241E6B000001025800
 Packets:45 in 1.10 seconds
 </pre>
 If nothing happens or you get a lot of UNKNOWN lines, try reversing the two wires on your setup and repeating the test. If that fails contact the [author](#feedback).
+
+Here's an example of results if the wires are switched.
+<pre>
+Length:42 UNKNOWN   =>7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFFFFFF87F75FE1D1F3FF6FB5E6FAD7C7C7F173C5D7BD
+Length:29 UNKNOWN   =>0076F8FEFCFEFCFE7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
+Length:40 UNKNOWN   =>FFFF87F75FE1D1F3FF6FB5E6FAD7FF5FFF0FD70FBBFA6EE933FFBBEFC9E711FFF92FB5FF89EBFDFE
+Length:42 UNKNOWN   =>7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFFFFFF87F75FE1D1F3FF6FB5E6FAD74341FFB7FBFFB9
+Length:42 UNKNOWN   =>7FFFFD99FFFF11FFFDFF99EFD3E129FFFFFFFB4FFFFFFF87F75FE1D1F3FF6FB5E6FAD7C3C3FFFFFFFFB7
+Length:29 UNKNOWN   =>00F4D15C46FC9EFC7FFFFD99FFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
+Length:42 UNKNOWN   =>FFFF87F75FE1D1F3FF6FB5E6FAD7FFFFFFFFA9FFFF7FFFFD99FFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
+Length:42 UNKNOWN   =>FFFF87F75FE1D1F3FF6FB5E6FAD7FFFFFFFFFFFFFF7FFFFD99FFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
+Length:29 UNKNOWN   =>FFFF87F75FE1D1F3FF6FB5E6FAD7FBCDD7FF23FFBF007AE85C8CFE24FC
+Length:42 UNKNOWN   =>7FFFFD99FFFF11FFFDFF99EFD3E129FFFFFFFB4FFFFFFF87F75FE1D1F3FF6FB5E6FAD7C7C7F173C5D7BD
+Length:29 UNKNOWN   =>007AF45C8CFE24FC7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
+</pre>
 
 ## Available Tools
 Tools will be added as they are developed. Tools are implemented as Python modules and can be invoked with this generalized command:
