@@ -34,7 +34,7 @@ class Magnum:
     :type trace: boolean, optional
     '''
     #
-    #  Names of all the packet type
+    #  Names of all the packet types
     #
     AGS_A1 = "AGS_A1"
     AGS_A2 = "AGS_A2"
@@ -63,7 +63,7 @@ class Magnum:
     # refer to struct.unpack for format description
     #
     default_remote = 'BBBBBbBBBBBBBB'
-    formats = {
+    unpackFormats = {
         AGS_A1: 'BbBbBB',
         AGS_A2: 'BBBHB',
         BMK_81:  'BbHhHHhHHBB',
@@ -176,7 +176,7 @@ class Magnum:
 
     #
     # based on what we know from ME doucmentation
-    # attempt to build a know packet and unpack its data into values
+    # attempt to build a known packet and unpack its data into values
     #
     def parsePacket(self, packet):
         if len(packet) == 22:
@@ -259,7 +259,11 @@ class Magnum:
                         packetType = Magnum.REMOTE_11
                     elif lastbyte == 0xD0:
                         packetType = Magnum.REMOTE_D0
-            mask = ">" + Magnum.formats[packetType]
+            #
+            # Unpack as big endian
+            # Refer to unpackFormats
+            #
+            mask = ">" + Magnum.unpackFormats[packetType]
             if len(mask) > 1:
                 try:
                     fields = unpack(mask, packet)
@@ -273,7 +277,7 @@ class Magnum:
 
     #
     # cleanup looks for consecutive UNKNOWN packet pairs and concatenates the pair
-    # and attempts to parse the result. It has reasonable success
+    # and attempts to parse the result. It has reasonable success.
     #
     def cleanup(self, messages):
         cleaned = []
@@ -302,22 +306,24 @@ class Magnum:
     #
     #  returns a deepcopy of the device data collections
     #
-    def getDevices(self, packets=None):
+    def getDevices(self):
         '''
         Get a list of all identified devices 
-
-        :param packets: a list of packets as returned by **getPackets**, Default is None
-        :type packets: list, optional
         :return: List of device dictionaries 
     
         Each dictionary has two items:
 
-        - **device**  one of INVERTER, REMOTE, AGS, BMK and PT100  
+        - **device**  one of INVERTER, REMOTE, AGS, BMK or PT100  
         - **data** contains a dictionary of values for the device.
         '''
-        workpackets = packets if packets else self.getPackets()
-        # pass all the packets to the correct object
-        for packet in workpackets:
+        # pass each the packets to the correct object
+        #
+        # each packet is a tupple of: 
+        #     type(string) name of packet
+        #     raw packet (bytes) the raw binary bytes of the packet
+        #     unpacked data (tupple int) integers of data deconstructed to macth ME definition
+        #
+        for packet in self.getPackets():
             packetType = packet[0]
             if packetType == Magnum.INV:
                 if self.inverter == None:
