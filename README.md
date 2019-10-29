@@ -27,10 +27,10 @@ first determine your serial device by running
 Normally a USB device will show up as `/dev/ttyUSB0` and a HAT as `/dev/ttyAMA0` or `/dev/ttyS0`
 
 Next run the provided test program  
-`python3 -m magnum.tools.testrs485 --help`   will tell you choices.
+`python3 -m magnum.tools.magtest --help`   will tell you choices.tesrs485
 
 Usually just run  
-`python3 -m magnum.tools.testrs485 -d /dev/ttyUSB0` or other device name.  
+`python3 -m magnum.tools.magtest -d /dev/ttyUSB0` or other device name.  
 This should show up to 50 packets with names. such as:
 <pre>
 Length:21 REMOTE_A2 =>00003C04500F170601C8A5860100465000781478A2
@@ -64,11 +64,11 @@ Length:29 UNKNOWN   =>007AF45C8CFE24FC7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
 ## Available Tools
 Tools will be added as they are developed. Tools are implemented as Python modules and can be invoked with this generalized command:
 `python3 -m magnum.tools.<tool name> --help`
-Currently the tools avaiable are:
+Currently the tools available are:
 
-### testrs485
+### magtest
 This tool is described in the installation instructions.
-`python3 -m magnum.tools.testrs485 --help`
+`python3 -m magnum.tools.magtest --help`
 
 ## magdump
 This is a program that will dump a JSON string to the console for all available devices.  The default is to dump a string and exit. But if the interval is set to a number the program will dump a string every <interval> seconds

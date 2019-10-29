@@ -127,64 +127,59 @@ import traceback
 from collections import OrderedDict
 from datetime import datetime
 
+import magnum
 
+parser = argparse.ArgumentParser(description="Magnum Data Dump",
+                                    epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
+parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
+                    help="Serial device name (default: %(default)s)")
+parser.add_argument("-i", "--interval", default=0, type=int, dest='interval',
+                    help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
+parser.add_argument('-v', "--verbose", action="store_true", default=False,
+                    help="Display options at runtime (default: %(default)s)")
+seldom = parser.add_argument_group("Seldom used")
+seldom.add_argument("--packets", default=50, type=int,
+                    help="Number of packets to generate in reader (default: %(default)s)")
+seldom.add_argument("--timeout", default=0.005, type=float,
+                    help="Timeout for serial read (default: %(default)s)")
+seldom.add_argument("--trace", action="store_true", default=False,
+                    help="Add most recent raw packet info to data (default: %(default)s)")
+seldom.add_argument("-nc", "--nocleanup", action="store_false",
+                    help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
+args = parser.parse_args()
 
-def main():
-    import magnum
-    parser = argparse.ArgumentParser(description="Magnum Data Dump",
-                                     epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
-    parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
-                        help="Serial device name (default: %(default)s)")
-    parser.add_argument("-i", "--interval", default=0, type=int, dest='interval',
-                        help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
-    parser.add_argument('-v', "--verbose", action="store_true", default=False,
-                        help="Display options at runtime (default: %(default)s)")
-    seldom = parser.add_argument_group("Seldom used")
-    seldom.add_argument("--packets", default=50, type=int,
-                        help="Number of packets to generate in reader (default: %(default)s)")
-    seldom.add_argument("--timeout", default=0.005, type=float,
-                        help="Timeout for serial read (default: %(default)s)")
-    seldom.add_argument("--trace", action="store_true", default=False,
-                        help="Add most recent raw packet info to data (default: %(default)s)")
-    seldom.add_argument("-nc", "--nocleanup", action="store_false",
-                        help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
-    args = parser.parse_args()
-
-    if args.verbose:
-        print("Options:{}".format(str(args).replace(
-            "Namespace(", "").replace(")", "")))
-    magnumReader = magnum.magnum.Magnum(device=args.device, packets=args.packets,
-                                 timeout=args.timeout, cleanpackets=args.cleanpackets)
-    if args.interval != 0 and args.verbose == True:
-        print("Dumping every:{1} seconds. Using: {0} ".format(
-            args.device, args.interval))
-    while True:
-        start = time.time()
-        devices = magnumReader.getDevices()
-        if len(devices) != 0:
-            try:
-                now = int(time.time())
-                alldata = OrderedDict()
-                alldata["datetime"] = str(
-                    datetime.fromtimestamp(now).astimezone())
-                alldata["device"] = 'MAGNUM'
-                magnumdata = []
-                for device in devices:
-                    data = OrderedDict()
-                    data["device"] = device["device"]
-                    data["data"] = device["data"]
-                    magnumdata.append(data)
-                alldata["data"] = magnumdata
-                print(json.dumps(
-                    alldata, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':')))
-            except:
-                traceback.print_exc()
-        if args.interval == 0:
-            break
-        interval = time.time() - start
-        sleep = args.interval - interval
-        if sleep > 0:
-            time.sleep(sleep)
-
-if __name__ == '__main__':
-    main()
+if args.verbose:
+    print("Options:{}".format(str(args).replace(
+        "Namespace(", "").replace(")", "")))
+magnumReader = magnum.magnum.Magnum(device=args.device, packets=args.packets,
+                                    timeout=args.timeout, cleanpackets=args.cleanpackets)
+if args.interval != 0 and args.verbose == True:
+    print("Dumping every:{1} seconds. Using: {0} ".format(
+        args.device, args.interval))
+while True:
+    start = time.time()
+    devices = magnumReader.getDevices()
+    if len(devices) != 0:
+        try:
+            now = int(time.time())
+            alldata = OrderedDict()
+            alldata["datetime"] = str(
+                datetime.fromtimestamp(now).astimezone())
+            alldata["device"] = 'MAGNUM'
+            magnumdata = []
+            for device in devices:
+                data = OrderedDict()
+                data["device"] = device["device"]
+                data["data"] = device["data"]
+                magnumdata.append(data)
+            alldata["data"] = magnumdata
+            print(json.dumps(
+                alldata, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':')))
+        except:
+            traceback.print_exc()
+    if args.interval == 0:
+        break
+    interval = time.time() - start
+    sleep = args.interval - interval
+    if sleep > 0:
+        time.sleep(sleep)
