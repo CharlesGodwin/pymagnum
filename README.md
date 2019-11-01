@@ -8,7 +8,7 @@ Source site is: https://github.com/CharlesGodwin/pymagnum.
 
 **Although this software has been tested, it is new. Please report all success and failure to the [author](#feedback). Thank you.**
 
-In order to use this software you need to have a RS485 adaptor connected to a Magnum Energy Network. Refer to this document (https://gitlab.com/Magnum_Energy/distribution/blob/master/Building_a_Magnum_Energy_Adaptor.pdf) for instructions.
+In order to use this software you need to have a RS485 adaptor connected to a Magnum Energy Network. Refer to this document (https://github.com/CharlesGodwin/pymagnum/blob/master/Building_a_Magnum_Energy_Adaptor.pdf) for instructions. In order to read this properly we recoomend you download the fie first. github does not render PF files accuratetly.
 
 ## Installation
 
