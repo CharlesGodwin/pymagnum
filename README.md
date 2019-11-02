@@ -21,8 +21,8 @@ Throughout this documentation `python` and its installer `pip` are refered to us
 You will need pip3 installed. On a Pi use:  
 `sudo apt install python3-pip`
 
-Then install or update this software package using:  
-`sudo pip3 install --upgrade  -i https://test.pypi.org/simple/ pymagnum`
+Then install or upgrade this software package using:  
+`sudo pip3 install --upgrade pymagnum`
 
 Once this software is installed test the interconnect hardware:
 
