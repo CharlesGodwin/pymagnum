@@ -3,4 +3,4 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
-__version__="1.0a2"
+__version__="1.0rc1"
