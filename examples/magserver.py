@@ -18,7 +18,6 @@ from magnum import magnum
 
 magnumReader = None
 
-
 class magServer(BaseHTTPRequestHandler):
 
     def log_request(self, code='-', size='-'):
@@ -44,7 +43,7 @@ class magServer(BaseHTTPRequestHandler):
                 now = int(time.time())
                 data["datetime"] = str(
                     datetime.fromtimestamp(now).astimezone())
-                data["timestamp"] = now
+
                 data["devices"] = devices
                 jsonString = json.dumps(data)
                 self.wfile.write(jsonString.encode("utf8"))

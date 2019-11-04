@@ -16,7 +16,7 @@ from magnum import magnum
 parser = argparse.ArgumentParser(description="Magnum Data Extractor Example")
 parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
                     help="Serial device name (default: %(default)s)")
-parser.add_argument("-i", "--interval", default=30, type=int, dest='interval',
+parser.add_argument("-i", "--interval", default=60, type=int, dest='interval',
                     help="Interval, in seconds between logging (default: %(default)s)")
 args = parser.parse_args()
 reader = magnum.Magnum(device=args.device)

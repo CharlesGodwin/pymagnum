@@ -118,10 +118,10 @@ class Magnum:
         '''
         Retrieves the raw packets. This is not normally used.
 
-        :return: List of returned :class:`tupple` objects
+        :return: List of `tupple` objects
         :rtype: list
         
-        **tupple**:
+        **tupple contents**:
 
         - name of packet
         - bytes of packet
@@ -308,13 +308,15 @@ class Magnum:
     #
     def getDevices(self):
         '''
-        Get a list of all identified devices 
+        Get a list of connected devices 
+
         :return: List of device dictionaries 
+        :rtype: list
     
         Each dictionary has two items:
 
-        - **device**  one of INVERTER, REMOTE, AGS, BMK or PT100  
-        - **data** contains a dictionary of values for the device.
+        - **device**  One of INVERTER, REMOTE, AGS, BMK or PT100  
+        - **data** A dictionary of name/value pairs for the device.
         '''
         # pass each the packets to the correct object
         #

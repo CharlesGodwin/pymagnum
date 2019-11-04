@@ -13,4 +13,5 @@ pymagnum.code-workspace
 *.bak
 credentials.txt
 Building_a_Magnum_Energy_Adaptor/
-~$ilding_a_Magnum_Energy_Adaptor.docx
+source/_build
+docs/_build
