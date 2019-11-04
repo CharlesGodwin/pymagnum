@@ -9,7 +9,7 @@ from distutils.core import setup
 import setuptools
 import magnum
 
-with open("README.md", "r") as file:
+with open("README.rst", "r") as file:
     long_description = file.read()
 
 setup(name='pymagnum',
@@ -18,7 +18,7 @@ setup(name='pymagnum',
       author='Charles Godwin',
       author_email='magnum@godwin.ca',
       long_description=long_description,
-      long_description_content_type="text/markdown",
+      long_description_content_type="text/x-rst",
       license="BSD",
       url='https://github.com/CharlesGodwin/pymagnum',
       packages=setuptools.find_packages(),

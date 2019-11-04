@@ -50,9 +50,8 @@ Usually just run
 name.
 This should show up to 50 packets with names. such as:
 
-.. raw:: html
+::
 
-   <pre>
    Length:21 REMOTE_A2 =>00003C04500F170601C8A5860100465000781478A2
    Length:18 BMK_81    =>81550992FFC0089B0C77FFBFE11300390A01
    Length:21 INVERTER  =>400000F60002780001003311241E6B000001025800
@@ -63,7 +62,6 @@ This should show up to 50 packets with names. such as:
    .
    .
    Packets:50 in 1.10 seconds
-   </pre>
 
 If nothing happens or you get a lot of UNKNOWN lines, try reversing the
 two wires on your setup and repeating the test. Also double check you
@@ -73,9 +71,8 @@ are referencing the right device. HAT serial device can be either
 
 Here’s an example of results if the wires are switched.
 
-.. raw:: html
+::
 
-   <pre>
    Length:42 UNKNOWN   =>7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFFFFFF87F75FE1D1F3FF6FB5E6FAD7C7C7F173C5D7BD
    Length:29 UNKNOWN   =>0076F8FEFCFEFCFE7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
    Length:40 UNKNOWN   =>FFFF87F75FE1D1F3FF6FB5E6FAD7FF5FFF0FD70FBBFA6EE933FFBBEFC9E711FFF92FB5FF89EBFDFE
@@ -87,7 +84,6 @@ Here’s an example of results if the wires are switched.
    Length:29 UNKNOWN   =>FFFF87F75FE1D1F3FF6FB5E6FAD7FBCDD7FF23FFBF007AE85C8CFE24FC
    Length:42 UNKNOWN   =>7FFFFD99FFFF11FFFDFF99EFD3E129FFFFFFFB4FFFFFFF87F75FE1D1F3FF6FB5E6FAD7C7C7F173C5D7BD
    Length:29 UNKNOWN   =>007AF45C8CFE24FC7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
-   </pre>
 
 Available Tools
 ---------------
@@ -115,9 +111,8 @@ interval is set to a number, the program will dump a string every
 
 The regular options to set with this tool are:
 
-.. raw:: html
+::
 
-   <pre>
     -h, --help            show this help message and exit
     -d DEVICE, --device DEVICE
                           Serial device name (default: /dev/ttyUSB0)
@@ -132,16 +127,7 @@ The regular options to set with this tool are:
     --trace               Add most recent raw packet info to data (default:
                           False)
     -nc, --nocleanup      Suppress clean up of unknown packets (default: True)
-   </pre>
 
-Remove software
----------------
-
-| If you want to know what version is installed use:
-| ``pip3 show pymagnum``
-
-| If you want to remove the software use:
-| ``sudo pip3 uninstall pymagnum``
 
 Usage
 -----
@@ -151,15 +137,13 @@ examples directory.
 
 Typical usage is:
 
-.. raw:: html
+::
 
-   <pre>
    from magnum import magnum
 
    reader = magnum.Magnum(device='/dev/ttyUSB0')
    devices = reader.getDevices()
    print(devices)
-   </pre>
 
 You need to import the magnum module, instantiate the class with
 optional parameters and then get an instance of the models for
