@@ -14,3 +14,4 @@ pymagnum.code-workspace
 credentials.txt
 Building_a_Magnum_Energy_Adaptor/
 source/_build
+docs/_build
