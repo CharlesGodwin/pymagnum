@@ -10,6 +10,7 @@ of Sensata Technologies https://www.magnum-dimensions.com/
 `Documentation <https://pymagnum.readthedocs.io/>`_
 
 `Changes <https://github.com/CharlesGodwin/pymagnum/blob/master/CHANGES.rst>`_
+
 Copyright (c) 2018-2019 Charles Godwin magnum@godwin.ca
 
 SPDX-License-Identifier: BSD-3-Clause

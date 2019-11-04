@@ -2,6 +2,9 @@
 
 Setup
 -----
+
+`The Python package site <https://pypi.org/project/pymagnum/>`_
+
 Installation
 ============
 
