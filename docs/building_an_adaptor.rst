@@ -169,7 +169,7 @@ but do NOT recommend it. Once the supplier provided information for
 pinouts, I was able to read data using it, but I got a very high rate of
 bad packets.
 
-|image11|\ 
+|image11|\
 
 
 |image12|
