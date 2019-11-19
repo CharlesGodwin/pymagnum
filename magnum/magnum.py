@@ -95,14 +95,8 @@ class Magnum:
         self.timeout = timeout
         self.cleanpackets = cleanpackets
         self.trace = trace
-        self.reader = serial.serial_for_url(device,
-                                            baudrate=19200,
-                                            bytesize=8,
-                                            timeout=timeout,
-                                            stopbits=serial.STOPBITS_ONE,
-                                            dsrdtr=False,
-                                            parity=serial.PARITY_NONE)
-        self.reader.close()
+        self.device = device
+        self.reader = None
         self.inverter = None
         self.remote = None
         self.bmk = None
@@ -111,7 +105,7 @@ class Magnum:
         self.pt100 = None
         self.inverter_revision = -1
         self.inverter_model = -1
-    #
+
     # returns a list of tupples of {message type, bytes of packet, and tupple of {unpacked packet values)}
     #
     def getPackets(self):
@@ -127,6 +121,36 @@ class Magnum:
         - bytes of packet
         - tupple of unpacked values - Bassed on ME documentation
         '''
+        packets = self.readPackets()
+        messages = []
+        unknown = 0
+        for packet in packets:
+            message = self.parsePacket(packet)
+            if message[0] == UNKNOWN:
+                unknown += 1
+            messages.append(message)
+        #
+        # if there at least 2 UNKNOWN packets
+        # attemtp to clean them up
+        #
+        if unknown > 1 and self.cleanpackets:
+            messages = self.cleanup(messages)
+        return messages
+        #
+    #  raw read of packets to bytes[]
+    #  This can be overriden for tests
+    #
+
+    def readPackets(self):
+        if self.reader == None:
+            self.reader = serial.serial_for_url(self.device,
+                                                baudrate=19200,
+                                                bytesize=8,
+                                                timeout=self.timeout,
+                                                stopbits=serial.STOPBITS_ONE,
+                                                dsrdtr=False,
+                                                parity=serial.PARITY_NONE)
+            self.reader.close()
         packet = bytearray()
         packets = []
         #
@@ -156,24 +180,8 @@ class Magnum:
                 packetsleft -= 1
                 packet = bytearray()
         self.reader.close()
-        #
-        # end of packet reads
-        #
-        messages = []
-        unknown = 0
-        for packet in packets:
-            message = self.parsePacket(packet)
-            if message[0] == UNKNOWN:
-                unknown += 1
-            messages.append(message)
-        #
-        # if there at least 2 UNKNOWN packets
-        # attemtp to clean them up
-        #
-        if unknown > 1 and self.cleanpackets:
-            messages = self.cleanup(messages)
-        return messages
-
+        return packets
+    #
     #
     # based on what we know from ME doucmentation
     # attempt to build a known packet and unpack its data into values
@@ -219,7 +227,7 @@ class Magnum:
                     #
                     #  Also the ME-ARC sends a spurious record with a zero end byte
                     #
-                    if packet[:14] == Magnum.sevenzeros:
+                    if packet[-7:] == Magnum.sevenzeros:
                         packetType = Magnum.REMOTE_00
                     else:
                         if version == (self.inverter_revision and model == self.inverter_model) or self.inverter_revision == -1:
