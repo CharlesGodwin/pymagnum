@@ -9,7 +9,9 @@ Magnum Energy network.
 This software is not endorsed or supported by Magnum Energy, a product
 of Sensata Technologies https://www.magnum-dimensions.com/
 
-`Documentation <https://pymagnum.readthedocs.io/>`_
+Please read the documentation before installing this package.
+
+g`Documentation <https://pymagnum.readthedocs.io/>`_
 
 `Changes <https://github.com/CharlesGodwin/pymagnum/blob/master/CHANGES.rst>`_
 
