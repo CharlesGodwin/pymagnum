@@ -236,7 +236,7 @@ class Magnum:
                             packetType = Magnum.REMOTE_00
                 else:
                     if lastbyte == 0:
-                        if version == (self.inverter_revision and model == self.inverter_model) or self.inverter_revision == -1:
+                        if (version == self.inverter_revision and model == self.inverter_model) or self.inverter_revision == -1:
                             packetType = Magnum.INV
                             if self.inverter_revision == -1:
                                 self.inverter_revision = version
@@ -483,13 +483,13 @@ class BMKDevice:
         self.device["data"] = self.data
         self.data["revision"] = ""
         self.data["soc"] = 0
-        self.data["vdc"] = 0
-        self.data["adc"] = 0
-        self.data["vmin"] = 0
-        self.data["vmax"] = 0
+        self.data["vdc"] = 0.0
+        self.data["adc"] = 0.0
+        self.data["vmin"] = 0.0
+        self.data["vmax"] = 0.0
         self.data["amph"] = 0
-        self.data["amphtrip"] = 0
-        self.data["amphout"] = 0
+        self.data["amphtrip"] = 0.0
+        self.data["amphout"] = 0.0
         self.data["Fault"] = 0
         self.data["Fault_Text"] = ""
 
