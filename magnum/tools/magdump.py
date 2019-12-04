@@ -164,10 +164,9 @@ def main():
         devices = magnumReader.getDevices()
         if len(devices) != 0:
             try:
-                now = int(time.time())
                 alldata = OrderedDict()
-                alldata["datetime"] = str(
-                    datetime.fromtimestamp(now).astimezone())
+                alldata["datetime"] = datetime.now().astimezone().replace(
+                    microsecond=0).isoformat()
                 alldata["device"] = 'MAGNUM'
                 magnumdata = []
                 for device in devices:
