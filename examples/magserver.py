@@ -15,6 +15,7 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 from magnum import magnum
+from tzlocal import get_localzone
 
 magnumReader = None
 
@@ -41,8 +42,8 @@ class magServer(BaseHTTPRequestHandler):
                 self._set_headers(contenttype="application/json")
                 data = OrderedDict()
                 now = int(time.time())
-                data["datetime"] = str(
-                    datetime.fromtimestamp(now).astimezone())
+                data["datetime"] = datetime.now(
+                    get_localzone()).replace(microsecond=0).isoformat()
 
                 data["devices"] = devices
                 jsonString = json.dumps(data)

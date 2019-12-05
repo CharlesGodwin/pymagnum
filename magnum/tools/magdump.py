@@ -127,7 +127,9 @@ import traceback
 from collections import OrderedDict
 from datetime import datetime
 
-from magnum import magnum, __version__
+from magnum import __version__, magnum
+from tzlocal import get_localzone
+
 
 def main():
     global args
@@ -165,8 +167,8 @@ def main():
         if len(devices) != 0:
             try:
                 alldata = OrderedDict()
-                alldata["datetime"] = datetime.now().astimezone().replace(
-                    microsecond=0).isoformat()
+                alldata["datetime"] = datetime.now(
+                    get_localzone()).replace(microsecond=0).isoformat()
                 alldata["device"] = 'MAGNUM'
                 magnumdata = []
                 for device in devices:

@@ -52,8 +52,8 @@ from collections import OrderedDict
 from datetime import datetime
 
 import paho.mqtt.client as mqtt
-
 from magnum import magnum
+from tzlocal import get_localzone
 
 parser = argparse.ArgumentParser(description="Magnum Data MQTT Publisher",
                                  epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
@@ -105,7 +105,8 @@ while True:
             client.connect(args.broker)
             data = OrderedDict()
             now = int(time.time())
-            data["datetime"] = str(datetime.fromtimestamp(now).astimezone())
+            data["datetime"] = datetime.now(
+                get_localzone()).replace(microsecond=0).isoformat()
             for device in devices:
                 topic = args.topic + device["device"].lower()
                 data["device"] = device["device"]

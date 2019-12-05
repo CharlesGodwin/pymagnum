@@ -29,7 +29,7 @@ setup(name='pymagnum',
           "License :: OSI Approved :: BSD License",
           "Operating System :: OS Independent"
       ],
-      install_requires=['pyserial'],
+      install_requires=['pyserial', 'tzlocal'],
       python_requires='>=3.5',
       entry_points={
           'console_scripts': [
