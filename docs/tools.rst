@@ -3,16 +3,15 @@
 Available Tools
 ---------------
 
-Tools will be added as they are developed. Tools are implemented as
-Python modules and can be invoked with this generalized command:
-``python3 -m magnum.tools.<tool name> --help`` Currently the tools
+Tools will be added as they are developed. Currently the tools
 available are:
 
 magtest
 =======
 
 This tool is described in the installation instructions.
-``python3 -m magnum.tools.magtest --help``
+
+``magtest --help``
 
 magdump
 =======
@@ -22,7 +21,7 @@ available devices. The default is to dump a string and exit. But if the
 interval is set to a number, the program will dump a string every
 ``interval`` seconds
 
-``python3 -m magnum.tools.magdump --help``
+``magdump --help``
 
 The regular options to set with this tool are:
 
