@@ -400,16 +400,16 @@ class AGSDevice:
         self.device = OrderedDict()
         self.device["device"] = AGS
         self.device["data"] = self.data
-        self.data["revision"] = 0.0
+        self.data["revision"] = '0.0'
         self.data["status"] = 0
         self.data["status_text"] = ""
         self.data["running"] = False
-        self.data["temp"] = 0
-        self.data["runtime"] = 0
+        self.data["temp"] = 0.0
+        self.data["runtime"] = 0.0
         self.data["gen_last_run"] = 0
         self.data["last_full_soc"] = 0
         self.data["gen_total_run"] = 0
-        self.data["vdc"] = 0
+        self.data["vdc"] = 0.0
 
     def parse(self, packet):
         packetType = packet[0]
@@ -729,10 +729,10 @@ class PT100Device:
         self.data["battery_amps"] = 0
         self.data["pv_voltage"] = 0
         self.data["charge_time"] = 0
-        self.data["target_battery_voltage"] = 0
+        self.data["target_battery_voltage"] = 0.0
         self.data["relay_state"] = 0
         self.data["alarm_state"] = 0
-        self.data["battery_temperature"] = 0
+        self.data["battery_temperature"] = 0.0
         self.data["inductor_temperature"] = 0
         self.data["fet_temperature"] = 0
         self.data["lifetime_kwhrs"] = 0
@@ -796,7 +796,7 @@ class PT100Device:
             byte_value = unpacked[11]
             self.data['inductor_temperature'] = byte_value
             byte_value = unpacked[12]
-            self.data['fet_temperature'] = (byte_value)
+            self.data['fet_temperature'] = byte_value
             modes = {
                 2: "Sleep",
                 3: "Float",
