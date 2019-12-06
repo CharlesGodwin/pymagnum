@@ -34,11 +34,11 @@ Once this software is installed, test the interconnect hardware:
   up as ``/dev/ttyUSB0`` and a HAT as ``/dev/ttyAMA0`` or ``/dev/ttyS0``
 
 | Next run the provided test program
-| ``python3 -m magnum.tools.magtest --help``
+| ``magtest --help``
 | will tell you choices.
 
 Usually you just need to run
-``python3 -m magnum.tools.magtest -d /dev/ttyUSB0`` or other device
+``magtest -d /dev/ttyUSB0`` or other device
 name.
 This should show up to 50 packets with names. such as: ::
 
@@ -53,8 +53,26 @@ This should show up to 50 packets with names. such as: ::
    .
    Packets:50 in 1.10 seconds
 
-If nothing happens or you get a lot of UNKNOWN lines, try reversing the
-two wires on your setup and repeating the test. Also double check you
+Troubleshooting
+===============
+
+
+If nothing happens or you get a lot of UNKNOWN lines, try these trouble shooting routines.
+
+timeout is too short
+--------------------
+
+One problem is that the default settings for determining the end of a packet
+is not right for your setup. try increasing the timeout by adding this to your test
+``magtest --timeout 0.005 -d /dev/ttyUSB0``
+
+Increase the value if neccesary.
+
+
+Reverse Wiring
+--------------
+
+try reversing the two wires on your setup and repeating the test. Also double check you
 are referencing the right device. HAT serial device can be either
 ``/dev/ttyAMA0`` or ``/dev/ttyS0``. Try both. If that fails contact the
 author using :ref:`feedback`.
@@ -72,6 +90,7 @@ Here’s an example of results if the wires are switched::
    Length:29 UNKNOWN   =>FFFF87F75FE1D1F3FF6FB5E6FAD7FBCDD7FF23FFBF007AE85C8CFE24FC
    Length:42 UNKNOWN   =>7FFFFD99FFFF11FFFDFF99EFD3E129FFFFFFFB4FFFFFFF87F75FE1D1F3FF6FB5E6FAD7C7C7F173C5D7BD
    Length:29 UNKNOWN   =>007AF45C8CFE24FC7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
+
 
 Copyright (c) 2018-2019 Charles Godwin magnum@godwin.ca
 
