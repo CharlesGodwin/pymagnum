@@ -15,3 +15,8 @@ credentials.txt
 Building_a_Magnum_Energy_Adaptor/
 source/_build
 docs/_build
+testdata/log.json.txt
+testdata/log.txt
+testdata/log2.txt
+testdata/log3.txt
+.pymodhis
