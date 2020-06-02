@@ -66,12 +66,12 @@ class Magnum:
     unpackFormats = {
         AGS_A1: 'BbBbBB',
         AGS_A2: 'BBBHB',
-        BMK_81:  'BbHhHHhHHBB',
-        INV: 'BBhhBBbbBBBBBBBBhb',
-        PT_C1: 'BbBBHhhbbbbbb',
-        PT_C2: 'BbBHBbBBBB',
-        PT_C3: 'BH11B',
-        PT_C4: '7B',
+        BMK_81: 'BbHhHHhHHBB',
+        INV:    'BBhhBBbbBBBBBBBBhb',
+        PT_C1:  'BBBBHhhBBBBBB',
+        PT_C2:  'BBHHbBBBBB',
+        PT_C3:  'BBH11B',
+        PT_C4:  '8B',
         REMOTE_00: default_remote + '7B',
         REMOTE_11: default_remote + '7B',  # just the first 2 bytes count
         REMOTE_80: default_remote + 'bbbb3B',
@@ -131,7 +131,7 @@ class Magnum:
             messages.append(message)
         #
         # if there at least 2 UNKNOWN packets
-        # attemtp to clean them up
+        # attempt to clean them up
         #
         if unknown > 1 and self.cleanpackets:
             messages = self.cleanup(messages)
@@ -278,7 +278,10 @@ class Magnum:
                 except Exception as e:
                     msg = "{0} Converting {1} - {2} bytes".format(
                         e.args[0], packetType, len(packet))
-                    raise unpack_error(msg) from e
+                    fields = {}
+                    print(msg)
+                    packetType = UNKNOWN
+                    # raise unpack_error(msg) from e
             else:
                 fields = {}
             return([packetType, packet, fields])
@@ -397,9 +400,9 @@ class AGSDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = AGS
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = AGS
+        self.deviceData["data"] = self.data
         self.data["revision"] = '0.0'
         self.data["status"] = 0
         self.data["status_text"] = ""
@@ -472,15 +475,15 @@ class AGSDevice:
             self.data["status_text"] = status[self.data["status"]]
 
     def getDevice(self):
-        return self.device
+        return self.deviceData
 
 class BMKDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = BMK
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = BMK
+        self.deviceData["data"] = self.data
         self.data["revision"] = ""
         self.data["soc"] = 0
         self.data["vdc"] = 0.0
@@ -517,15 +520,15 @@ class BMKDevice:
                 self.data["Fault_Text"] = "Fault Start"
 
     def getDevice(self):
-        return self.device
+        return self.deviceData
 
 class InverterDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = INVERTER
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = INVERTER
+        self.deviceData["data"] = self.data
         self.data["revision"] = str(0.0)
         self.data["mode"] = 0
         self.data["mode_text"] = ""
@@ -708,15 +711,15 @@ class InverterDevice:
             self.data["stackmode_text"] = "Unknown"
 
     def getDevice(self):
-        return self.device
+        return self.deviceData
 
 class PT100Device:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = PT100
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = PT100
+        self.deviceData["data"] = self.data
         self.data["address"] = 0
         self.data["on_off"] = 0
         self.data["mode"] = 0
@@ -886,7 +889,7 @@ class PT100Device:
             self.data['max_inductor_temperature'] = unpacked[6]
 
     def getDevice(self):
-        return self.device
+        return self.deviceData
 
 class RemoteDevice:
 
@@ -908,9 +911,9 @@ class RemoteDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = REMOTE
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = REMOTE
+        self.deviceData["data"] = self.data
         self.data["revision"] = "0.0"
         self.data["action"] = 0
         self.data["searchwatts"] = 0
@@ -1180,15 +1183,15 @@ class RemoteDevice:
         for item in RemoteDevice.noMSH:
             if item in self.data:
                 self.data.pop(item)
-        return self.device
+        return self.deviceData
 
 class RTRDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = RTR
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = RTR
+        self.deviceData["data"] = self.data
         self.data["revision"] = "0.0"
 
     def parse(self, packet):
@@ -1200,4 +1203,4 @@ class RTRDevice:
             self.data["revision"] = str(round(unpacked[1] / 10))
 
     def getDevice(self):
-        return self.device
+        return self.deviceData
