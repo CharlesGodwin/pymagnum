@@ -84,7 +84,7 @@ seldom.add_argument("-nc", "--nocleanup", action="store_false",
 args = parser.parse_args()
 if args.interval < 10 or args.interval > (60*60):
     parser.error(
-        "argument -i/--iinterval: must be between 10 seconds and 3600 (1 hour)")
+        "argument -i/--interval: must be between 10 seconds and 3600 (1 hour)")
 if args.topic[-1] != "/":
     args.topic += "/"
 print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))

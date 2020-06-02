@@ -51,8 +51,14 @@ def main():
         for packet in packets:
             if packet[0] == magnum.UNKNOWN:
                 unknown += 1
+            if args.trace:
+                end = ' decode:'
+            else:
+                end = '\n'
             print(formatstring.format(
-                len(packet[1]), packet[0], packet[1].hex().upper()))
+                len(packet[1]), packet[0], packet[1].hex().upper()), end=end)
+            if args.trace:
+                print(*packet[2])
         format1 = "Packets:{0} of {1} with {2} UNKNOWN, in {3:2.2f} seconds"
         format2 = "Packets:{0} in {3:2.2f} seconds"
         format = format1 if unknown > 0 else format2

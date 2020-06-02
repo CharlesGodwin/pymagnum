@@ -20,3 +20,16 @@ testdata/log.txt
 testdata/log2.txt
 testdata/log3.txt
 .pymodhis
+testdata/dump.txt
+testdata/dump1.txt
+testdata/dump2.txt
+testdata/log1_1.txt
+testdata/log1.txt
+testdata/log2_2.txt
+testdata/dump1_20200328.txt
+testdata/dump2_20200328.txt
+testdata/log1_20200328.txt
+testdata/log2_20200328.txt
+testdata/magnum_pt100.txt
+testdata/sample.csv
+testdata/magtest_20200601.log
