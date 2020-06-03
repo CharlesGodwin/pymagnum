@@ -40,10 +40,12 @@ class Magnum:
     AGS_A2 = "AGS_A2"
     BMK_81 = "BMK_81"
     INV = "INVERTER"
+    INV_CLASSIC = "INVERTER_CLASSIC"
     PT_C1 = "PT_C1"
     PT_C2 = "PT_C2"
     PT_C3 = "PT_C3"
     PT_C4 = "PT_C4"
+    REMOTE_CLASSIC = "REMOTE_CLASSIC"
     REMOTE_00 = "REMOTE_00"
     REMOTE_11 = "REMOTE_11"
     REMOTE_80 = "REMOTE_80"
@@ -67,11 +69,13 @@ class Magnum:
         AGS_A1: 'BbBbBB',
         AGS_A2: 'BBBHB',
         BMK_81: 'BbHhHHhHHBB',
-        INV:    'BBhhBBbbBBBBBBBBhb',
-        PT_C1:  'BBBBHhhBBBBBB',
-        PT_C2:  'BBHHbBBBBB',
-        PT_C3:  'BBH11B',
-        PT_C4:  '8B',
+        INV: 'BBhhBBbbBBBBBBBBhb',
+        INV_CLASSIC: "BBhhBBbbBBBBBB",
+        PT_C1: 'BBBBHhHBBBBBB',
+        PT_C2: 'BBHHbBBBBBB',
+        PT_C3: 'BBH11B',
+        PT_C4: '8B',
+        REMOTE_CLASSIC: default_remote,
         REMOTE_00: default_remote + '7B',
         REMOTE_11: default_remote + '7B',  # just the first 2 bytes count
         REMOTE_80: default_remote + 'bbbb3B',
@@ -119,7 +123,7 @@ class Magnum:
 
         - name of packet
         - bytes of packet
-        - tupple of unpacked values - Bassed on ME documentation
+        - tupple of unpacked values - Based on ME documentation
         '''
         packets = self.readPackets()
         messages = []
@@ -138,7 +142,7 @@ class Magnum:
         return messages
         #
     #  raw read of packets to bytes[]
-    #  This can be overriden for tests
+    #  This can be overridden for tests
     #
 
     def readPackets(self):
@@ -183,7 +187,7 @@ class Magnum:
         return packets
     #
     #
-    # based on what we know from ME doucmentation
+    # based on what we know from ME documentation
     # attempt to build a known packet and unpack its data into values
     #
     def parsePacket(self, packet):
@@ -276,8 +280,7 @@ class Magnum:
                 try:
                     fields = unpack(mask, packet)
                 except Exception as e:
-                    msg = "{0} Converting {1} - {2} bytes".format(
-                        e.args[0], packetType, len(packet))
+                    msg = "{0} Converting {1} - {2} bytes".format(e.args[0], packetType, len(packet))
                     fields = {}
                     print(msg)
                     packetType = UNKNOWN
@@ -312,7 +315,7 @@ class Magnum:
     #     returns an array of device ordered dictionary
     #
     #  Each class is instantiated only once per run time execution
-    #  This allows an oblect to reflect the latest CUMULATIVE value for the packets.
+    #  This allows an object to reflect the latest CUMULATIVE value for the packets.
     #  This is useful for PT100 and AGS packets which are not too numerous
     #
     #  returns a deepcopy of the device data collections
@@ -338,11 +341,12 @@ class Magnum:
         #
         for packet in self.getPackets():
             packetType = packet[0]
-            if packetType == Magnum.INV:
+            if packetType in (Magnum.INV, Magnum.INV_CLASSIC):
                 if self.inverter == None:
                     self.inverter = InverterDevice(trace=self.trace)
                 self.inverter.parse(packet)
-            elif packetType in (Magnum.REMOTE_00,
+            elif packetType in (Magnum.REMOTE_CLASSIC,
+                                Magnum.REMOTE_00,
                                 Magnum.REMOTE_11,
                                 Magnum.REMOTE_80,
                                 Magnum.REMOTE_A0,
@@ -558,7 +562,7 @@ class InverterDevice:
         unpacked = packet[2]
         if self.trace:
             self.data[packetType] = packet[1].hex().upper()
-        if packetType == Magnum.INV:
+        if packetType in( Magnum.INV, Magnum.INV_CLASSIC):
             self.data["mode"] = unpacked[0]
             self.data["fault"] = unpacked[1]
             self.data["vdc"] = unpacked[2] / 10
@@ -572,10 +576,12 @@ class InverterDevice:
             self.data["tfmr"] = unpacked[10]
             self.data["fet"] = unpacked[11]
             self.data["model"] = unpacked[12]
-            self.data["stackmode"] = unpacked[13]
-            self.data["AACin"] = unpacked[14]
-            self.data["AACout"] = unpacked[15]
-            self.data["Hz"] = round(unpacked[16] / 10, 2)
+            if packetType == Magnum.INV:
+                self.data["stackmode"] = unpacked[13]
+                self.data["AACin"] = unpacked[14]
+                self.data["AACout"] = unpacked[15]
+                self.data["Hz"] = round(unpacked[16] / 10, 2)
+                self.set_stackmode_text()
         #
         #    (Model <= 50) means 12V inverter
         #    (Model <= 107) means 24V inverter
@@ -595,7 +601,7 @@ class InverterDevice:
             self.set_invled_text()
             self.set_mode_text()
             self.set_model_text()
-            self.set_stackmode_text()
+         
 
     def set_fault_text(self):
         faults = {
@@ -720,6 +726,7 @@ class PT100Device:
         self.deviceData = OrderedDict()
         self.deviceData["device"] = PT100
         self.deviceData["data"] = self.data
+        # Start of C1
         self.data["address"] = 0
         self.data["on_off"] = 0
         self.data["mode"] = 0
@@ -735,9 +742,10 @@ class PT100Device:
         self.data["target_battery_voltage"] = 0.0
         self.data["relay_state"] = 0
         self.data["alarm_state"] = 0
-        self.data["battery_temperature"] = 0.0
+        self.data["battery_temperature"] = 0
         self.data["inductor_temperature"] = 0
         self.data["fet_temperature"] = 0
+        # Start of C2
         self.data["lifetime_kwhrs"] = 0
         self.data["resettable_kwhrs"] = 0
         self.data["ground_fault_current"] = 0
@@ -746,6 +754,7 @@ class PT100Device:
         self.data["model"] = ''
         self.data["output_current_rating"] = 0
         self.data["input_voltage_rating"] = 0
+        # Start of C3
         self.data["record"] = 0
         self.data["daily_kwh"] = 0
         self.data["max_daily_pv_volts"] = 0
@@ -758,6 +767,7 @@ class PT100Device:
         self.data["daily_amp_hours"] = 0
         self.data["peak_daily_power"] = 0
         self.data["peak_daily_power_time"] = 0
+        # Start of C4
         self.data["fault_number"] = 0
         self.data["max_battery_volts"] = 0
         self.data["max_pv_to_battery_vdc"] = 0
@@ -775,10 +785,9 @@ class PT100Device:
             self.data['address'] = unpacked[1] >> 5
             byte_value = unpacked[2]
             #  byte 2
-            self.data['on_off'] = True if (
-                byte_value & 0x80) >> 7 != 0 else False
-            self.data['mode'] = (byte_value & 0x70) >> 4
-            self.data['regulation'] = byte_value & 0x0F
+            self.data['on_off'] = True if (byte_value & 0x01) != 0 else False
+            self.data['mode'] = byte_value >> 1 & 0x07
+            self.data['regulation'] = byte_value >> 4 & 0x0F
             #  byte 3
             byte_value = unpacked[3]
             self.data['fault'] = byte_value >> 3
@@ -787,13 +796,10 @@ class PT100Device:
             self.data['pv_voltage'] = unpacked[6] / 10
             self.data['charge_time'] = unpacked[7] / 10
             byte_value = unpacked[8]
-            self.data['target_battery_voltage'] = (
-                byte_value / 10) * Magnum.multiplier
+            self.data['target_battery_voltage'] = (byte_value / 10) * Magnum.multiplier
             byte_value = unpacked[9]
-            self.data['relay_state'] = True if (
-                (byte_value & 0x80) >> 7) != 0 else False
-            self.data['alarm_state'] = True if (
-                (byte_value & 0x70) >> 6) != 0 else False
+            self.data['relay_state'] = True if (byte_value & 0xFE) != 0 else False
+            self.data['alarm_state'] = True if (byte_value >> 1 & 0xFE) != 0 else False
             byte_value = unpacked[10]
             self.data['battery_temperature'] = byte_value / 10
             byte_value = unpacked[11]
@@ -825,7 +831,7 @@ class PT100Device:
                 self.data['regulation_text'] = regulations[self.data['regulation']]
             else:
                 self.data['regulation_text'] = "Unknown"
-            faults =   {
+            faults = {
                 0: "No Fault",
                 1: "Input er Fault",
                 2: "Output er Fault",
@@ -1162,6 +1168,8 @@ class RemoteDevice:
         elif packetType == Magnum.REMOTE_D0:
             self.setBaseValues(unpacked)
             # I have no idea what a D0 is
+        elif packetType == Magnum.REMOTE_CLASSIC:
+            self.setBaseValues(unpacked)
 
     def removeBMK(self):
         for item in RemoteDevice.noBMK:

@@ -26,6 +26,8 @@ def main():
                     help="Timeout for serial read - float between 0 and 1 second (default: %(default)s)")
     group.add_argument("-nc", "--nocleanup", action="store_true",
                     help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
+    group.add_argument("--trace", action="store_true", default=False,
+                        help="Add most recent raw packet info to data (default: %(default)s)")
     args = parser.parse_args()
     if args.timeout < 0 or args.timeout > 1.0:
         parser.error(
