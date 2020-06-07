@@ -10,8 +10,8 @@ This software is not endorsed or supported by Magnum Energy, a product
 of Sensata Technologies https://www.magnum-dimensions.com/
 
 Please read the documentation before installing this package.
-Some operating systems, including Raspian,
-require you use python3 and pip3 to use the Python 3 version of these tools.
+Some operating systems, including Raspberry Pi OS,
+require you to use ``python3`` and ``pip3`` to use the Python 3 version of these tools.
 
 `Documentation <https://pymagnum.readthedocs.io/>`_
 

@@ -8,8 +8,12 @@ import time
 import traceback
 import json
 from os.path import abspath
-# import magnum as magnum
-from magnum import magnum, __version__
+try:
+    from magnum import magnum
+except:
+    import magnum
+# import magnum
+# from magnum import magnum, __version__
 # from magnum import Magnum, __version__
 
 args = None
@@ -42,10 +46,10 @@ def main():
                         help="Show unpacked info for packet data (default: %(default)s)")
     parser.add_argument("filename", type=argparse.FileType("r", encoding="UTF-8"),
                         help="File name with dummy packets" )
-    args = parser.parse_args()pythom
+    args = parser.parse_args()
     # print('Version:{0}'.format(__version__))
     print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
-    dummyreader = dummypackets()
+    dummyreader = dummypackets(cleanpackets=False)
     try:
         if args.dump:
             devices = dummyreader.getDevices()
@@ -61,7 +65,8 @@ def main():
                 print(formatstring.format(
                     len(packet[1]), packet[0], packet[1].hex().upper()), end = end)
                 if args.trace:
-                    print(*packet[2])
+                    print(*packet[2], end = ' ')
+                    print(packet[3])
     except:
         print("Error detected attempting to read data - test failed")
         traceback.print_exc()

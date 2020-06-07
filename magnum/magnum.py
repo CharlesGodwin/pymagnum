@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
+#  This manages 'classic' MS devices
+#
 import time
 from copy import deepcopy
 from collections import OrderedDict
@@ -38,14 +40,18 @@ class Magnum:
     #
     AGS_A1 = "AGS_A1"
     AGS_A2 = "AGS_A2"
+
     BMK_81 = "BMK_81"
     INV = "INVERTER"
-    INV_CLASSIC = "INVERTER_CLASSIC"
+    INV_C = "INVERTER_C"
+    # 
+    #  byte ofset 10 must be < 0x28 identifies as inverter
+    # 
     PT_C1 = "PT_C1"
     PT_C2 = "PT_C2"
     PT_C3 = "PT_C3"
     PT_C4 = "PT_C4"
-    REMOTE_CLASSIC = "REMOTE_CLASSIC"
+    REMOTE_C = "REMOTE_C"
     REMOTE_00 = "REMOTE_00"
     REMOTE_11 = "REMOTE_11"
     REMOTE_80 = "REMOTE_80"
@@ -69,13 +75,13 @@ class Magnum:
         AGS_A1: 'BbBbBB',
         AGS_A2: 'BBBHB',
         BMK_81: 'BbHhHHhHHBB',
-        INV: 'BBhhBBbbBBBBBBBBhb',
-        INV_CLASSIC: "BBhhBBbbBBBBBB",
+        INV:   'BBhhBBBBBBBBBBBBhb',
+        INV_C: "BBhhBBBBBBBBBB",
         PT_C1: 'BBBBHhHBBBBBB',
         PT_C2: 'BBHHbBBBBBB',
         PT_C3: 'BBH11B',
         PT_C4: '8B',
-        REMOTE_CLASSIC: default_remote,
+        REMOTE_C: default_remote + 'BB',
         REMOTE_00: default_remote + '7B',
         REMOTE_11: default_remote + '7B',  # just the first 2 bytes count
         REMOTE_80: default_remote + 'bbbb3B',
@@ -94,6 +100,46 @@ class Magnum:
     }
 
     multiplier = 1
+    inverter_models = {
+                0x06: "MM612",
+                0x07: "MM612-AE",
+                0x08: "MM1212",
+                0x09: "MMS1012",
+                0x0A: "MM1012E",
+                0x0B: "MM1512",
+                0x0C: "MMS912E",
+                0x0F: "ME1512",
+                0x14: "ME2012",
+                0x15: "RD2212",
+                0x19: "ME2512",
+                0x1E: "ME3112",
+                0x23: "MS2012",
+                0x24: "MS1512E",
+                0x28: "MS2012E",
+                0x2C: "MSH3012M",
+                0x2D: "MS2812",
+                0x2F: "MS2712E",
+                0x35: "MM1324E",
+                0x36: "MM1524",
+                0x37: "RD1824",
+                0x3B: "RD2624E",
+                0x3F: "RD2824",
+                0x45: "RD4024E",
+                0x4A: "RD3924",
+                0x5A: "MS4124E",
+                0x5B: "MS2024",
+                0x67: "MSH4024M",
+                0x68: "MSH4024RE",
+                0x69: "MS4024",
+                0x6A: "MS4024AE",
+                0x6B: "MS4024PAE",
+                0x6F: "MS4448AE",
+                0x70: "MS3748AEJ",
+                0x72: "MS4048",
+                0x73: "MS4448PAE",
+                0x74: "MS3748PAEJ",
+                0x75: "MS4348PE"
+    }
     def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, cleanpackets=True, trace=False):
         self.packetcount = packets
         self.timeout = timeout
@@ -193,6 +239,8 @@ class Magnum:
     def parsePacket(self, packet):
         if len(packet) == 22:
             packet = packet[:21]
+        elif len(packet) == 17: # takes care of classic
+            packet = packet[:16]
         packetType = UNKNOWN
         if len(packet) > 0:
             packetLen = len(packet)
@@ -218,6 +266,13 @@ class Magnum:
             elif packetLen == 16:
                 if firstbyte == 0xC1:
                     packetType = Magnum.PT_C1
+                elif packet[10] <= 0x27 and packet[14] in Magnum.inverter_models:
+                    packetType = Magnum.INV_C
+                    if self.inverter_revision == -1:
+                        self.inverter_revision = packet[10]
+                        self.inverter_model = packet[14]
+                else:
+                    packetType = Magnum.REMOTE_C
             elif packetLen == 18:
                 if firstbyte == 0x81:
                     packetType = Magnum.BMK_81
@@ -226,8 +281,8 @@ class Magnum:
                 model = packet[14]
                 if lastbyte == 0 and firstbyte == 0:
                     #
-                    #  There is an undocumented Remote message generated with seven 0x00 bytes a
-                    #  the end. This code distinguishes it from a Inverter record with status byte 0  = 0x0
+                    #  There is an undocumented Remote message generated with seven 0x00 bytes at the end. 
+                    #  This code distinguishes it from a Inverter record with status byte 0 == 0x0
                     #
                     #  Also the ME-ARC sends a spurious record with a zero end byte
                     #
@@ -287,7 +342,7 @@ class Magnum:
                     # raise unpack_error(msg) from e
             else:
                 fields = {}
-            return([packetType, packet, fields])
+            return([packetType, packet, fields, Magnum.unpackFormats[packetType]])
 
     #
     # cleanup looks for consecutive UNKNOWN packet pairs and concatenates the pair
@@ -341,11 +396,11 @@ class Magnum:
         #
         for packet in self.getPackets():
             packetType = packet[0]
-            if packetType in (Magnum.INV, Magnum.INV_CLASSIC):
+            if packetType in (Magnum.INV, Magnum.INV_C):
                 if self.inverter == None:
                     self.inverter = InverterDevice(trace=self.trace)
                 self.inverter.parse(packet)
-            elif packetType in (Magnum.REMOTE_CLASSIC,
+            elif packetType in (Magnum.REMOTE_C,
                                 Magnum.REMOTE_00,
                                 Magnum.REMOTE_11,
                                 Magnum.REMOTE_80,
@@ -562,7 +617,7 @@ class InverterDevice:
         unpacked = packet[2]
         if self.trace:
             self.data[packetType] = packet[1].hex().upper()
-        if packetType in( Magnum.INV, Magnum.INV_CLASSIC):
+        if packetType in( Magnum.INV, Magnum.INV_C):
             self.data["mode"] = unpacked[0]
             self.data["fault"] = unpacked[1]
             self.data["vdc"] = unpacked[2] / 10
@@ -570,7 +625,11 @@ class InverterDevice:
             self.data["VACout"] = unpacked[4]
             self.data["VACin"] = unpacked[5]
             self.data["invled"] = unpacked[6]
+            if self.data["invled"] != 0:
+                self.data["invled"] = 1
             self.data["chgled"] = unpacked[7]
+            if self.data["chgled"] != 0:
+                self.data["chgled"] = 1
             self.data["revision"] = str(round(unpacked[8] / 10, 2))
             self.data["bat"] = unpacked[9]
             self.data["tfmr"] = unpacked[10]
@@ -581,7 +640,11 @@ class InverterDevice:
                 self.data["AACin"] = unpacked[14]
                 self.data["AACout"] = unpacked[15]
                 self.data["Hz"] = round(unpacked[16] / 10, 2)
-                self.set_stackmode_text()
+            else:
+                self.data["stackmode"] = 0
+                for key in ["AACin","AACout","Hz"]:
+                    self.data.pop(key, '')
+            self.set_stackmode_text()
         #
         #    (Model <= 50) means 12V inverter
         #    (Model <= 107) means 24V inverter
@@ -658,48 +721,9 @@ class InverterDevice:
             self.data["mode_text"] = "??"
 
     def set_model_text(self):
-        models = {
-            6: "MM612",
-            7: "MM612-AE",
-            8: "MM1212",
-            9: "MMS1012",
-            10: "MM1012E",
-            11: "MM1512",
-            12: "MMS912E",
-            15: "ME1512",
-            20: "ME2012",
-            21: "RD2212",
-            25: "ME2512",
-            30: "ME3112",
-            35: "MS2012",
-            36: "MS1512E",
-            40: "MS2012E",
-            44: "MSH3012M",
-            45: "MS2812",
-            47: "MS2712E",
-            53: "MM1324E",
-            54: "MM1524",
-            55: "RD1824",
-            59: "RD2624E",
-            63: "RD2824",
-            69: "RD4024E",
-            74: "RD3924",
-            90: "MS4124E",
-            91: "MS2024",
-            103: "MSH4024M",
-            104: "MSH4024RE",
-            105: "MS4024",
-            106: "MS4024AE",
-            107: "MS4024PAE",
-            111: "MS4448AE",
-            112: "MS3748AEJ",
-            114: "MS4048",
-            115: "MS4448PAE",
-            116: "MS3748PAEJ",
-            117: "MS4348PE"
-        }
-        if self.data["model"] in models:
-            self.data["model_text"] = models[self.data["model"]]
+
+        if self.data["model"] in Magnum.inverter_models:
+            self.data["model_text"] = Magnum.inverter_models[self.data["model"]]
         else:
             self.data["model_text"] = "Unknown"
 
@@ -1039,7 +1063,11 @@ class RemoteDevice:
         unpacked = packet[2]
         if self.trace:
             self.data[packetType] = packet[1].hex().upper()
-        if packetType == Magnum.REMOTE_00:
+        if packetType == Magnum.REMOTE_C:
+            self.setBaseValues(unpacked)
+            for key in ["vsfloat","vEQ","absorbtime", "remotetimehours","remotetimemins"]:
+                self.data.pop(key, '')
+        elif packetType == Magnum.REMOTE_00:
             self.setBaseValues(unpacked)
         elif packetType == Magnum.REMOTE_11:
             self.setBaseValues(unpacked)
@@ -1086,8 +1114,7 @@ class RemoteDevice:
             self.data["ampstart"] = unpacked[16]
             self.data["ampsstartdelay"] = unpacked[17]
             if self.data["ampsstartdelay"] > 127:
-                self.data["ampsstartdelay"] = (
-                    self.data["ampsstartdelay"] & 0x0f) * 60
+                self.data["ampsstartdelay"] = (self.data["ampsstartdelay"] & 0x0f) * 60
             self.data["ampstop"] = unpacked[18]
             self.data["ampsstopdelay"] = unpacked[19]
             if self.data["ampsstopdelay"] > 127:
@@ -1168,8 +1195,6 @@ class RemoteDevice:
         elif packetType == Magnum.REMOTE_D0:
             self.setBaseValues(unpacked)
             # I have no idea what a D0 is
-        elif packetType == Magnum.REMOTE_CLASSIC:
-            self.setBaseValues(unpacked)
 
     def removeBMK(self):
         for item in RemoteDevice.noBMK:
