@@ -3,9 +3,10 @@
 ========================
 Version 1.1.1   Pending
 ------------------------
-- Fixed up PT-100 Parsing
-- Added support for old (classic) Inverter and Remote
+- Improved up PT-100 processing
+- Added support for older (classic) Inverter and Remote issue #10
 - Revised documentation to indicate support for only MS series inverters and ME-RC, ME-ARC, ME-RTR and ME-ARTR remotes
+- Added how to build instructions
 
 Version 1.1     2019/12/08
 ---------------------------
