@@ -92,6 +92,6 @@ Here’s an example of results if the wires are switched::
    Length:29 UNKNOWN   =>007AF45C8CFE24FC7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
 
 
-Copyright (c) 2018-2019 Charles Godwin magnum@godwin.ca
+Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
 
 SPDX-License-Identifier: BSD-3-Clause
