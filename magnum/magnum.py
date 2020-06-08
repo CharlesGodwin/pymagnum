@@ -11,6 +11,7 @@ from collections import OrderedDict
 from struct import calcsize
 from struct import error as unpack_error
 from struct import unpack
+import math
 
 import serial
 
@@ -77,7 +78,7 @@ class Magnum:
         BMK_81: 'BbHhHHhHHBB',
         INV:   'BBhhBBBBBBBBBBBBhb',
         INV_C: "BBhhBBBBBBBBBB",
-        PT_C1: 'BBBBHhHBBBBBB',
+        PT_C1: 'BBBBHhHBBBbBB', # made -3 byte signed
         PT_C2: 'BBHHbBBBBBB',
         PT_C3: 'BBH11B',
         PT_C4: '8B',
@@ -750,11 +751,13 @@ class PT100Device:
         self.deviceData = OrderedDict()
         self.deviceData["device"] = PT100
         self.deviceData["data"] = self.data
+        self.data['revision'] = 0.0
         # Start of C1
         self.data["address"] = 0
         self.data["on_off"] = 0
         self.data["mode"] = 0
         self.data["mode_text"] = ''
+        self.data["mode_hex"] = ''
         self.data["regulation"] = 0
         self.data["regulation_text"] = ''
         self.data["fault"] = 0
@@ -770,34 +773,34 @@ class PT100Device:
         self.data["inductor_temperature"] = 0
         self.data["fet_temperature"] = 0
         # Start of C2
-        self.data["lifetime_kwhrs"] = 0
-        self.data["resettable_kwhrs"] = 0
-        self.data["ground_fault_current"] = 0
-        self.data["nominal_battery_voltage"] = 0
+        self.data["lifetime_kwhrs"] = math.nan
+        self.data["resettable_kwhrs"] = math.nan
+        self.data["ground_fault_current"] = math.nan
+        self.data["nominal_battery_voltage"] = math.nan
         self.data["stacker_info"] = 0
         self.data["model"] = ''
-        self.data["output_current_rating"] = 0
-        self.data["input_voltage_rating"] = 0
+        self.data["output_current_rating"] = math.nan
+        self.data["input_voltage_rating"] = math.nan
         # Start of C3
-        self.data["record"] = 0
-        self.data["daily_kwh"] = 0
-        self.data["max_daily_pv_volts"] = 0
-        self.data["max_daily_pv_volts_time"] = 0
-        self.data["max_daily_battery_volts"] = 0
-        self.data["max_daily_battery_volts_time"] = 0
-        self.data["minimum_daily_battery_volts"] = 0
-        self.data["minimum_daily_battery_volts_time"] = 0
-        self.data["daily_time_operational"] = 0
-        self.data["daily_amp_hours"] = 0
-        self.data["peak_daily_power"] = 0
-        self.data["peak_daily_power_time"] = 0
+        self.data["record"] = math.nan
+        self.data["daily_kwh"] = math.nan
+        self.data["max_daily_pv_volts"] = math.nan
+        self.data["max_daily_pv_volts_time"] = math.nan
+        self.data["max_daily_battery_volts"] = math.nan
+        self.data["max_daily_battery_volts_time"] = math.nan
+        self.data["minimum_daily_battery_volts"] = math.nan
+        self.data["minimum_daily_battery_volts_time"] = math.nan
+        self.data["daily_time_operational"] = math.nan
+        self.data["daily_amp_hours"] = math.nan
+        self.data["peak_daily_power"] = math.nan
+        self.data["peak_daily_power_time"] = math.nan
         # Start of C4
         self.data["fault_number"] = 0
-        self.data["max_battery_volts"] = 0
-        self.data["max_pv_to_battery_vdc"] = 0
-        self.data["max_battery_temperature"] = 0
-        self.data["max_fet_temperature"] = 0
-        self.data["max_inductor_temperature"] = 0
+        self.data["max_battery_volts"] = math.nan
+        self.data["max_pv_to_battery_vdc"] = math.nan
+        self.data["max_battery_temperature"] = math.nan
+        self.data["max_fet_temperature"] = math.nan
+        self.data["max_inductor_temperature"] = math.nan
 
     def parse(self, packet):
         packetType = packet[0]
@@ -811,7 +814,9 @@ class PT100Device:
             #  byte 2
             self.data['on_off'] = True if (byte_value & 0x01) != 0 else False
             self.data['mode'] = byte_value >> 1 & 0x07
+            self.data['mode_hex'] = hex(unpacked[2]).upper()
             self.data['regulation'] = byte_value >> 4 & 0x0F
+
             #  byte 3
             byte_value = unpacked[3]
             self.data['fault'] = byte_value >> 3
@@ -825,7 +830,8 @@ class PT100Device:
             self.data['relay_state'] = True if (byte_value & 0xFE) != 0 else False
             self.data['alarm_state'] = True if (byte_value >> 1 & 0xFE) != 0 else False
             byte_value = unpacked[10]
-            self.data['battery_temperature'] = byte_value / 10
+            
+            self.data['battery_temperature'] = float((byte_value / 10) + 25.0) # based on 25 C base
             byte_value = unpacked[11]
             self.data['inductor_temperature'] = byte_value
             byte_value = unpacked[12]
