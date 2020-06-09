@@ -21,6 +21,9 @@ version 3.5 of Python.
 | Then install or upgrade this software package using:
 | ``sudo pip3 install --upgrade pymagnum``
 
+If you want to check which version is have installed on your system, run this command:
+``sudo pip3 show pymagnum``
+
 .. _testing:
 
 Testing
