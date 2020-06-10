@@ -7,6 +7,7 @@ Version 1.1.1   Pending
 - Added support for older (classic) Inverter and Remote issue #10
 - Revised documentation to indicate support for only MS series inverters and ME-RC, ME-ARC, ME-RTR and ME-ARTR remotes
 - Added how to build instructions
+- Removed reference to duplicates in examples/mqttlogger.py 
 
 Version 1.1     2019/12/08
 ---------------------------
