@@ -898,7 +898,7 @@ class PT100Device:
             self.data['revision'] = str(unpacked[6] / 10)
             self.data['model'] = unpacked[7]
             self.data['output_current_rating'] = unpacked[8]
-            self.data['input_voltage_rating'] = unpacked[9]
+            self.data['input_voltage_rating'] = unpacked[9] * 10
         elif packetType == Magnum.PT_C3:
             short_value = unpacked[1]
             self.data['address'] = ((short_value & 0xE000) >> 13)
