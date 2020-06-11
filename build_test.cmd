@@ -4,4 +4,4 @@ rd /s /q pymagnum.egg-info
 python setup.py sdist bdist_wheel
 python -m twine upload --verbose -u CharlesG --repository-url https://test.pypi.org/legacy/ dist/*
 @echo Use this to install
-@echo sudo pip3 install --upgrade -i https://test.pypi.org/simple/ pymagnum=VERSION
+@echo sudo pip3 install --upgrade -i https://test.pypi.org/simple/ pymagnum==VERSION
