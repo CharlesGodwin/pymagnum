@@ -3,7 +3,7 @@
 ========================
 Version 1.1.1   2020/06/11
 ------------------------
-- Improved up PT-100 processing
+- Improved PT-100 processing
 - Added support for older (classic) Inverter and Remote issue #10
 - Revised documentation to indicate support for only MS series inverters and ME-RC, ME-ARC, ME-RTR and ME-ARTR remotes
 - Added how to build instructions
