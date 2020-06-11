@@ -1,7 +1,7 @@
 ========================
  pyMagnum Release Notes
 ========================
-Version 1.1.1   2020/06/11
+Version 1.1.1.post1 2020/06/11
 ------------------------
 - Improved PT-100 processing
 - Added support for older (classic) Inverter and Remote issue #10
