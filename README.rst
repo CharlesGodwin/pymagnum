@@ -15,7 +15,7 @@ require you to use ``python3`` and ``pip3`` to use the Python 3 version of these
 
 `Documentation <https://pymagnum.readthedocs.io/>`_
 
-`Changes <CHANGES.rst>`_
+`Changes <https://github.com/CharlesGodwin/pymagnum/blob/master/CHANGES.rst>`_
 
 Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
 
