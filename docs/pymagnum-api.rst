@@ -49,6 +49,6 @@ pyMagnum API
         - bytes of packet
         - tupple of unpacked values for fields in packet - Based on ME documentation
 
-Copyright (c) 2018-2019 Charles Godwin magnum@godwin.ca
+Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
 
 SPDX-License-Identifier: BSD-3-Clause

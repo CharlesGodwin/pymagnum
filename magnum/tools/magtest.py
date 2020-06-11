@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018-2019 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2020 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
@@ -26,6 +26,8 @@ def main():
                     help="Timeout for serial read - float between 0 and 1 second (default: %(default)s)")
     group.add_argument("-nc", "--nocleanup", action="store_true",
                     help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
+    group.add_argument("--trace", action="store_true", default=False,
+                        help="Add most recent raw packet info to data (default: %(default)s)")
     args = parser.parse_args()
     if args.timeout < 0 or args.timeout > 1.0:
         parser.error(
@@ -51,8 +53,14 @@ def main():
         for packet in packets:
             if packet[0] == magnum.UNKNOWN:
                 unknown += 1
-            print(formatstring.format(
-                len(packet[1]), packet[0], packet[1].hex().upper()))
+            if args.trace:
+                end = ' decode:'
+            else:
+                end = '\n'
+            print(formatstring.format(len(packet[1]), packet[0], packet[1].hex().upper()), end=end)
+            if args.trace:
+                print(*packet[2], end = ' ')
+                print(packet[3])
         format1 = "Packets:{0} of {1} with {2} UNKNOWN, in {3:2.2f} seconds"
         format2 = "Packets:{0} in {3:2.2f} seconds"
         format = format1 if unknown > 0 else format2

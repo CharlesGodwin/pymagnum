@@ -1,7 +1,9 @@
 #
-# Copyright (c) 2018-2019 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2020 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
+#
+#  This manages 'classic' MS devices
 #
 import time
 from copy import deepcopy
@@ -9,6 +11,7 @@ from collections import OrderedDict
 from struct import calcsize
 from struct import error as unpack_error
 from struct import unpack
+import math
 
 import serial
 
@@ -38,12 +41,18 @@ class Magnum:
     #
     AGS_A1 = "AGS_A1"
     AGS_A2 = "AGS_A2"
+
     BMK_81 = "BMK_81"
     INV = "INVERTER"
+    INV_C = "INVERTER_C"
+    # 
+    #  byte ofset 10 must be < 0x28 identifies as inverter
+    # 
     PT_C1 = "PT_C1"
     PT_C2 = "PT_C2"
     PT_C3 = "PT_C3"
     PT_C4 = "PT_C4"
+    REMOTE_C = "REMOTE_C"
     REMOTE_00 = "REMOTE_00"
     REMOTE_11 = "REMOTE_11"
     REMOTE_80 = "REMOTE_80"
@@ -66,12 +75,14 @@ class Magnum:
     unpackFormats = {
         AGS_A1: 'BbBbBB',
         AGS_A2: 'BBBHB',
-        BMK_81:  'BbHhHHhHHBB',
-        INV: 'BBhhBBbbBBBBBBBBhb',
-        PT_C1: 'BbBBHhhbbbbbb',
-        PT_C2: 'BbBHBbBBBB',
-        PT_C3: 'BH11B',
-        PT_C4: '7B',
+        BMK_81: 'BbHhHHhHHBB',
+        INV:   'BBhhBBBBBBBBBBBBhb',
+        INV_C: "BBhhBBBBBBBBBB",
+        PT_C1: 'BBBBHhHBBBbBB', # made -3 byte signed
+        PT_C2: 'BBHHbBBBBBB',
+        PT_C3: 'BBH11B',
+        PT_C4: '8B',
+        REMOTE_C: default_remote + 'BB',
         REMOTE_00: default_remote + '7B',
         REMOTE_11: default_remote + '7B',  # just the first 2 bytes count
         REMOTE_80: default_remote + 'bbbb3B',
@@ -90,6 +101,46 @@ class Magnum:
     }
 
     multiplier = 1
+    inverter_models = {
+                0x06: "MM612",
+                0x07: "MM612-AE",
+                0x08: "MM1212",
+                0x09: "MMS1012",
+                0x0A: "MM1012E",
+                0x0B: "MM1512",
+                0x0C: "MMS912E",
+                0x0F: "ME1512",
+                0x14: "ME2012",
+                0x15: "RD2212",
+                0x19: "ME2512",
+                0x1E: "ME3112",
+                0x23: "MS2012",
+                0x24: "MS1512E",
+                0x28: "MS2012E",
+                0x2C: "MSH3012M",
+                0x2D: "MS2812",
+                0x2F: "MS2712E",
+                0x35: "MM1324E",
+                0x36: "MM1524",
+                0x37: "RD1824",
+                0x3B: "RD2624E",
+                0x3F: "RD2824",
+                0x45: "RD4024E",
+                0x4A: "RD3924",
+                0x5A: "MS4124E",
+                0x5B: "MS2024",
+                0x67: "MSH4024M",
+                0x68: "MSH4024RE",
+                0x69: "MS4024",
+                0x6A: "MS4024AE",
+                0x6B: "MS4024PAE",
+                0x6F: "MS4448AE",
+                0x70: "MS3748AEJ",
+                0x72: "MS4048",
+                0x73: "MS4448PAE",
+                0x74: "MS3748PAEJ",
+                0x75: "MS4348PE"
+    }
     def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, cleanpackets=True, trace=False):
         self.packetcount = packets
         self.timeout = timeout
@@ -119,7 +170,7 @@ class Magnum:
 
         - name of packet
         - bytes of packet
-        - tupple of unpacked values - Bassed on ME documentation
+        - tupple of unpacked values - Based on ME documentation
         '''
         packets = self.readPackets()
         messages = []
@@ -131,14 +182,14 @@ class Magnum:
             messages.append(message)
         #
         # if there at least 2 UNKNOWN packets
-        # attemtp to clean them up
+        # attempt to clean them up
         #
         if unknown > 1 and self.cleanpackets:
             messages = self.cleanup(messages)
         return messages
         #
     #  raw read of packets to bytes[]
-    #  This can be overriden for tests
+    #  This can be overridden for tests
     #
 
     def readPackets(self):
@@ -183,12 +234,14 @@ class Magnum:
         return packets
     #
     #
-    # based on what we know from ME doucmentation
+    # based on what we know from ME documentation
     # attempt to build a known packet and unpack its data into values
     #
     def parsePacket(self, packet):
         if len(packet) == 22:
             packet = packet[:21]
+        elif len(packet) == 17: # takes care of classic
+            packet = packet[:16]
         packetType = UNKNOWN
         if len(packet) > 0:
             packetLen = len(packet)
@@ -214,6 +267,13 @@ class Magnum:
             elif packetLen == 16:
                 if firstbyte == 0xC1:
                     packetType = Magnum.PT_C1
+                elif packet[10] <= 0x27 and packet[14] in Magnum.inverter_models:
+                    packetType = Magnum.INV_C
+                    if self.inverter_revision == -1:
+                        self.inverter_revision = packet[10]
+                        self.inverter_model = packet[14]
+                else:
+                    packetType = Magnum.REMOTE_C
             elif packetLen == 18:
                 if firstbyte == 0x81:
                     packetType = Magnum.BMK_81
@@ -222,8 +282,8 @@ class Magnum:
                 model = packet[14]
                 if lastbyte == 0 and firstbyte == 0:
                     #
-                    #  There is an undocumented Remote message generated with seven 0x00 bytes a
-                    #  the end. This code distinguishes it from a Inverter record with status byte 0  = 0x0
+                    #  There is an undocumented Remote message generated with seven 0x00 bytes at the end. 
+                    #  This code distinguishes it from a Inverter record with status byte 0 == 0x0
                     #
                     #  Also the ME-ARC sends a spurious record with a zero end byte
                     #
@@ -276,12 +336,14 @@ class Magnum:
                 try:
                     fields = unpack(mask, packet)
                 except Exception as e:
-                    msg = "{0} Converting {1} - {2} bytes".format(
-                        e.args[0], packetType, len(packet))
-                    raise unpack_error(msg) from e
+                    msg = "{0} Converting {1} - {2} bytes".format(e.args[0], packetType, len(packet))
+                    fields = {}
+                    print(msg)
+                    packetType = UNKNOWN
+                    # raise unpack_error(msg) from e
             else:
                 fields = {}
-            return([packetType, packet, fields])
+            return([packetType, packet, fields, Magnum.unpackFormats[packetType]])
 
     #
     # cleanup looks for consecutive UNKNOWN packet pairs and concatenates the pair
@@ -309,7 +371,7 @@ class Magnum:
     #     returns an array of device ordered dictionary
     #
     #  Each class is instantiated only once per run time execution
-    #  This allows an oblect to reflect the latest CUMULATIVE value for the packets.
+    #  This allows an object to reflect the latest CUMULATIVE value for the packets.
     #  This is useful for PT100 and AGS packets which are not too numerous
     #
     #  returns a deepcopy of the device data collections
@@ -335,11 +397,12 @@ class Magnum:
         #
         for packet in self.getPackets():
             packetType = packet[0]
-            if packetType == Magnum.INV:
+            if packetType in (Magnum.INV, Magnum.INV_C):
                 if self.inverter == None:
                     self.inverter = InverterDevice(trace=self.trace)
                 self.inverter.parse(packet)
-            elif packetType in (Magnum.REMOTE_00,
+            elif packetType in (Magnum.REMOTE_C,
+                                Magnum.REMOTE_00,
                                 Magnum.REMOTE_11,
                                 Magnum.REMOTE_80,
                                 Magnum.REMOTE_A0,
@@ -397,9 +460,9 @@ class AGSDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = AGS
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = AGS
+        self.deviceData["data"] = self.data
         self.data["revision"] = '0.0'
         self.data["status"] = 0
         self.data["status_text"] = ""
@@ -472,15 +535,15 @@ class AGSDevice:
             self.data["status_text"] = status[self.data["status"]]
 
     def getDevice(self):
-        return self.device
+        return self.deviceData
 
 class BMKDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = BMK
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = BMK
+        self.deviceData["data"] = self.data
         self.data["revision"] = ""
         self.data["soc"] = 0
         self.data["vdc"] = 0.0
@@ -517,15 +580,15 @@ class BMKDevice:
                 self.data["Fault_Text"] = "Fault Start"
 
     def getDevice(self):
-        return self.device
+        return self.deviceData
 
 class InverterDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = INVERTER
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = INVERTER
+        self.deviceData["data"] = self.data
         self.data["revision"] = str(0.0)
         self.data["mode"] = 0
         self.data["mode_text"] = ""
@@ -555,7 +618,7 @@ class InverterDevice:
         unpacked = packet[2]
         if self.trace:
             self.data[packetType] = packet[1].hex().upper()
-        if packetType == Magnum.INV:
+        if packetType in( Magnum.INV, Magnum.INV_C):
             self.data["mode"] = unpacked[0]
             self.data["fault"] = unpacked[1]
             self.data["vdc"] = unpacked[2] / 10
@@ -563,16 +626,26 @@ class InverterDevice:
             self.data["VACout"] = unpacked[4]
             self.data["VACin"] = unpacked[5]
             self.data["invled"] = unpacked[6]
+            if self.data["invled"] != 0:
+                self.data["invled"] = 1
             self.data["chgled"] = unpacked[7]
+            if self.data["chgled"] != 0:
+                self.data["chgled"] = 1
             self.data["revision"] = str(round(unpacked[8] / 10, 2))
             self.data["bat"] = unpacked[9]
             self.data["tfmr"] = unpacked[10]
             self.data["fet"] = unpacked[11]
             self.data["model"] = unpacked[12]
-            self.data["stackmode"] = unpacked[13]
-            self.data["AACin"] = unpacked[14]
-            self.data["AACout"] = unpacked[15]
-            self.data["Hz"] = round(unpacked[16] / 10, 2)
+            if packetType == Magnum.INV:
+                self.data["stackmode"] = unpacked[13]
+                self.data["AACin"] = unpacked[14]
+                self.data["AACout"] = unpacked[15]
+                self.data["Hz"] = round(unpacked[16] / 10, 2)
+            else:
+                self.data["stackmode"] = 0
+                for key in ["AACin","AACout","Hz"]:
+                    self.data.pop(key, '')
+            self.set_stackmode_text()
         #
         #    (Model <= 50) means 12V inverter
         #    (Model <= 107) means 24V inverter
@@ -592,7 +665,7 @@ class InverterDevice:
             self.set_invled_text()
             self.set_mode_text()
             self.set_model_text()
-            self.set_stackmode_text()
+         
 
     def set_fault_text(self):
         faults = {
@@ -649,48 +722,9 @@ class InverterDevice:
             self.data["mode_text"] = "??"
 
     def set_model_text(self):
-        models = {
-            6: "MM612",
-            7: "MM612-AE",
-            8: "MM1212",
-            9: "MMS1012",
-            10: "MM1012E",
-            11: "MM1512",
-            12: "MMS912E",
-            15: "ME1512",
-            20: "ME2012",
-            21: "RD2212",
-            25: "ME2512",
-            30: "ME3112",
-            35: "MS2012",
-            36: "MS1512E",
-            40: "MS2012E",
-            44: "MSH3012M",
-            45: "MS2812",
-            47: "MS2712E",
-            53: "MM1324E",
-            54: "MM1524",
-            55: "RD1824",
-            59: "RD2624E",
-            63: "RD2824",
-            69: "RD4024E",
-            74: "RD3924",
-            90: "MS4124E",
-            91: "MS2024",
-            103: "MSH4024M",
-            104: "MSH4024RE",
-            105: "MS4024",
-            106: "MS4024AE",
-            107: "MS4024PAE",
-            111: "MS4448AE",
-            112: "MS3748AEJ",
-            114: "MS4048",
-            115: "MS4448PAE",
-            116: "MS3748PAEJ",
-            117: "MS4348PE"
-        }
-        if self.data["model"] in models:
-            self.data["model_text"] = models[self.data["model"]]
+
+        if self.data["model"] in Magnum.inverter_models:
+            self.data["model_text"] = Magnum.inverter_models[self.data["model"]]
         else:
             self.data["model_text"] = "Unknown"
 
@@ -708,19 +742,22 @@ class InverterDevice:
             self.data["stackmode_text"] = "Unknown"
 
     def getDevice(self):
-        return self.device
+        return self.deviceData
 
 class PT100Device:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = PT100
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = PT100
+        self.deviceData["data"] = self.data
+        self.data['revision'] = 0.0
+        # Start of C1
         self.data["address"] = 0
         self.data["on_off"] = 0
         self.data["mode"] = 0
         self.data["mode_text"] = ''
+        self.data["mode_hex"] = ''
         self.data["regulation"] = 0
         self.data["regulation_text"] = ''
         self.data["fault"] = 0
@@ -732,35 +769,38 @@ class PT100Device:
         self.data["target_battery_voltage"] = 0.0
         self.data["relay_state"] = 0
         self.data["alarm_state"] = 0
-        self.data["battery_temperature"] = 0.0
+        self.data["battery_temperature"] = 0
         self.data["inductor_temperature"] = 0
         self.data["fet_temperature"] = 0
-        self.data["lifetime_kwhrs"] = 0
-        self.data["resettable_kwhrs"] = 0
-        self.data["ground_fault_current"] = 0
-        self.data["nominal_battery_voltage"] = 0
+        # Start of C2
+        self.data["lifetime_kwhrs"] = math.nan
+        self.data["resettable_kwhrs"] = math.nan
+        self.data["ground_fault_current"] = math.nan
+        self.data["nominal_battery_voltage"] = math.nan
         self.data["stacker_info"] = 0
         self.data["model"] = ''
-        self.data["output_current_rating"] = 0
-        self.data["input_voltage_rating"] = 0
-        self.data["record"] = 0
-        self.data["daily_kwh"] = 0
-        self.data["max_daily_pv_volts"] = 0
-        self.data["max_daily_pv_volts_time"] = 0
-        self.data["max_daily_battery_volts"] = 0
-        self.data["max_daily_battery_volts_time"] = 0
-        self.data["minimum_daily_battery_volts"] = 0
-        self.data["minimum_daily_battery_volts_time"] = 0
-        self.data["daily_time_operational"] = 0
-        self.data["daily_amp_hours"] = 0
-        self.data["peak_daily_power"] = 0
-        self.data["peak_daily_power_time"] = 0
+        self.data["output_current_rating"] = math.nan
+        self.data["input_voltage_rating"] = math.nan
+        # Start of C3
+        self.data["record"] = math.nan
+        self.data["daily_kwh"] = math.nan
+        self.data["max_daily_pv_volts"] = math.nan
+        self.data["max_daily_pv_volts_time"] = math.nan
+        self.data["max_daily_battery_volts"] = math.nan
+        self.data["max_daily_battery_volts_time"] = math.nan
+        self.data["minimum_daily_battery_volts"] = math.nan
+        self.data["minimum_daily_battery_volts_time"] = math.nan
+        self.data["daily_time_operational"] = math.nan
+        self.data["daily_amp_hours"] = math.nan
+        self.data["peak_daily_power"] = math.nan
+        self.data["peak_daily_power_time"] = math.nan
+        # Start of C4
         self.data["fault_number"] = 0
-        self.data["max_battery_volts"] = 0
-        self.data["max_pv_to_battery_vdc"] = 0
-        self.data["max_battery_temperature"] = 0
-        self.data["max_fet_temperature"] = 0
-        self.data["max_inductor_temperature"] = 0
+        self.data["max_battery_volts"] = math.nan
+        self.data["max_pv_to_battery_vdc"] = math.nan
+        self.data["max_battery_temperature"] = math.nan
+        self.data["max_fet_temperature"] = math.nan
+        self.data["max_inductor_temperature"] = math.nan
 
     def parse(self, packet):
         packetType = packet[0]
@@ -772,10 +812,11 @@ class PT100Device:
             self.data['address'] = unpacked[1] >> 5
             byte_value = unpacked[2]
             #  byte 2
-            self.data['on_off'] = True if (
-                byte_value & 0x80) >> 7 != 0 else False
-            self.data['mode'] = (byte_value & 0x70) >> 4
-            self.data['regulation'] = byte_value & 0x0F
+            self.data['on_off'] = True if (byte_value & 0x01) != 0 else False
+            self.data['mode'] = byte_value >> 1 & 0x07
+            self.data['mode_hex'] = hex(unpacked[2]).upper()
+            self.data['regulation'] = byte_value >> 4 & 0x0F
+
             #  byte 3
             byte_value = unpacked[3]
             self.data['fault'] = byte_value >> 3
@@ -784,15 +825,13 @@ class PT100Device:
             self.data['pv_voltage'] = unpacked[6] / 10
             self.data['charge_time'] = unpacked[7] / 10
             byte_value = unpacked[8]
-            self.data['target_battery_voltage'] = (
-                byte_value / 10) * Magnum.multiplier
+            self.data['target_battery_voltage'] = (byte_value / 10) * Magnum.multiplier
             byte_value = unpacked[9]
-            self.data['relay_state'] = True if (
-                (byte_value & 0x80) >> 7) != 0 else False
-            self.data['alarm_state'] = True if (
-                (byte_value & 0x70) >> 6) != 0 else False
+            self.data['relay_state'] = True if (byte_value & 0xFE) != 0 else False
+            self.data['alarm_state'] = True if (byte_value >> 1 & 0xFE) != 0 else False
             byte_value = unpacked[10]
-            self.data['battery_temperature'] = byte_value / 10
+            
+            self.data['battery_temperature'] = float((byte_value / 10) + 25.0) # based on 25 C base
             byte_value = unpacked[11]
             self.data['inductor_temperature'] = byte_value
             byte_value = unpacked[12]
@@ -822,7 +861,7 @@ class PT100Device:
                 self.data['regulation_text'] = regulations[self.data['regulation']]
             else:
                 self.data['regulation_text'] = "Unknown"
-            faults =   {
+            faults = {
                 0: "No Fault",
                 1: "Input er Fault",
                 2: "Output er Fault",
@@ -859,7 +898,7 @@ class PT100Device:
             self.data['revision'] = str(unpacked[6] / 10)
             self.data['model'] = unpacked[7]
             self.data['output_current_rating'] = unpacked[8]
-            self.data['input_voltage_rating'] = unpacked[9]
+            self.data['input_voltage_rating'] = unpacked[9] * 10
         elif packetType == Magnum.PT_C3:
             short_value = unpacked[1]
             self.data['address'] = ((short_value & 0xE000) >> 13)
@@ -886,7 +925,7 @@ class PT100Device:
             self.data['max_inductor_temperature'] = unpacked[6]
 
     def getDevice(self):
-        return self.device
+        return self.deviceData
 
 class RemoteDevice:
 
@@ -908,9 +947,9 @@ class RemoteDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = REMOTE
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = REMOTE
+        self.deviceData["data"] = self.data
         self.data["revision"] = "0.0"
         self.data["action"] = 0
         self.data["searchwatts"] = 0
@@ -1030,7 +1069,11 @@ class RemoteDevice:
         unpacked = packet[2]
         if self.trace:
             self.data[packetType] = packet[1].hex().upper()
-        if packetType == Magnum.REMOTE_00:
+        if packetType == Magnum.REMOTE_C:
+            self.setBaseValues(unpacked)
+            for key in ["vsfloat","vEQ","absorbtime", "remotetimehours","remotetimemins"]:
+                self.data.pop(key, '')
+        elif packetType == Magnum.REMOTE_00:
             self.setBaseValues(unpacked)
         elif packetType == Magnum.REMOTE_11:
             self.setBaseValues(unpacked)
@@ -1077,8 +1120,7 @@ class RemoteDevice:
             self.data["ampstart"] = unpacked[16]
             self.data["ampsstartdelay"] = unpacked[17]
             if self.data["ampsstartdelay"] > 127:
-                self.data["ampsstartdelay"] = (
-                    self.data["ampsstartdelay"] & 0x0f) * 60
+                self.data["ampsstartdelay"] = (self.data["ampsstartdelay"] & 0x0f) * 60
             self.data["ampstop"] = unpacked[18]
             self.data["ampsstopdelay"] = unpacked[19]
             if self.data["ampsstopdelay"] > 127:
@@ -1180,15 +1222,15 @@ class RemoteDevice:
         for item in RemoteDevice.noMSH:
             if item in self.data:
                 self.data.pop(item)
-        return self.device
+        return self.deviceData
 
 class RTRDevice:
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
-        self.device = OrderedDict()
-        self.device["device"] = RTR
-        self.device["data"] = self.data
+        self.deviceData = OrderedDict()
+        self.deviceData["device"] = RTR
+        self.deviceData["data"] = self.data
         self.data["revision"] = "0.0"
 
     def parse(self, packet):
@@ -1200,4 +1242,4 @@ class RTRDevice:
             self.data["revision"] = str(round(unpacked[1] / 10))
 
     def getDevice(self):
-        return self.device
+        return self.deviceData

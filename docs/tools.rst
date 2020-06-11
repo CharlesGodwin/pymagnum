@@ -42,6 +42,6 @@ The regular options to set with this tool are:
                           False)
     -nc, --nocleanup      Suppress clean up of unknown packets (default: True)
 
-Copyright (c) 2018-2019 Charles Godwin magnum@godwin.ca
+Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
 
 SPDX-License-Identifier: BSD-3-Clause

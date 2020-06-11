@@ -1,5 +1,4 @@
 .vscode
-magnum/cgmagnum.code-workspace
 magnum/.vscode
 magnum/tools/__pycache__
 magnum/__pycache__
@@ -12,6 +11,7 @@ pymagnum.egg-info
 pymagnum.code-workspace
 *.bak
 credentials.txt
-Building_a_Magnum_Energy_Adaptor/
 source/_build
 docs/_build
+testdata
+.pymodhis

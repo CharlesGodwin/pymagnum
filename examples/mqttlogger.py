@@ -1,11 +1,10 @@
 #
-# Copyright (c) 2018-2019 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2020 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
 # This code is provided as an example of a JSON logger that writers to MQTT
 # run the program with --help for details of options.
-# By default consectutive duplicate data records are not logged.
 # Each device is a seperate JSON record new-line delimited
 # The JSON Record is like this:
 # datetime is a timestamp for local time
@@ -68,8 +67,6 @@ seldom.add_argument("-p", "--port", default=1883, type=int,
                     help="Broker port (default: %(default)s)")
 logger.add_argument("-i", "--interval", default=60, type=int, dest='interval',
                     help="Interval, in seconds, between publishing (default: %(default)s)")
-logger.add_argument("--duplicates", action="store_true",
-                    help="Log duplicate entries (default: %(default)s)", dest="allowduplicates")
 reader.add_argument("-d", "--device", default="/dev/ttyUSB0",
                     help="Serial device name (default: %(default)s)")
 seldom.add_argument("--packets", default=50, type=int,
@@ -84,7 +81,7 @@ seldom.add_argument("-nc", "--nocleanup", action="store_false",
 args = parser.parse_args()
 if args.interval < 10 or args.interval > (60*60):
     parser.error(
-        "argument -i/--iinterval: must be between 10 seconds and 3600 (1 hour)")
+        "argument -i/--interval: must be between 10 seconds and 3600 (1 hour)")
 if args.topic[-1] != "/":
     args.topic += "/"
 print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
@@ -92,11 +89,9 @@ print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
 # pylint: disable=locally-disabled, not-callable
 magnumReader = magnum.Magnum(device=args.device, packets=args.packets,
                              timeout=args.timeout, cleanpackets=args.cleanpackets)
-print("Publishing to broker:{0} Every:{2} seconds with {3}duplicates. Using: {1} ".format(
-    args.broker, args.device, args.interval, "no " if args.cleanpackets else ""))
+print("Publishing to broker:{0} Every:{2} seconds. Using: {1} ".format(args.broker, args.device, args.interval"))
 uuidstr = str(uuid.uuid1())
 client = mqtt.Client(client_id=uuidstr, clean_session=False)
-saveddevices = {}
 while True:
     start = time.time()
     devices = magnumReader.getDevices()
@@ -110,23 +105,11 @@ while True:
             for device in devices:
                 topic = args.topic + device["device"].lower()
                 data["device"] = device["device"]
-                savedkey = data["device"]
-                duplicate = False
-                if not args.allowduplicates:
-                    if savedkey in saveddevices:
-                        if device["device"] == magnum.REMOTE:
-                            # normalize time of day in remote data for equal test
-                            for key in ["remotetimehours", "remotetimemins"]:
-                                saveddevices[savedkey][key] = device["data"][key]
-                        if saveddevices[savedkey] == device["data"]:
-                            duplicate = True
-                if not duplicate:
-                    saveddevices[savedkey] = device["data"]
-                    data["data"] = device["data"]
-                    payload = json.dumps(
-                        data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
-                    client.publish(topic, payload=payload)
-            client.disconnect()
+                data["data"] = device["data"]
+                payload = json.dumps(
+                    data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
+                client.publish(topic, payload=payload)
+        client.disconnect()
         except:
             traceback.print_exc()
     interval = time.time() - start
