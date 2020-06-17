@@ -1,6 +1,10 @@
 ========================
  pyMagnum Release Notes
 ========================
+Version 1.1.2   2020/06/17
+------------------------
+- Fixed error in 'running' status for AGS device
+
 Version 1.1.1.post1 2020/06/11
 ------------------------
 - Improved PT-100 processing

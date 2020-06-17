@@ -495,7 +495,7 @@ class AGSDevice:
             self.data["gen_total_run"] = unpacked[3]
 
     def setRunning(self):
-        if self.data["status"] in (3, 6, 7, 8, 12, 13, 14, 18, 19, 26, 2):
+        if self.data["status"] in (3, 6, 7, 8, 12, 13, 14, 18, 19, 26, 27):
             self.data["running"] = True
         else:
             self.data["running"] = False
