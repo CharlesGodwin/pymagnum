@@ -1,6 +1,10 @@
 ========================
  pyMagnum Release Notes
 ========================
+Version 1.1.3   2020/07/12
+-----------------------
+- Fixed issue #13 leaving port open when no network detected
+
 Version 1.1.2   2020/06/17
 ------------------------
 - Fixed error in 'running' status for AGS device

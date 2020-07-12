@@ -213,6 +213,8 @@ class Magnum:
         #
         time.sleep(0.25)
         if self.reader.inWaiting() == 0:
+            self.reader.close()
+            self.reader = None
             raise ConnectionError("There doesn't seem to be a network")
         packetsleft = self.packetcount
         self.reader.flushInput()
