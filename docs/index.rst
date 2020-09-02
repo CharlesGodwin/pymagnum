@@ -15,6 +15,7 @@ Magnum Energy Network Reader
    pymagnum-api
    examples
    building_an_adaptor
+   ME_network_overview
    feedback
 
 Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca

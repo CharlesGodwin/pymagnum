@@ -14,7 +14,7 @@ from datetime import datetime
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-from magnum import magnum
+from magnum.magnum import Magnum
 from tzlocal import get_localzone
 
 magnumReader = None
@@ -77,6 +77,8 @@ if __name__ == "__main__":
                         help="Timeout for serial read (default: %(default)s)")
     seldom_used.add_argument("-l", "--listen", default="ALL",
                         help="IP address on which the server listens (default: %(default)s)")
+    parser.add_argument("--trace", action="store_true", default=False,
+                        help="Show unpacked info for packet data (default: %(default)s)")                        
     seldom_used.add_argument("-nc", "--nocleanup", action="store_false",
                         help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
     args = parser.parse_args()
@@ -84,8 +86,8 @@ if __name__ == "__main__":
         args.listen = ''
     print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
     try:
-        magnumReader = magnum.Magnum(device=args.device, packets=args.packets,
-                                     timeout=args.timeout, cleanpackets=args.cleanpackets)
+        magnumReader = Magnum(device=args.device, packets=args.packets,
+                                     timeout=args.timeout, cleanpackets=args.cleanpackets, trace=args.trace)
     except Exception as e:
         print("Error detected attempting to connect to Magnum network")
         traceback.print_exc()

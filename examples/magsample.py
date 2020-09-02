@@ -10,16 +10,17 @@
 import argparse
 import json
 import time
-
-from magnum import magnum
+from magnum.magnum import Magnum
 
 parser = argparse.ArgumentParser(description="Magnum Data Extractor Example")
 parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
                     help="Serial device name (default: %(default)s)")
+parser.add_argument("--trace", action="store_true", default=False,
+                        help="Add packet data to JSON (default: %(default)s)")                    
 parser.add_argument("-i", "--interval", default=60, type=int, dest='interval',
                     help="Interval, in seconds between logging (default: %(default)s)")
 args = parser.parse_args()
-reader = magnum.Magnum(device=args.device)
+reader = Magnum(device=args.device, trace=args.trace)
 while True: 
     start = time.time()
     devices = reader.getDevices()

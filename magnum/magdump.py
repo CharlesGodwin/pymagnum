@@ -127,12 +127,13 @@ import traceback
 from collections import OrderedDict
 from datetime import datetime
 
-from magnum import __version__, magnum
 from tzlocal import get_localzone
+
+import magnum
+from magnum.magnum import Magnum
 
 
 def main():
-    global args
     parser = argparse.ArgumentParser(description="Magnum Data Dump",
                                         epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
     parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
@@ -147,16 +148,16 @@ def main():
     seldom.add_argument("--timeout", default=0.005, type=float,
                         help="Timeout for serial read (default: %(default)s)")
     seldom.add_argument("--trace", action="store_true", default=False,
-                        help="Add most recent raw packet info to data (default: %(default)s)")
+                        help="Add most recent raw packet(s) info to data (default: %(default)s)")
     seldom.add_argument("-nc", "--nocleanup", action="store_false",
                         help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
     args = parser.parse_args()
 
     if args.verbose:
-        print('Version:{0}'.format(__version__))
+        print('Version:{0}'.format(magnum.__version__))
         print("Options:{}".format(str(args).replace(
             "Namespace(", "").replace(")", "")))
-    magnumReader = magnum.Magnum(device=args.device, packets=args.packets,
+    magnumReader = Magnum(device=args.device, packets=args.packets, trace=args.trace,
                                         timeout=args.timeout, cleanpackets=args.cleanpackets)
     if args.interval != 0 and args.verbose == True:
         print("Dumping every:{1} seconds. Using: {0} ".format(

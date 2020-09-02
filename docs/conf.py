@@ -13,6 +13,8 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../magnum'))
+sys.path.insert(0, os.path.abspath('../'))
+
 
 
 # -- Project information -----------------------------------------------------
@@ -22,7 +24,7 @@ copyright = '2019-2020, Charles Godwin'
 author = 'Charles Godwin'
 
 # The full version, including alpha/beta/rc tags
-release = '1.1.3'
+release = '2.0'
 
 # -- General configuration ---------------------------------------------------
 

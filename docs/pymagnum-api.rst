@@ -15,7 +15,7 @@ pyMagnum API
 
     :param int packets:
         How many packets to capture in one sample, defaults to 50.
-        Increase this size if you want a better analysis of the packets. Decrease to improve rsponse time but don't make it too small or you will get incomplete data.
+        Increase this size if you want a better analysis of the packets. Decrease to improve response time but don't make it too small or you will get incomplete data.
 
     :param boolean cleanpackets:
         Allow object to try to fixup two adjacent :const:`UNKNOWN` packets by merging them, defaults to :const:`True`
@@ -24,7 +24,7 @@ pyMagnum API
         How much time delay, in fractions of second,  to trigger end of packet, defaults to 0.001 second
 
     :param boolean trace:
-        Enable adding last of every packet type processed. The packets, as HEX strings, are appended to to data object, Defaults to :const:`False`
+        Enable adding a list of every packet processed since last getDevices(). The trace, is added to the "trace" dictionary item as a list of packet type and HEX of packet pairs, Defaults to :const:`False`
 
 .. method:: getDevices()
 
@@ -32,22 +32,23 @@ pyMagnum API
 
     :return: List of device dictionaries
 
-        Each dictionary has two items:
+          Each dictionary has two or, optionally, three items:
 
-        - **device** - One of :const:`INVERTER`, :const:`REMOTE`, :const:`AGS`, :const:`BMK` or :const:`PT100`
+        - **device** - One of :const:`INVERTER`, :const:`REMOTE`, :const:`AGS`, :const:`BMK`, :const:`RTR`, :const:`ACLD` or :const:`PT100`
         - **data** - A dictionary of name/value pairs for the fields in the device.
+        - **trace** - If trace is set to True then trace will have a list of tuples of every packet since last time invoked        
 
 .. method:: getPackets()
 
     Retrieves the raw packets from the network. This is not normally used.
 
-    :return: List of `tupple` objects
+    :return: List of `tuple` objects
 
-        **tupple contents**:
+        **tuple contents**:
 
         - name of packet
         - bytes of packet
-        - tupple of unpacked values for fields in packet - Based on ME documentation
+        - tuple of unpacked values for fields in packet - Based on ME documentation
 
 Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
 

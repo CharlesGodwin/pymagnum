@@ -1,3 +1,4 @@
 pyserial
 sphinx_rtd_theme
 setuptools
+uptime
