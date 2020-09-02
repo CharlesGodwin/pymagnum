@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
+# DO NOT SORT IMPORTS
+# 
 import os
 import sys
 from collections import OrderedDict
@@ -10,7 +12,6 @@ from struct import error as unpack_error
 from struct import unpack
 from time import sleep
 
-import serial
 from uptime import uptime
 
 from magnum import *
@@ -30,6 +31,7 @@ except:
 delay = MAGNUM_DELAY - uptime() # delay serial startup until system settles down - at least MAGNUM_DELAY seconds
 if delay > 0.0:
     sleep(delay)
+import serial # This must be after the sleep(delay)
 
 class Magnum:
     '''
