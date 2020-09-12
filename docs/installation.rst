@@ -94,6 +94,13 @@ Here’s an example of results if the wires are switched::
    Length:42 UNKNOWN   =>7FFFFD99FFFF11FFFDFF99EFD3E129FFFFFFFB4FFFFFFF87F75FE1D1F3FF6FB5E6FAD7C7C7F173C5D7BD
    Length:29 UNKNOWN   =>007AF45C8CFE24FC7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
 
+System Startup
+--------------
+
+Some systems have encountered problems with stray voltage being sent to the RS-485 device if this software 
+starts too soon after initial system boot. The symptom of this is flickering in the inverter. To reduce the risk of this happening, this software delays intializing
+the serial inteface for 30 seconds after boot time. 
+This delay can modified, please refer to source named magnum.py for details, or contact the author using :ref:`feedback`.
 
 Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
 

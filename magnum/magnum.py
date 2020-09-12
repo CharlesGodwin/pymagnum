@@ -24,6 +24,8 @@ from magnum.remotedevice import RemoteDevice
 from magnum.rtrdevice import RTRDevice
 
 # MAGNUM_DELAY can be defined in environment
+# export MAGNUM_DELAY=nnn.nn
+
 try:
     MAGNUM_DELAY = float(os.getenv('MAGNUM_DELAY', 30.0))
 except:
