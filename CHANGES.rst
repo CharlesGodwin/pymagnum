@@ -5,9 +5,10 @@ Version 2.0   pending
 ---------------------
 - Revised: PT-100 processing issue #15
 - Added: 30 second delay from boot time issue #16
+  (refer to Installation in documentation)
 - Enhanced: ``magtest``
 - Enhanced: Normalized fields and field types
-    - many Integer fields become Float
+    - Many Integer fields have become Float
     - Some fields have been dropped
 - Added: documentation of fields
 - Fixed: Bug in battery size calculation - now using BMK value
