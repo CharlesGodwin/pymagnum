@@ -89,7 +89,7 @@ print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
 # pylint: disable=locally-disabled, not-callable
 magnumReader = magnum.Magnum(device=args.device, packets=args.packets,
                              timeout=args.timeout, cleanpackets=args.cleanpackets)
-print("Publishing to broker:{0} Every:{2} seconds. Using: {1} ".format(args.broker, args.device, args.interval"))
+print("Publishing to broker:{0} Every:{2} seconds. Using: {1} ".format(args.broker, args.device, args.interval))
 uuidstr = str(uuid.uuid1())
 client = mqtt.Client(client_id=uuidstr, clean_session=False)
 while True:
@@ -109,7 +109,7 @@ while True:
                 payload = json.dumps(
                     data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
                 client.publish(topic, payload=payload)
-        client.disconnect()
+            client.disconnect()
         except:
             traceback.print_exc()
     interval = time.time() - start
