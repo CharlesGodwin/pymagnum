@@ -4,7 +4,8 @@
 # SPDX-License-Identifier:    BSD-3-Clause
 #
 # DO NOT SORT IMPORTS
-# 
+#
+
 import os
 import sys
 from collections import OrderedDict
@@ -30,10 +31,13 @@ try:
     MAGNUM_DELAY = float(os.getenv('MAGNUM_DELAY', 30.0))
 except:
     MAGNUM_DELAY = 30.0
-delay = MAGNUM_DELAY - uptime() # delay serial startup until system settles down - at least MAGNUM_DELAY seconds
+# delay serial startup until system settles down - at least MAGNUM_DELAY seconds
+delay = MAGNUM_DELAY - uptime()
 if delay > 0.0:
     sleep(delay)
-import serial # This must be after the sleep(delay)
+# This must be after the sleep(delay)
+import serial  # noqa
+
 
 class Magnum:
     '''
@@ -59,11 +63,11 @@ class Magnum:
         AGS_A2: 'BBBHB',
         BMK_81: 'BbHhHHhHHBB',
         INV:   'BBhhBBBBBBBBBBBBhb',
-        INV_C: "BBhhBBBBBBBBBB", # old style inverter
-        PT_C1: 'BBBBHhHBBBBBB', 
+        INV_C: "BBhhBBBBBBBBBB",  # old style inverter
+        PT_C1: 'BBBBHhHBBBBBB',
         PT_C2: 'BBHHBBBBBBB',
-        PT_C3: '15B', # double check documentation
-        REMOTE_C:  default_remote + 'BB', # old style remote 
+        PT_C3: '15B',  # double check documentation
+        REMOTE_C:  default_remote + 'BB',  # old style remote
         REMOTE_00: default_remote + '7B',
         REMOTE_11: default_remote + '7B',  # just the first 2 bytes count
         REMOTE_80: default_remote + 'bbbb3B',
@@ -72,17 +76,16 @@ class Magnum:
         REMOTE_A2: default_remote + 'bb5B',
         REMOTE_A3: default_remote + '7B',
         REMOTE_A4: default_remote + '7B',
-        REMOTE_C0: default_remote + '7B', # PT100  not used
-        REMOTE_C1: default_remote + '7B', # PT100  not used
-        REMOTE_C2: default_remote + '7B', # PT100  not used
-        REMOTE_C3: default_remote + '7B', # PT100  not used
-        REMOTE_D0: default_remote + '7B', # ACLD Needs work
+        REMOTE_C0: default_remote + '7B',  # PT100  not used
+        REMOTE_C1: default_remote + '7B',  # PT100  not used
+        REMOTE_C2: default_remote + '7B',  # PT100  not used
+        REMOTE_C3: default_remote + '7B',  # PT100  not used
+        REMOTE_D0: default_remote + '7B',  # ACLD Needs work
         ACLD_D1: '7B',                    # ACLD Needs work
         RTR_91: 'BB',
         UNKNOWN: ''
     }
 
-    
     def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, cleanpackets=True, trace=False):
         self.packetcount = packets
         self.timeout = timeout
@@ -102,13 +105,14 @@ class Magnum:
     #
     # returns a list of tupples of {message type, bytes of packet, and tupple of {unpacked packet values)}
     #
+
     def getPackets(self):
         '''
         Retrieves the raw packets. This is not normally used.
 
         :return: List of `tupple` objects
         :rtype: list
-        
+
         **tupple contents**:
 
         - name of packet
@@ -134,6 +138,7 @@ class Magnum:
     #  raw read of packets to bytes[]
     #  This can be overridden for tests
     #
+
     def readPackets(self):
         if self.reader == None:
             self.reader = serial.serial_for_url(self.device,
@@ -181,10 +186,11 @@ class Magnum:
     # based on what we know from ME documentation
     # attempt to build a known packet and unpack its data into values
     #
+
     def parsePacket(self, packet):
         if len(packet) == 22:
             packet = packet[:21]
-        elif len(packet) == 17: # takes care of classic
+        elif len(packet) == 17:  # takes care of classic
             packet = packet[:16]
         packetType = UNKNOWN
         if len(packet) > 0:
@@ -221,7 +227,7 @@ class Magnum:
                 model = packet[14]
                 if lastbyte == 0 and firstbyte == 0:
                     #
-                    #  There is an undocumented Remote message generated with seven 0x00 bytes at the end. 
+                    #  There is an undocumented Remote message generated with seven 0x00 bytes at the end.
                     #  This code distinguishes it from a Inverter record with status byte 0 == 0x0
                     #
                     #  Also the ME-ARC sends a spurious record with a zero end byte
@@ -275,7 +281,8 @@ class Magnum:
                 try:
                     fields = unpack(mask, packet)
                 except Exception as e:
-                    msg = "{0} Converting {1} - {2} bytes".format(e.args[0], packetType, len(packet))
+                    msg = "{0} Converting {1} - {2} bytes".format(
+                        e.args[0], packetType, len(packet))
                     fields = {}
                     print(msg)
                     packetType = UNKNOWN
@@ -315,13 +322,14 @@ class Magnum:
     #
     #  returns a deepcopy of the device data collections
     #
+
     def getDevices(self):
         '''
         Get a list of connected devices 
 
         :return: List of device dictionaries 
         :rtype: list
-    
+
         Each dictionary has two or, optionally, three items:
 
         - **device**  One of INVERTER, REMOTE, AGS, BMK or PT100  
@@ -330,7 +338,7 @@ class Magnum:
         '''
         # pass each the packets to the correct object
         #
-        # each packet is a tupple of: 
+        # each packet is a tupple of:
         #     type(string) name of packet
         #     raw packet (bytes) the raw binary bytes of the packet
         #     unpacked data (tupple int) integers of data deconstructed to macth ME doumentation
@@ -369,7 +377,7 @@ class Magnum:
             elif packetType == RTR_91:
                 if self.rtr == None:
                     self.rtr = RTRDevice(trace=self.trace)
-                self.rtr.parse(packet) 
+                self.rtr.parse(packet)
             elif packetType in (PT_C1, PT_C2, PT_C3):
                 if self.pt100 == None:
                     self.pt100 = PT100Device(trace=self.trace)
@@ -377,7 +385,7 @@ class Magnum:
             elif packetType == ACLD_D1:
                 if self.acld == None:
                     self.acld = ACLDDevice(trace=self.trace)
-                self.rtr.parse(packet) 
+                self.rtr.parse(packet)
         if self.remote:
             #
             # remove extraneous REMOTE fields if corresponding device is not present

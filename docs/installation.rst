@@ -9,7 +9,7 @@ Installation
 ============
 
 Throughout this documentation ``python`` and its installer ``pip`` are
-refered to using the default convention of a Raspberry Pi. The term
+referred to using the default convention of a Raspberry Pi. The term
 ``python3`` and ``pip3`` refer to Python 3 versions of the programs. On
 other systems the default installation may be Python 3, so just use
 ``python`` and ``pip`` in those systems. This software requires a minimum of
@@ -69,7 +69,7 @@ One problem is that the default settings for determining the end of a packet
 is not right for your setup. try increasing the timeout by adding this to your test
 ``magtest --timeout 0.005 -d /dev/ttyUSB0``
 
-Increase the value if neccesary.
+Increase the value if necessary.
 
 
 Reverse Wiring
@@ -98,8 +98,8 @@ System Startup
 --------------
 
 Some systems have encountered problems with stray voltage being sent to the RS-485 device if this software 
-starts too soon after initial system boot. The symptom of this is flickering in the inverter. To reduce the risk of this happening, this software delays intializing
-the serial inteface for 30 seconds after boot time. 
+starts too soon after initial system boot. The symptom of this is flickering in the inverter. To reduce the risk of this happening, this software delays initializing
+the serial interface for 30 seconds after boot time. 
 This delay can modified, please refer to source named magnum.py for details, or contact the author using :ref:`feedback`.
 
 Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca

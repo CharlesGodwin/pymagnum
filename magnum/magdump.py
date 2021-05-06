@@ -134,7 +134,7 @@ from magnum.magnum import Magnum
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Magnum Data Dump",
+    parser = argparse.ArgumentParser(description="Magnum Data Dump",prog="Magnum Dump",
                                         epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
     parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
                         help="Serial device name (default: %(default)s)")
@@ -142,6 +142,8 @@ def main():
                         help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
     parser.add_argument('-v', "--verbose", action="store_true", default=False,
                         help="Display options at runtime (default: %(default)s)")
+    parser.add_argument('--version', action='version',
+                        version="%(prog)s {}".format(magnum.__version__))
     seldom = parser.add_argument_group("Seldom used")
     seldom.add_argument("--packets", default=50, type=int,
                         help="Number of packets to generate in reader (default: %(default)s)")
