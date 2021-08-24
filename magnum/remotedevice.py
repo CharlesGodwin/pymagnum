@@ -3,7 +3,7 @@ from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
-
+from magnum.inverterdevice import InverterDevice
 class RemoteDevice:
 
     noAGS = ["ampsstartdelay", "ampsstopdelay", "ampstart", "ampstop", "begintime", "cool", "exercisedays", "exerciseruntime", "exercisestart", "genstart", "maxrun", "quietbegintime", "quietendtime",
@@ -116,7 +116,7 @@ class RemoteDevice:
         self.data["searchwatts"] = unpacked[1]
         value = unpacked[3]
         if(value > 100):
-            self.data["absorb"] = value * multiplier / 10
+            self.data["absorb"] = value * InverterDevice.multiplier / 10
             self.data["battype"] = 0
         else:
             self.data["absorb"] = 0
@@ -131,7 +131,7 @@ class RemoteDevice:
         # self.data["genstart"] = unpacked[8]
         self.data["lbco"] = unpacked[9] / 10
         self.data["vaccutout"] = float(unpacked[10])
-        self.data["vsfloat"] = unpacked[11] * multiplier / 10
+        self.data["vsfloat"] = unpacked[11] * InverterDevice.multiplier / 10
         self.data["vEQ"] = self.data["absorb"] + (unpacked[12] / 10)
         self.data["absorbtime"] = unpacked[13] / 10
 
@@ -165,7 +165,7 @@ class RemoteDevice:
             self.data["runtime"] = unpacked[16] / 10
             self.data["starttemp"] = float(unpacked[17])
             self.data["starttemp"] = round((self.data["starttemp"] - 32) * 5 / 9, 1)
-            value = unpacked[18] * multiplier
+            value = unpacked[18] * InverterDevice.multiplier
             self.data["startvdc"] = value / 10
             self.data["quiettime"] = unpacked[19]
         elif packetType == REMOTE_A1:
@@ -175,7 +175,7 @@ class RemoteDevice:
             minutes = unpacked[15] * 15
             self.data["stoptime"] = ((minutes // 60) * 100) + (minutes % 60)
             value = unpacked[16]
-            self.data["vdcstop"] = value * multiplier / 10
+            self.data["vdcstop"] = value * InverterDevice.multiplier / 10
             self.data["voltstartdelay"] = unpacked[17]
             if self.data["voltstartdelay"] > 127:
                 self.data["voltstartdelay"] = (
@@ -228,17 +228,17 @@ class RemoteDevice:
         if bmk == None:
             for item in self.noBMK:
                 if item in self.data:
-                    self.data.remove(item)
+                    self.data.pop(item)
 
         if ags == None:
             for item in self.noAGS:
                 if item in self.data:
-                    self.data.remove(item)
+                    self.data.pop(item)
 
         if pt100 == None:
             for item in self.noPT100:
                 if item in self.data:
-                    self.data.remove(item)
+                    self.data.pop(item)
         # remove MSH as it's not supported - yet
         # for item in self.noMSH:
         #     if item in self.data:

@@ -34,7 +34,8 @@ setup(name='pymagnum',
       entry_points={
           'console_scripts': [
               'magdump = magnum.magdump:main',
-              'magtest = magnum.magtest:main'
+              'magtest = magnum.magtest:main',
+              'magtestpacket = magnum.test_packets:main'
           ],
       },
       keywords='Magnum Energy Renewable Solar Network RS485 IoT'

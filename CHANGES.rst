@@ -15,7 +15,7 @@ Version 2.0   pending
 - Fixed: Source code was refactored to simplify coding
     - each device class was moved to an individual file
     - the tools subdirectory was collapsed into the main directory
-
+- Fixed: The voltage multiplier was not being handled correctly. some values were being generated as if you have a 12VDC system when voltage of system was 24VDC or 48VDC.
 Version 1.1.3   2020/07/12
 --------------------------
 - Fixed issue #13 leaving port open when no network detected

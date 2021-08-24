@@ -65,7 +65,8 @@ splitter like this one.
 
 |image3|\ **ME ARTR Advanced Remote**
 
-Use P5 or P6 only
+Use P5 or P6 only. The ARTR, does not communicate well when just a RS-485 reader is connected to a port. 
+The solution is to use a splitter and share a port with another Magnum device like BMK, PT100 or AGS-N
 
 This photo shows the connection for an AGS unit.
 

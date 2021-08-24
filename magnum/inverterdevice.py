@@ -94,6 +94,11 @@ class InverterDevice:
         0x08:  "Series stack - slave"
     }
 
+    #
+    # voltage multiplier
+    #
+    multiplier = 1
+
     def __init__(self, trace=False):
         self.trace = trace
         self.data = OrderedDict()
@@ -165,13 +170,13 @@ class InverterDevice:
         #
             if self.data["model"] <= 50:
                 # voltage = 12
-                multiplier = 1
+                InverterDevice.multiplier = 1
             elif self.data["model"] <= 107:
                 # voltage = 24
-                multiplier = 2
+                InverterDevice.multiplier = 2
             elif self.data["model"] <= 150:
                 # voltage = 48
-                multiplier = 4
+                InverterDevice.multiplier = 4
 
             if self.data["fault"] in self.faults:
                 self.data["fault_text"] = self.faults[self.data["fault"]]

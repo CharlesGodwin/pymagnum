@@ -28,7 +28,16 @@ class dummypackets(Magnum):
                     stop = decode
                 else:
                     stop = len(line)
-                packets.append(bytes.fromhex(line[ix+2:stop].strip()))
+                data = bytes.fromhex(line[ix+2:stop].strip())
+                if args.flip:
+                    flipped = bytearray()
+                    for item in data:
+                        flippit = ~item
+                        flip2 = flippit.to_bytes(
+                            2, byteorder='little', signed=True)
+                        flipped.append(flip2[0])
+                    data = bytes(flipped)
+                packets.append(data)
             line = args.filename.readline()
         args.filename.close()
         return packets
@@ -38,6 +47,8 @@ def main():
     parser = argparse.ArgumentParser("Magnum packet tester")
     parser.add_argument('-d', "--dump", action="store_true", default=False,
                         help="Display packets as JSON (default: %(default)s)")
+    parser.add_argument('-f', "--flip", action="store_true", default=False,
+                        help="Flip bits in input values (default: %(default)s)")
     parser.add_argument("--trace", action="store_true", default=False,
                         help="Add most recent raw packet(s) info to data (default: %(default)s)")                        
     parser.add_argument("filename", type=argparse.FileType("r", encoding="UTF-8"),
@@ -45,7 +56,7 @@ def main():
     args = parser.parse_args()
     # print('Version:{0}'.format(__version__))
     print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
-    dummyreader = dummypackets(cleanpackets=False, trace=True)
+    dummyreader = dummypackets(cleanpackets=False, trace=args.trace)
     try:
         if args.dump:
             devices = dummyreader.getDevices()

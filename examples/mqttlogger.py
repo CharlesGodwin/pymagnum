@@ -5,12 +5,12 @@
 #
 # This code is provided as an example of a JSON logger that writers to MQTT
 # run the program with --help for details of options.
-# Each device is a seperate JSON record new-line delimited
+# Each device is a separate JSON record new-line delimited
 # The JSON Record is like this:
 # datetime is a timestamp for local time
 # timestamp is the same time but as a Unix Epoch second as UTC time - this is useful for time series software
-# the data object is pertiement to each device
-# The curent devices are INVERTER, REMOTE, AGS, BMK, and PT100
+# the data object is pertinent to each device
+# The current devices are INVERTER, REMOTE, AGS, BMK, and PT100
 # topic =  magnum/inverter
 # payload
 # {

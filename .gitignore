@@ -15,4 +15,4 @@ source/_build
 docs/_build
 testdata
 .pymodhis
-
+logs/**

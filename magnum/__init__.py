@@ -3,11 +3,11 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
-__version__="2.0rc2"
+__version__="2.0rc3"
 #
 # names of devices
 #
-ACLD = 'ACLD'
+ACLD = "ACLD"
 AGS = "AGS"
 BMK = "BMK"
 INVERTER = "INVERTER"
@@ -48,7 +48,3 @@ REMOTE_D0 = "REMOTE_D0"
 RTR_91 = "RTR_91"
 
 ACLD_D1 = "ACLD_D1"
-# 
-# voltage multiplier
-# 
-multiplier = 1

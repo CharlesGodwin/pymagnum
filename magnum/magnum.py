@@ -15,6 +15,8 @@ from time import sleep
 
 from uptime import uptime
 
+# from magnum import magnum
+# import magnum
 from magnum import *
 from magnum.aclddevice import ACLDDevice
 from magnum.agsdevice import AGSDevice
@@ -86,12 +88,13 @@ class Magnum:
         UNKNOWN: ''
     }
 
-    def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, cleanpackets=True, trace=False):
+    def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, cleanpackets=True, trace=False, flip=False):
         self.packetcount = packets
         self.timeout = timeout
         self.cleanpackets = cleanpackets
         self.trace = trace
         self.device = device
+        self.flip = flip
         self.reader = None
         self.inverter = None
         self.remote = None
@@ -188,6 +191,9 @@ class Magnum:
     #
 
     def parsePacket(self, packet):
+        # Needs work 
+        if self.flip:
+            pass
         if len(packet) == 22:
             packet = packet[:21]
         elif len(packet) == 17:  # takes care of classic
@@ -213,7 +219,7 @@ class Magnum:
             elif packetLen == 16:
                 if firstbyte == 0xC1:
                     packetType = PT_C1
-                elif packet[10] <= 0x27 and packet[14] in self.inverter_models:
+                elif packet[10] <= 0x27 and packet[14] in InverterDevice.inverter_models:
                     packetType = INV_C
                     if self.inverter_revision == -1:
                         self.inverter_revision = packet[10]
@@ -242,10 +248,11 @@ class Magnum:
                 else:
                     if lastbyte == 0:
                         if (version == self.inverter_revision and model == self.inverter_model) or self.inverter_revision == -1:
-                            packetType = INV
-                            if self.inverter_revision == -1:
-                                self.inverter_revision = version
-                                self.inverter_model = model
+                            if model in InverterDevice.inverter_models:
+                                packetType = INV
+                                if self.inverter_revision == -1:
+                                    self.inverter_revision = version
+                                    self.inverter_model = model
                         else:
                             packetType = REMOTE_00
                     elif lastbyte == 0xa0:

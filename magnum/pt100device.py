@@ -4,6 +4,7 @@ from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
+from magnum.inverterdevice import InverterDevice
 
 class PT100Device:
     def __init__(self, trace=False):
@@ -84,7 +85,7 @@ class PT100Device:
             self.data['pv_voltage'] = unpacked[6] / 10
             self.data['charge_time'] = unpacked[7] / 10
             byte_value = unpacked[8]
-            self.data['target_battery_voltage'] = byte_value / 10 * multiplier
+            self.data['target_battery_voltage'] = byte_value / 10 * InverterDevice.multiplier
             byte_value = unpacked[9]
             self.data['relay_state'] = byte_value & 0x01
             self.data['alarm_state'] = (byte_value >> 1) & 0x01
