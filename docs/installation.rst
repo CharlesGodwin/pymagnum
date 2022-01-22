@@ -43,8 +43,9 @@ Once this software is installed, test the interconnect hardware:
 Usually you just need to run
 ``magtest -d /dev/ttyUSB0`` or other device
 name.
-This should show up to 50 packets with names. such as: ::
+This should show up to 50 packets with names. such as:
 
+.. code-block::
    Length:21 REMOTE_A2 =>00003C04500F170601C8A5860100465000781478A2
    Length:18 BMK_81    =>81550992FFC0089B0C77FFBFE11300390A01
    Length:21 INVERTER  =>400000F60002780001003311241E6B000001025800
@@ -80,7 +81,9 @@ are referencing the right device. HAT serial device can be either
 ``/dev/ttyAMA0`` or ``/dev/ttyS0``. Try both. If that fails contact the
 author using :ref:`feedback`.
 
-Here’s an example of results if the wires are switched::
+Here’s an example of results if the wires are switched
+
+.. code-block:: text
 
    Length:42 UNKNOWN   =>7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFFFFFF87F75FE1D1F3FF6FB5E6FAD7C7C7F173C5D7BD
    Length:29 UNKNOWN   =>0076F8FEFCFEFCFE7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
@@ -97,9 +100,9 @@ Here’s an example of results if the wires are switched::
 System Startup
 --------------
 
-Some systems have encountered problems with stray voltage being sent to the RS-485 device if this software 
+Some systems have encountered problems with stray voltage being sent to the RS-485 device if this software
 starts too soon after initial system boot. The symptom of this is flickering in the inverter. To reduce the risk of this happening, this software delays initializing
-the serial interface for 30 seconds after boot time. 
+the serial interface for 30 seconds after boot time.
 This delay can modified, please refer to source named magnum.py for details, or contact the author using :ref:`feedback`.
 
 Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca

@@ -25,7 +25,7 @@ interval is set to a number, the program will dump a string every
 
 The regular options to set with this tool are:
 
-::
+.. code-block::
 
     -h, --help            show this help message and exit
     -d DEVICE, --device DEVICE
