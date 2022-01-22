@@ -36,7 +36,7 @@ pyMagnum API
 
         - **device** - One of :const:`INVERTER`, :const:`REMOTE`, :const:`AGS`, :const:`BMK`, :const:`RTR`, :const:`ACLD` or :const:`PT100`
         - **data** - A dictionary of name/value pairs for the fields in the device.
-        - **trace** - If trace is set to True then trace will have a list of tuples of every packet since last time invoked        
+        - **trace** - If trace is set to True then trace will have a list of tuples of every packet since last time invoked
 
 .. method:: getPackets()
 

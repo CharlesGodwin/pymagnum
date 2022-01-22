@@ -3,8 +3,9 @@ magnum/.vscode
 magnum/tools
 magnum/__pycache__
 __pycache__
-build
-dist
+build/**
+docs/_build
+dist/**
 install.log
 magnum.egg-info
 pymagnum.egg-info
