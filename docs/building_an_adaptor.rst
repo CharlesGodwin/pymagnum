@@ -65,7 +65,7 @@ splitter like this one.
 
 |image3|\ **ME ARTR Advanced Remote**
 
-Use P5 or P6 only. The ARTR, does not communicate well when just a RS-485 reader is connected to a port. 
+Use P5 or P6 only. The ARTR, does not communicate well when just a RS-485 reader is connected to a port.
 The solution is to use a splitter and share a port with another Magnum device like BMK, PT100 or AGS-N
 
 This photo shows the connection for an AGS unit.
@@ -237,46 +237,31 @@ and Amazon
 
 .. |image0| image:: media/image1.png
    :width: 5.03611in
-   :height: 2.5in
 .. |image1| image:: media/image2.png
    :width: 1.26712in
-   :height: 0.98099in
 .. |image2| image:: media/image3.png
    :width: 3.92083in
-   :height: 2.93403in
 .. |image3| image:: media/image4.png
    :width: 4.25195in
-   :height: 3.32184in
 .. |image4| image:: media/image5.jpg
    :width: 3.83056in
-   :height: 2.18194in
 .. |image5| image:: media/image6.png
    :width: 1.23944in
-   :height: 1.57313in
 .. |image6| image:: media/image7.png
    :width: 1.58333in
-   :height: 1.09722in
 .. |image7| image:: media/image8.png
    :width: 1.44016in
-   :height: 0.99425in
 .. |image8| image:: media/image9.png
    :width: 3.33194in
-   :height: 2.21806in
 .. |image9| image:: media/image10.jpg
    :width: 1.34722in
-   :height: 1.34722in
 .. |image10| image:: media/image11.jpeg
    :width: 1.36944in
-   :height: 0.87778in
 .. |image11| image:: media/image12.jpeg
    :width: 2.76875in
-   :height: 2.15347in
 .. |image12| image:: media/image13.png
    :width: 2.1125in
-   :height: 2.20417in
 .. |image13| image:: media/image14.jpeg
    :width: 3.24893in
-   :height: 1.82752in
 .. |A circuit board Description automatically generated| image:: media/image15.jpeg
    :width: 3.2217in
-   :height: 1.81221in
