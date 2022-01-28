@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = 'Magnum Energy'
-copyright = '2019-2020, Charles Godwin'
+copyright = '2019-2022, Charles Godwin'
 author = 'Charles Godwin'
 
 # The full version, including alpha/beta/rc tags

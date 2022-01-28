@@ -17,6 +17,6 @@ require you to use ``python3`` and ``pip3`` to use the Python 3 version of these
 
 `Changes <https://github.com/CharlesGodwin/pymagnum/blob/master/CHANGES.rst>`_
 
-Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
+Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
 
 SPDX-License-Identifier: BSD-3-Clause

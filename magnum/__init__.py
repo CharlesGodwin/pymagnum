@@ -1,9 +1,9 @@
 #
-# Copyright (c) 2018-2020 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
-__version__="2.0rc3"
+__version__="2.0rc4"
 #
 # names of devices
 #
@@ -15,12 +15,12 @@ PT100 = "PT100"
 REMOTE = "REMOTE"
 RTR = "RTR"
 UNKNOWN = "UNKNOWN"
-# 
+#
 #  Names of all the packet types
 #
 AGS_A1 = "AGS_A1"
 AGS_A2 = "AGS_A2"
- 
+
 BMK_81 = "BMK_81"
 
 INV = "INVERTER"
@@ -39,7 +39,7 @@ REMOTE_A1 = "REMOTE_A1"
 REMOTE_A2 = "REMOTE_A2"
 REMOTE_A3 = "REMOTE_A3"
 REMOTE_A4 = "REMOTE_A4"
-REMOTE_C0 = "REMOTE_C0" 
+REMOTE_C0 = "REMOTE_C0"
 REMOTE_C1 = "REMOTE_C1"
 REMOTE_C2 = "REMOTE_C2"
 REMOTE_C3 = "REMOTE_C3"

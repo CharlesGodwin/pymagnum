@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018-2020 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
@@ -105,28 +105,52 @@ class Magnum:
         self.acld = None
         self.inverter_revision = -1
         self.inverter_model = -1
+        if device[0:1] == '!':
+            self.stored_packets = self._load_packets(device[1:])
+        else:
+            self.stored_packets = None
+        return
+
+    def _load_packets(self, filename):
+        packets = []
+        with open(filename) as file:
+            lines = file.readlines()
+        for line in lines:
+            ix = line.find("=>")
+            decode = line.find("decode:")
+            if ix >= 0:
+                decode = line.find("decode:")  # supports traced packets
+                if decode > ix:
+                    stop = decode
+                else:
+                    stop = len(line)
+                data = bytes.fromhex(line[ix+2:stop].strip())
+                packets.append(data)
+        if len(packets) == 0:
+            raise ValueError(f"There were no valid records in {filename}")
+        return packets
     #
-    # returns a list of tupples of {message type, bytes of packet, and tupple of {unpacked packet values)}
+    # returns a list of tuples of {message type, bytes of packet, and tuple of {unpacked packet values)}
     #
 
     def getPackets(self):
         '''
         Retrieves the raw packets. This is not normally used.
 
-        :return: List of `tupple` objects
+        :return: List of `tuple` objects
         :rtype: list
 
-        **tupple contents**:
+        **tuple contents**:
 
         - name of packet
         - bytes of packet
-        - tupple of unpacked values - Based on ME documentation
+        - tuple of unpacked values - Based on ME documentation
         '''
         packets = self.readPackets()
         messages = []
         unknown = 0
         for packet in packets:
-            message = self.parsePacket(packet)
+            message = self._parsePacket(packet)
             if message[0] == UNKNOWN:
                 unknown += 1
             messages.append(message)
@@ -138,11 +162,20 @@ class Magnum:
             messages = self.cleanup(messages)
         return messages
         #
+
     #  raw read of packets to bytes[]
     #  This can be overridden for tests
     #
 
     def readPackets(self):
+        packet = bytearray()
+        packets = []
+        if self.stored_packets != None:
+            for ix in range(self.packetcount):
+                packet = self.stored_packets.pop()
+                packets.append(packet)
+                self.stored_packets.append(packet)
+            return packets
         if self.reader == None:
             self.reader = serial.serial_for_url(self.device,
                                                 baudrate=19200,
@@ -152,8 +185,7 @@ class Magnum:
                                                 dsrdtr=False,
                                                 parity=serial.PARITY_NONE)
             self.reader.close()
-        packet = bytearray()
-        packets = []
+
         #
         # open port every time
         #
@@ -190,8 +222,8 @@ class Magnum:
     # attempt to build a known packet and unpack its data into values
     #
 
-    def parsePacket(self, packet):
-        # Needs work 
+    def _parsePacket(self, packet):
+        # Needs work
         if self.flip:
             pass
         if len(packet) == 22:
@@ -316,7 +348,7 @@ class Magnum:
                 nextmessage = messages[index + 1]
                 if nextmessage[0] == UNKNOWN:
                     # we may have a match
-                    newmessage = self.parsePacket(message[1] + nextmessage[1])
+                    newmessage = self._parsePacket(message[1] + nextmessage[1])
                     ignoreit = True
                     cleaned.append(newmessage)
         return cleaned
@@ -332,23 +364,23 @@ class Magnum:
 
     def getDevices(self):
         '''
-        Get a list of connected devices 
+        Get a list of connected devices
 
-        :return: List of device dictionaries 
+        :return: List of device dictionaries
         :rtype: list
 
         Each dictionary has two or, optionally, three items:
 
-        - **device**  One of INVERTER, REMOTE, AGS, BMK or PT100  
+        - **device**  One of INVERTER, REMOTE, AGS, BMK or PT100
         - **data** A dictionary of name/value pairs for the device.
         - **trace** If trace is set to True then trace will have a list of tupples of every packet since last time invoked
         '''
         # pass each the packets to the correct object
         #
-        # each packet is a tupple of:
+        # each packet is a tuple of:
         #     type(string) name of packet
         #     raw packet (bytes) the raw binary bytes of the packet
-        #     unpacked data (tupple int) integers of data deconstructed to macth ME doumentation
+        #     unpacked data (tuple int) integers of data deconstructed to match ME documentation
         #
         for packet in self.getPackets():
             packetType = packet[0]

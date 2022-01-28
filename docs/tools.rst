@@ -38,10 +38,11 @@ The regular options to set with this tool are:
    seldom used:
     --packets PACKETS     Number of packets to generate in reader (default: 50)
     --timeout TIMEOUT     Timeout for serial read (default: 0.005)
-    --trace               Add most recent raw packet info to data (default:
-                          False)
-    -nc, --nocleanup      Suppress clean up of unknown packets (default: True)
+    --trace               Add most recent raw packet info to data (default: False)
+    --nocleanup           Suppress clean up of unknown packets (default: False)
 
-Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
+You can define more than one device. The easiest way is to have multiple ``--device /dev/ttyUSBX`` options in the command.
+
+Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
 
 SPDX-License-Identifier: BSD-3-Clause

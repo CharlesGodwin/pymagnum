@@ -1,20 +1,20 @@
 #
-# Copyright (c) 2018-2020 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
-#  This module tests the functonality of the serial interface
+#  This module tests the functionality of the serial interface
 #  by attempting to read 50 packets of data and parsing them
 #  The results are dumped to the terminal
-#
-import argparse
+
 import os
+import signal
 import sys
 import time
-import traceback
 
 import magnum
 from magnum.magnum import Magnum
+from magnum.magparser import MagnumArgumentParser
 
 
 class Logger(object):
@@ -39,32 +39,38 @@ class Logger(object):
             self.log.close()
 
 
+def sigint_handler(signal, frame):
+    print('Interrupted. Shutting down.')
+    sys.exit(0)
+
 def main():
-    parser = argparse.ArgumentParser(
-        description="Magnum RS485 Reader Test", fromfile_prefix_chars='@', prog="Magnum Test", epilog="Use `python -m serial.tools.list_ports` to identify devices.")
+    signal.signal(signal.SIGINT, sigint_handler)
+    parser = MagnumArgumentParser(
+        description="Magnum RS485 Reader Test", prog="Magnum Test",
+        epilog="Use `python -m serial.tools.list_ports` to identify devices. This program does NOT support use of options @file.")
     parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
-                        help="Serial device name (default: %(default)s)")
-    parser.add_argument('--version', action='version',
-                        version="%(prog)s {}".format(magnum.__version__))
-    group = parser.add_argument_group("seldom used arguments")
-    group.add_argument("-n", "--packets", default=50, type=int,
-                       help="Number of packets to generate (default: %(default)s)")
-    group.add_argument("-t", "--timeout", default=0.001, type=float,
-                       help="Timeout for serial read - float between 0 and 1 second (default: %(default)s)")
-    group.add_argument("-nc", "--nocleanup", action="store_true",
-                       help="Suppress clean up of unknown packets (default: %(default)s)", dest='cleanpackets')
-    group.add_argument("--trace", action="store_true", default=False,
-                       help="Add most recent raw packet info to data (default: %(default)s)")
-    group.add_argument("--log", action="store_true", default=False,
+                        help="Serial device name (default: %(default)s). MUST be only one device.")
+    parser.add_argument("-i", "--interval", default=0, type=int, dest='interval',
+                        help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
+    parser.add_argument('-v', "--verbose", action="store_true", default=False,
+                         help="Display options at runtime (default: %(default)s)")
+    seldom = parser.add_argument_group("Seldom used")
+    seldom.add_argument('--version', action='version',
+                        version="%(prog)s Version:{}".format(magnum.__version__))
+    seldom.add_argument("--packets", default=50, type=int,
+                        help="Number of packets to generate in reader (default: %(default)s)")
+    seldom.add_argument("--timeout", default=0.005, type=float,
+                        help="Timeout for serial read (default: %(default)s)")
+    seldom.add_argument("--trace", action="store_true", default=False,
+                       help="Add most recent raw packet(s) info to data (default: %(default)s)")
+    seldom.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets',
+                         help="Suppress clean up of unknown packets (default: False)")
+    seldom.add_argument("--log", action="store_true", default=False,
                        help="Log test to logfile in current directory (default: %(default)s)")
-    args = parser.parse_args()
-    if args.timeout < 0 or args.timeout > 1.0:
-        parser.error(
-            "argument -t/--timeout: must be a number (float) between 0 and 1 second. i.e. 0.005")
-    if args.packets < 1:
-        parser.error("argument -n/--packets: must be greater than 0.")
-    args.cleanpackets = not args.cleanpackets
-    print('Version:{0}'.format(magnum.__version__))
+    args = parser.magnum_parse_args()
+    # Only supports one device
+    args.device = args.device[0]
+    print('Magnum Test Version:{0}'.format(magnum.__version__))
     print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
     if args.log:
         logfile = os.path.join(os.getcwd(), "magtest_" +
@@ -73,9 +79,8 @@ def main():
     try:
         reader = Magnum(device=args.device, packets=args.packets, trace=args.trace,
                         timeout=args.timeout, cleanpackets=args.cleanpackets)
-    except:
-        print("Error detected attempting to open serial device")
-        traceback.print_exc()
+    except Exception as e:
+        print("{0} {1}".format(args.device[0], str(e)))
         exit(2)
     try:
         start = time.time()
@@ -166,9 +171,9 @@ def main():
             if args.log:
                 print("Output was logged to {}".format(logfile))
 
-    except:
-        print("Error detected attempting to read network data - test failed")
-        traceback.print_exc()
+    except Exception as e:
+        print("{0} {1}".format(args.device, str(e)))
+        print("Error detected attempting to read network data - test failed.")
         exit(2)
 
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018-2020 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
@@ -33,9 +33,9 @@ try:
                             exclusive=True,
                             write_timeout=1.0
                             )
-    
+
 except Exception as e:
-    print('Error: Failed to open commuications port, exiting')
+    print('Error: Failed to open communications port, exiting')
     traceback.print_exc()
     exit(2)
 
@@ -53,7 +53,7 @@ args.filename.close()
 print("Processing:{} records from:{} using {}".format(
     len(packets), abspath(args.filename.name), args.device))
 
-try: 
+try:
     while True:
         for packet in packets:
             writer.write(packet)

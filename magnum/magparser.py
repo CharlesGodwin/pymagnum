@@ -1,0 +1,43 @@
+
+import argparse
+
+
+class MagnumArgumentParser(argparse.ArgumentParser):
+    def convert_arg_line_to_args(self, arg_line):
+        ix = arg_line.find('#')
+        if ix == 0:
+            return []
+        if ix > 0:
+            arg_line = arg_line[:ix]
+        arg_line = arg_line.replace(",", " ")
+        arg_line = arg_line.strip()
+        if len(arg_line) == 0:
+            return []
+        return arg_line.split()
+    # This method cleans up device
+
+    def magnum_parse_args(self):
+        args = self.parse_known_args()[0]
+        if hasattr(args, 'device'):
+            if not isinstance(args.device, list):
+                args.device = [args.device]
+            else:
+                devices = []
+                for dev in args.device:
+                    for subdev in dev:
+                        subdev = subdev.replace(",", " ")
+                        for item in subdev.split():
+                            devices.append(item)
+                args.device = list(dict.fromkeys(devices))  # strips duplicates
+            if len(args.device) == 0:
+                args.device = ['/dev/ttyUSB0']
+        if hasattr(args, 'timeout'):
+            if args.timeout < 0 or args.timeout > 1.0:
+                self.error(
+                    "option --timeout: Must be a number (float) between 0 and 1 second. i.e. 0.005")
+        if hasattr(args, 'packets'):
+            if args.packets < 1:
+                self.error("option --packets: Must be greater than 0.")
+        if hasattr(args, 'cleanpackets'):
+            args.cleanpackets = not args.cleanpackets
+        return args

@@ -1,0 +1,10 @@
+# Alter these to suit
+--device com4 com7
+--device !D:\users\charl\Documents\projects\pymagnum\testdata\packets_2019_12_04.log
+--interval 60
+--packets 50
+--timeout 0.005
+# Remove # to enable the following
+--verbose
+#--trace
+#--nocleanup

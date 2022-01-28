@@ -105,6 +105,6 @@ starts too soon after initial system boot. The symptom of this is flickering in 
 the serial interface for 30 seconds after boot time.
 This delay can modified, please refer to source named magnum.py for details, or contact the author using :ref:`feedback`.
 
-Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
+Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
 
 SPDX-License-Identifier: BSD-3-Clause

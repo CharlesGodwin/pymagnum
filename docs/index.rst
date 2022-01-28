@@ -18,6 +18,6 @@ Magnum Energy Network Reader
    ME_network_overview
    feedback
 
-Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
+Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
 
 SPDX-License-Identifier: BSD-3-Clause

@@ -17,3 +17,4 @@ docs/_build
 testdata
 .pymodhis
 logs/**
+./pymagnum.opt
