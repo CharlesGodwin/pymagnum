@@ -93,7 +93,7 @@ class Magnum:
         self.timeout = timeout
         self.cleanpackets = cleanpackets
         self.trace = trace
-        self.device = device
+        self.comm_device = device
         self.flip = flip
         self.reader = None
         self.inverter = None
@@ -110,8 +110,16 @@ class Magnum:
         else:
             self.stored_packets = None
         return
+    def getComm_Device(self):
+        return self.comm_device
 
     def _load_packets(self, filename):
+        ix = filename.find('!')
+        if ix > 0:
+            self.comm_device = filename[0:ix]
+            filename = filename[ix+1:]
+        else:
+            self.comm_device = filename
         packets = []
         with open(filename) as file:
             lines = file.readlines()
@@ -177,7 +185,7 @@ class Magnum:
                 self.stored_packets.append(packet)
             return packets
         if self.reader == None:
-            self.reader = serial.serial_for_url(self.device,
+            self.reader = serial.serial_for_url(self.comm_device,
                                                 baudrate=19200,
                                                 bytesize=8,
                                                 timeout=self.timeout,

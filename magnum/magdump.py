@@ -30,7 +30,7 @@ def main():
     signal.signal(signal.SIGINT, sigint_handler)
     parser = MagnumArgumentParser(description="Magnum Data Dump", prog="Magnum Dump", fromfile_prefix_chars='@',
                                   epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
-    parser.add_argument("-d", "--device", nargs='*', action='append',
+    parser.add_argument("-d", "--device", nargs='*', action='append', default=[],
                         help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")
     parser.add_argument("-i", "--interval", default=0, type=int, dest='interval',
                         help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
@@ -62,7 +62,7 @@ def main():
             magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
                                   timeout=args.timeout, cleanpackets=args.cleanpackets)
             magnumReader.getDevices()  # test read to see if all's good
-            magnumReaders[device] = magnumReader
+            magnumReaders[magnumReader.getComm_Device()] = magnumReader
         except Exception as e:
             print("{0} {1}".format(device, str(e)))
     if len(magnumReaders) == 0:

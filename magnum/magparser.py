@@ -17,6 +17,7 @@ class MagnumArgumentParser(argparse.ArgumentParser):
     # This method cleans up device
 
     def magnum_parse_args(self):
+
         args = self.parse_known_args()[0]
         if hasattr(args, 'device'):
             if not isinstance(args.device, list):
@@ -28,7 +29,14 @@ class MagnumArgumentParser(argparse.ArgumentParser):
                         subdev = subdev.replace(",", " ")
                         for item in subdev.split():
                             devices.append(item)
-                args.device = list(dict.fromkeys(devices))  # strips duplicates
+                devices = list(dict.fromkeys(devices))  # strips duplicates
+                file_no = 1
+                for ix, dev in enumerate(devices):
+                    if dev[0:1] == '!': # check for a tag
+                        if dev.find('!', 1) < 0:
+                            devices[ix] = f"!file{file_no}{dev}"
+                        file_no = file_no + 1
+                args.device = devices
             if len(args.device) == 0:
                 args.device = ['/dev/ttyUSB0']
         if hasattr(args, 'timeout'):

@@ -73,8 +73,8 @@ logger.add_argument("-t", "--topic", default='magnum/',
 logger.add_argument("-b", "--broker", default='localhost:1883',
                     help="MQTT Broker address and (optional port)(default: %(default)s)")
 logger.add_argument("-i", "--interval", default=60, type=int, dest='interval',
-                    help="Interval, in seconds, between publishing (default: %(default)s)")
-parser.add_argument("-d", "--device", nargs='*', action='append', default="/dev/ttyUSB0",
+                    help="Interval, in seconds, between publishing (default: %(default)s)"
+parser.add_argument("-d", "--device", nargs='*', action='append', default=[],
                     help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")
 seldom.add_argument("--packets", default=50, type=int,
                     help="Number of packets to generate in reader (default: %(default)s)")
@@ -97,7 +97,7 @@ for device in args.device:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
                               timeout=args.timeout, cleanpackets=args.cleanpackets)
         magnumReader.getDevices()  # test read to see if all's good
-        magnumReaders[device] = magnumReader
+        magnumReaders[magnumReader.getComm_Device()] = magnumReader
     except Exception as e:
         print("{0} {1}".format(device, str(e)))
 if len(magnumReaders) == 0:

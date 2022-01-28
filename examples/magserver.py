@@ -89,7 +89,7 @@ signal.signal(signal.SIGINT, sigint_handler)
 parser = MagnumArgumentParser(description="Magnum Network Reader",fromfile_prefix_chars='@',)
 parser.add_argument("-p", "--port", type=int, default=17223,
                     help="Port on which the server listens (default: %(default)s)")
-parser.add_argument("-d", "--device", nargs='*', action='append',
+parser.add_argument("-d", "--device", nargs='*', action='append', default=[],
                     help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")
 parser.add_argument('-v', "--verbose", action="store_true", default=False,
                     help="Display options at runtime (default: %(default)s)")
@@ -115,7 +115,7 @@ for device in args.device:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
                                 timeout=args.timeout, cleanpackets=args.cleanpackets)
         magnumReader.getDevices()  # test read to see if all's good
-        magnumReaders[device] = magnumReader
+        magnumReaders[magnumReader.getComm_Device()] = magnumReader
     except Exception as e:
         print("{0} {1}".format(device, str(e)))
 if len(magnumReaders) == 0:

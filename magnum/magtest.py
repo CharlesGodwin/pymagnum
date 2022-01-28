@@ -48,8 +48,8 @@ def main():
     parser = MagnumArgumentParser(
         description="Magnum RS485 Reader Test", prog="Magnum Test",
         epilog="Use `python -m serial.tools.list_ports` to identify devices. This program does NOT support use of options @file.")
-    parser.add_argument("-d", "--device", default="/dev/ttyUSB0",
-                        help="Serial device name (default: %(default)s). MUST be only one device.")
+    parser.add_argument("-d", "--device", default=[],
+                        help="Serial device name (default: /dev/ttyUSB0). MUST be only one device.")
     parser.add_argument("-i", "--interval", default=0, type=int, dest='interval',
                         help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
     parser.add_argument('-v', "--verbose", action="store_true", default=False,
@@ -80,7 +80,7 @@ def main():
         reader = Magnum(device=args.device, packets=args.packets, trace=args.trace,
                         timeout=args.timeout, cleanpackets=args.cleanpackets)
     except Exception as e:
-        print("{0} {1}".format(args.device[0], str(e)))
+        print("{0} {1}".format(args.device, str(e)))
         exit(2)
     try:
         start = time.time()
@@ -172,7 +172,7 @@ def main():
                 print("Output was logged to {}".format(logfile))
 
     except Exception as e:
-        print("{0} {1}".format(args.device, str(e)))
+        print("{0} {1}".format(reader.getComm_Device(), str(e)))
         print("Error detected attempting to read network data - test failed.")
         exit(2)
 

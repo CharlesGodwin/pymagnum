@@ -25,7 +25,7 @@ def sigint_handler(signal, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 parser = MagnumArgumentParser(
     description="Magnum Data Extractor Example", fromfile_prefix_chars='@')
-parser.add_argument("-d", "--device", nargs='*', action='append', default="/dev/ttyUSB0",
+parser.add_argument("-d", "--device", nargs='*', action='append', default=[],
                     help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")
 parser.add_argument("-i", "--interval", default=0, type=int, dest='interval',
                     help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
@@ -57,7 +57,7 @@ for device in args.device:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
                               timeout=args.timeout, cleanpackets=args.cleanpackets)
         magnumReader.getDevices()  # test read to see if all's good
-        magnumReaders[device] = magnumReader
+        magnumReaders[magnumReader.getComm_Device()] = magnumReader
     except Exception as e:
         print("{0} {1}".format(device, str(e)))
 if len(magnumReaders) == 0:
