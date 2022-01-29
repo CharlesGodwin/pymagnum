@@ -88,7 +88,7 @@ class Magnum:
         UNKNOWN: ''
     }
 
-    def __init__(self, device="/dev/ttyUSB0", timeout=0.001, packets=50, cleanpackets=True, trace=False, flip=False):
+    def __init__(self, device="/dev/ttyUSB0", timeout=0.005, packets=50, cleanpackets=True, trace=False, flip=False):
         self.packetcount = packets
         self.timeout = timeout
         self.cleanpackets = cleanpackets

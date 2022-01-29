@@ -25,7 +25,7 @@ interval is set to a number, the program will dump a string every
 
 The regular options to set with this tool are:
 
-.. code-block::
+.. code-block:: text
 
     -h, --help            show this help message and exit
     -d DEVICE, --device DEVICE
@@ -41,7 +41,27 @@ The regular options to set with this tool are:
     --trace               Add most recent raw packet info to data (default: False)
     --nocleanup           Suppress clean up of unknown packets (default: False)
 
-You can define more than one device. The easiest way is to have multiple ``--device /dev/ttyUSBX`` options in the command.
+You can define more than one device. Just provide multiple ``--device /dev/ttyUSBX`` options when invoking the command.
+
+Configuration (options) File
+============================
+
+The example programs and ``magdump`` support the use of an options file that is read instead of completing all the options on the command line.
+For example, instead of ``magdump --device /dev/ttyUSB1 --interval 60``, these cound be included in an options file named, for example `pymagnum.opt` and the
+command could be ``magdump @pymagnum.opt``. The `@` sign indicates the following is a file name and it read. There is an example in the `example` folder in GitHub.
+It looks like this: (# denotes comments)
+
+.. code-block:: text
+
+    # Alter these to suit
+    --device /dev/ttyUSB0
+    --interval 60
+    --packets 50
+    --timeout 0.005
+    # Remove # to enable the following
+    #--verbose
+    #--trace
+    #--nocleanup
 
 Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
 

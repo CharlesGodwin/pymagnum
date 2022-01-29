@@ -13,9 +13,22 @@ Please read the documentation before installing this package.
 Some operating systems, including Raspberry Pi OS,
 require you to use ``python3`` and ``pip3`` to use the Python 3 version of these tools.
 
-`Documentation <https://pymagnum.readthedocs.io/>`_
+..
+    production
 
-`Changes <https://github.com/CharlesGodwin/pymagnum/blob/master/CHANGES.rst>`_
+    `Documentation <https://pymagnum.readthedocs.io/>`_
+
+    `Changes <https://github.com/CharlesGodwin/pymagnum/blob/master/CHANGES.rst>`_
+
+..
+    Testing
+
+**This is release candidate only**
+
+`Documentation <https://godwin.ca/magnum/>`_
+
+`Changes <https://github.com/CharlesGodwin/pymagnum/blob/Pre-release-2.0/CHANGES.rst>`_
+
 
 Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
 

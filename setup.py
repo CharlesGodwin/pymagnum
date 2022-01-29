@@ -18,7 +18,7 @@ setup(name='pymagnum',
       author='Charles Godwin',
       author_email='magnum@godwin.ca',
       py_modules=['magnum.magtest',
-                  'magnum.magdump', 'magnum.test_packets'],
+                  'magnum.magdump'],
       long_description=long_description,
       long_description_content_type="text/x-rst",
       license="BSD",
@@ -30,12 +30,11 @@ setup(name='pymagnum',
           "Operating System :: OS Independent"
       ],
       install_requires=['pyserial', 'tzlocal', 'uptime'],
-      python_requires='>=3.5',
+      python_requires='>=3.7',
       entry_points={
           'console_scripts': [
               'magdump = magnum.magdump:main',
-              'magtest = magnum.magtest:main',
-              'magtestpacket = magnum.test_packets:main'
+              'magtest = magnum.magtest:main'
           ],
       },
       keywords='Magnum Energy Renewable Solar Network RS485 IoT'

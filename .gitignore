@@ -18,3 +18,4 @@ testdata
 .pymodhis
 logs/**
 ./pymagnum.opt
+publish_doc.ps1

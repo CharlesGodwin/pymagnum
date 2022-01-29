@@ -24,7 +24,7 @@ copyright = '2019-2022, Charles Godwin'
 author = 'Charles Godwin'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0'
+release = '2.0rc5'
 
 # -- General configuration ---------------------------------------------------
 
