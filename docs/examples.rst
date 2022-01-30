@@ -1,6 +1,8 @@
 Examples
 --------
 
+.. BUILDINFO
+
 .. production
     Example programs are available in `this repository <https://github.com/CharlesGodwin/pymagnum/tree/master/examples>`_.
 
