@@ -3,7 +3,8 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
-__version__="2.0rc5"
+#  BUILDINFO
+__version__="2.0rc6"
 #
 # names of devices
 #

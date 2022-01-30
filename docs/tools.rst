@@ -62,7 +62,3 @@ It looks like this: (# denotes comments)
     #--verbose
     #--trace
     #--nocleanup
-
-Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
-
-SPDX-License-Identifier: BSD-3-Clause

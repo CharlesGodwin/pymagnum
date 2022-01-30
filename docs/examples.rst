@@ -9,7 +9,3 @@ Example programs are available in `this repository <https://github.com/CharlesGo
 These programs support use of the `configuration file <tools.html#configuration-options-file>`_.
 
 These programs support defining multiple RS485 devices.
-
-Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
-
-SPDX-License-Identifier: BSD-3-Clause

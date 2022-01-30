@@ -30,7 +30,7 @@ setup(name='pymagnum',
           "Operating System :: OS Independent"
       ],
       install_requires=['pyserial', 'tzlocal', 'uptime'],
-      python_requires='>=3.7',
+      python_requires='>=3.5',
       entry_points={
           'console_scripts': [
               'magdump = magnum.magdump:main',

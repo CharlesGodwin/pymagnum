@@ -9,11 +9,11 @@ Clone the repository from https://github.com/CharlesGodwin/pymagnum
 One time, run:
 `sudo pip3 install -r requirements.txt`
 
-- If you want to create a unique version modify the value in file named `magnum/__init__.py`
-- Change documentation release number to match in `docs/conf.py`
+- Search for `BUILDINFO` in all files to identify changes needed for documentation and software builds.
+
 - Build the package by running the script / batch file `build_draft.sh` or, in Windows, `build_draft.cmd`
   The Windows version will also build the documentation and place it in `./build/html`. There is no script for building the documentation in linux.
-- If you want publish a private version of documentation modify README.rst
+- If you want to publish a private version of documentation modify README.rst
 - Install by running the following:  (replace \<version number\> with the current version number).
 `sudo pip3 install --update dist/pymagnum-<version number>.zip`
 

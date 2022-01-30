@@ -12,19 +12,22 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../magnum'))
-sys.path.insert(0, os.path.abspath('../'))
+from datetime import date
+# sys.path.insert(0, os.path.abspath('../magnum'))
+# sys.path.insert(0, os.path.abspath('../'))
 
 
 
 # -- Project information -----------------------------------------------------
-
+# BUILDINFO
 project = 'Magnum Energy'
-copyright = '2019-2022, Charles Godwin'
+year = date.today().year
+copyright = f"2018-{year}, Charles Godwin magnum@godwin.ca"
 author = 'Charles Godwin'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0rc5'
+release = '2.0rc6'
+version = '2.0'
 
 # -- General configuration ---------------------------------------------------
 
@@ -40,8 +43,16 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
+exclude_patterns = ['*.txt']
 
+rst_epilog = f"""
+.. |copyright| replace:: {copyright}
+.. |release| replace:: {release}
+.. |version| replace:: {version}
+
+SPDX-License-Identifier: BSD-3-Clause
+
+"""
 
 # -- Options for HTML output -------------------------------------------------
 

@@ -55,7 +55,3 @@ pyMagnum API
     Retrieves the name of the communication device for this instance of of the class. This is useful for generating messages.
 
     :return: String containing name of device, such as ``/dev/ttyUSB0``
-
-Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
-
-SPDX-License-Identifier: BSD-3-Clause

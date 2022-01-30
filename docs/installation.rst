@@ -65,7 +65,7 @@ Troubleshooting
 If nothing happens or you get a lot of UNKNOWN lines, try these trouble shooting routines.
 
 **Timeout is too short**
-
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 One problem is that the default settings for determining the end of a packet
 is not right for your setup. try increasing the timeout by adding this to your test
@@ -75,6 +75,7 @@ Increase the value if necessary.
 
 
 **Reverse Wiring**
+^^^^^^^^^^^^^^^^^^
 
 try reversing the two wires on your setup and repeating the test. Also double check you
 are referencing the right device. HAT serial device can be either
@@ -98,12 +99,9 @@ Here’s an example of results if the wires are switched
    Length:29 UNKNOWN   =>007AF45C8CFE24FC7FFFFD9BFFFF11FFFDFF99EFD3E129FFFFFFFB4FFF
 
 **System Startup**
+^^^^^^^^^^^^^^^^^^
 
 Some systems have encountered problems with stray voltage being sent to the RS-485 device if this software
 starts too soon after initial system boot. The symptom of this is flickering in the inverter. To reduce the risk of this happening, this software delays initializing
 the serial interface for 30 seconds after boot time.
 This delay can modified, please refer to source named magnum.py for details, or contact the author using :ref:`feedback`.
-
-Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
-
-SPDX-License-Identifier: BSD-3-Clause

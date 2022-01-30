@@ -13,6 +13,7 @@ Please read the documentation before installing this package.
 Some operating systems, including Raspberry Pi OS,
 require you to use ``python3`` and ``pip3`` to use the Python 3 version of these tools.
 
+.. BUILDINFO
 ..
     production
 
@@ -28,8 +29,3 @@ require you to use ``python3`` and ``pip3`` to use the Python 3 version of these
 `Documentation <https://godwin.ca/magnum/>`_
 
 `Changes <https://github.com/CharlesGodwin/pymagnum/blob/Pre-release-2.0/CHANGES.rst>`_
-
-
-Copyright (c) 2018-2022 Charles Godwin magnum@godwin.ca
-
-SPDX-License-Identifier: BSD-3-Clause
