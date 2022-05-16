@@ -3,6 +3,8 @@ from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
+from magnum.inverterdevice import InverterDevice
+
 
 class AGSDevice:
     status = {
@@ -60,13 +62,14 @@ class AGSDevice:
         packetType = packet[0]
         unpacked = packet[2]
         if self.trace:
-            self.deviceData["trace"].append([packetType,  packet[1].hex().upper()])
+            self.deviceData["trace"].append(
+                [packetType,  packet[1].hex().upper()])
         if packetType == AGS_A1:
             self.data["status"] = unpacked[1]
             if self.data["status"] in (3, 6, 7, 8, 12, 13, 14, 18, 19, 26, 27):
                 self.data["running"] = True
             else:
-                self.data["running"] = False 
+                self.data["running"] = False
             self.data["revision"] = str(round(unpacked[2] / 10, 1))
             self.data["temp"] = float(unpacked[3])
             if self.data["temp"] < 105.0:
@@ -76,12 +79,13 @@ class AGSDevice:
                 self.data["status_text"] = self.status[self.data["status"]]
             else:
                 self.data["status_text"] = "Unknown"
-            self.data["vdc"] = round(unpacked[5] / 10 * multiplier, 2)
+            self.data["vdc"] = round(
+                unpacked[5] / 10 * InverterDevice.multiplier, 2)
         elif packetType == AGS_A2:
             self.data["gen_last_run"] = unpacked[1]
             self.data["last_full_soc"] = unpacked[2]
             self.data["gen_total_run"] = unpacked[3]
-          
+
     def getDevice(self):
         device = deepcopy(self.deviceData)
         if self.trace:

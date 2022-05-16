@@ -1,21 +1,15 @@
 
 import argparse
+import shlex
+import os
 
 
 class MagnumArgumentParser(argparse.ArgumentParser):
+    isPosix = os.name != 'nt'
     def convert_arg_line_to_args(self, arg_line):
-        ix = arg_line.find('#')
-        if ix == 0:
-            return []
-        if ix > 0:
-            arg_line = arg_line[:ix]
-        arg_line = arg_line.replace(",", " ")
-        arg_line = arg_line.strip()
-        if len(arg_line) == 0:
-            return []
-        return arg_line.split()
-    # This method cleans up device
+        return shlex.split(arg_line, '#',  self.isPosix)
 
+    # This method cleans up device
     def magnum_parse_args(self):
 
         args = self.parse_known_args()[0]
