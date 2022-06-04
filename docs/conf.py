@@ -26,7 +26,7 @@ copyright = f"2018-{year}, Charles Godwin magnum@godwin.ca"
 author = 'Charles Godwin'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0rc6'
+release = '2.0'
 version = '2.0'
 
 # -- General configuration ---------------------------------------------------

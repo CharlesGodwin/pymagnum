@@ -44,44 +44,42 @@ def sigint_handler(signal, frame):
     sys.exit(0)
 
 def main():
+    exit_code = 0
     signal.signal(signal.SIGINT, sigint_handler)
     parser = MagnumArgumentParser(
         description="Magnum RS485 Reader Test", prog="Magnum Test",
         epilog="Use `python -m serial.tools.list_ports` to identify devices. This program does NOT support use of options @file.")
     parser.add_argument("-d", "--device", default=[],
                         help="Serial device name (default: /dev/ttyUSB0). MUST be only one device.")
-    parser.add_argument("-i", "--interval", default=0, type=int, dest='interval',
-                        help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
-    parser.add_argument('-v', "--verbose", action="store_true", default=False,
-                         help="Display options at runtime (default: %(default)s)")
+    parser.add_argument("--packets", default=50, type=int,
+                        help="Number of packets to generate in reader (default: %(default)s)")
+    parser.add_argument("--timeout", default=0.005, type=float,
+                        help="Timeout for serial read (default: %(default)s)")
+
     seldom = parser.add_argument_group("Seldom used")
     seldom.add_argument('--version', action='version',
                         version="%(prog)s Version:{}".format(magnum.__version__))
-    seldom.add_argument("--packets", default=50, type=int,
-                        help="Number of packets to generate in reader (default: %(default)s)")
-    seldom.add_argument("--timeout", default=0.005, type=float,
-                        help="Timeout for serial read (default: %(default)s)")
     seldom.add_argument("--trace", action="store_true", default=False,
                        help="Add most recent raw packet(s) info to data (default: %(default)s)")
     seldom.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets',
                          help="Suppress clean up of unknown packets (default: False)")
     seldom.add_argument("--log", action="store_true", default=False,
-                       help="Log test to logfile in current directory (default: %(default)s)")
+                       help="Write copy of program output to log file in current directory (default: %(default)s)")
     args = parser.magnum_parse_args()
     # Only supports one device
     args.device = args.device[0]
     print('Magnum Test Version:{0}'.format(magnum.__version__))
     print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
-    if args.log:
-        logfile = os.path.join(os.getcwd(), "magtest_" +
-                               time.strftime("%Y-%m-%d_%H%M%S") + ".txt")
-        sys.stdout = Logger(logname=logfile)
     try:
         reader = Magnum(device=args.device, packets=args.packets, trace=args.trace,
                         timeout=args.timeout, cleanpackets=args.cleanpackets)
     except Exception as e:
         print("{0} {1}".format(args.device, str(e)))
         exit(2)
+    if args.log:
+        logfile = os.path.join(os.getcwd(), "magtest_" +
+                            time.strftime("%Y-%m-%d_%H%M%S") + ".txt")
+    sys.stdout = Logger(logname=logfile)
     try:
         start = time.time()
         packets = reader.getPackets()
@@ -157,9 +155,9 @@ def main():
         if len(packets) > unknown:
             for key, value in device_list.items():
                 if value == 'NA':
-                    print("{0} not supported".format(key))
+                    print(f"{key} not supported")
                 elif value == False:
-                    print("{0} not connected".format(key))
+                    print(f"{key} not connected")
                 else:
                     print("{0} Detected".format(key))
             if device_list[magnum.PT100] == True:
@@ -168,14 +166,14 @@ def main():
             if device_list[magnum.ACLD] == True:
                 print("{0} is not currently supported, contact the author.".format(
                     magnum.ACLD))
-            if args.log:
-                print("Output was logged to {}".format(logfile))
 
     except Exception as e:
         print("{0} {1}".format(reader.getComm_Device(), str(e)))
         print("Error detected attempting to read network data - test failed.")
-        exit(2)
-
+        exit_code = 2
+    if args.log:
+        print("Output was logged to {}".format(logfile))
+    exit(exit_code)
 
 if __name__ == '__main__':
     main()

@@ -2,26 +2,27 @@
  pyMagnum Release Notes
 =======================
 
-Version 2.0   pending
+Version 2.0   2022/06/06
 ---------------------
 - Added: The ability to define all options in a configuration file. For example ``magdump @pymagnum.opt``. See documentation.
 - Added: ``magdump`` and examples programs support use of configuration file.
+- Added: A new method ``getComm_Device()`` in the Magnum class to retrieve name of device.
+- Added: 30 second delay from boot time issue #16
+- Added: documentation of fields
 - Enhanced: The utility tool ``magdump`` now supports defining more that one device. See documentation. **NOTE** ``magtest`` does NOT support multiple devices.
 - Enhanced: The example programs have been enhanced to support multiple devices.
-- Added: A new method ``getComm_Device()`` in the Magnum class to retrieve name of device.
-- Revised: PT-100 processing issue #15
-- Added: 30 second delay from boot time issue #16
-  (refer to Installation in documentation)
+- Enhanced: The utility tool ``magtest`` now supports writing a copy of the displayed messages to a log file. ``--log``
 - Enhanced: ``magtest``
 - Enhanced: Normalized fields and field types
     - Many Integer fields have become Float
     - Some fields have been dropped
-- Added: documentation of fields
+- Revised: PT-100 processing issue #15
+  (refer to Installation in documentation)
 - Fixed: Bug in battery size calculation - now using BMK value
 - Fixed: Source code was refactored to simplify coding
     - each device class was moved to an individual file
     - the tools subdirectory was collapsed into the main directory
-- Fixed: The voltage multiplier was not being handled correctly. some values were being generated as if you have a 12VDC system when voltage of system was 24VDC or 48VDC.
+- Fixed: The voltage multiplier was not being handled correctly. Some values were being generated as if you have a 12VDC system when voltage of system was 24VDC or 48VDC.
 
 Version 1.1.3   2020/07/12
 --------------------------

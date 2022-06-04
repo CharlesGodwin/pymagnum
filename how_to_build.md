@@ -7,7 +7,7 @@ This is a simple description of the steps needed to build a version locally.
 Clone the repository from https://github.com/CharlesGodwin/pymagnum
 
 One time, run:
-`sudo pip3 install -r requirements.txt`
+`sudo pip install -r requirements.txt`
 
 - Search for `BUILDINFO` in all files to identify changes needed for documentation and software builds.
 

@@ -15,9 +15,10 @@ To use this software you need to have a RS485 adaptor connected to a
 Magnum Energy Network. Refer to :ref:`building_an_adapter` for instructions.
 
 This software has only been tested with MS series inverter chargers and ME-RC, ME-ARC, ME-RTR and ME-ARTR remote controls.
-There are no plans to support other devices.
 
 Support for PT-100 charge controller is limited and should be considered a work-in-progress. If you have questions please use :ref:`feedback`.
+
+There are no plans to support other devices.
 
 If you want to be notified about new releases, please contact the
 author using :ref:`feedback`.

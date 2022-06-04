@@ -6,24 +6,23 @@ Setup
 
 `The Python package site <https://pypi.org/project/pymagnum/>`_
 
-Installation
-============
+Installation info
+=================
 
-Throughout this documentation ``python`` and its installer ``pip`` are
-referred to using the default convention of a Raspberry Pi. The term
-``python3`` and ``pip3`` refer to Python 3 versions of the programs. On
-other systems the default installation may be Python 3, so just use
-``python`` and ``pip`` in those systems. This software requires a minimum of
+Throughout this documentation, ``python``
+and its installer ``pip`` are
+referred to using the default convention of a python.
+If you are using an older OS, such as Buster on a Raspberry Pi, Use ``python3`` and ``pip3``to  refer to Python 3 versions of the programs. This software requires a minimum of
 version 3.7 of Python.
 
-| You will need pip3 installed. On a Pi use:
+| You will need pip installed. On a Pi use:
 | ``sudo apt install python3-pip``
 
 | Then install or upgrade this software package using:
-| ``sudo pip3 install --upgrade pymagnum``
+| ``sudo pip install --upgrade pymagnum``
 
 If you want to check which version is have installed on your system, run this command:
-``sudo pip3 show pymagnum``
+``sudo pip show pymagnum``
 
 .. _testing:
 
@@ -33,9 +32,8 @@ Testing
 Once this software is installed, test the interconnect hardware:
 
 | First determine your serial device by running
-| ``python3 -m serial.tools.list_ports``
-| Normally a USB device will show
-  up as ``/dev/ttyUSB0`` and a HAT as ``/dev/ttyAMA0`` or ``/dev/ttyS0``
+| ``python -m serial.tools.list_ports``
+| Normally a USB device will show up as ``/dev/ttyUSB0`` and a HAT as ``/dev/ttyAMA0`` or ``/dev/ttyS0``
 
 | Next run the provided test program
 | ``magtest --help``

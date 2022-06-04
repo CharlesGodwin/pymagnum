@@ -7,7 +7,7 @@ This project is for a program that reads the packets of data transmitted
 by Magnum Energy (ME) networks. This data is transmitted between ME
 components using a serial protocol called RS485. ME interconnects all
 its devices using four conductor cable with a plug at each end that is
-the same as a North American conventional phone jack. This is called
+the same as a North American conventional phone jack. This is called an
 RJ11 connector. It is NOT the same as the 8-conductor cable and
 connector used for internet connection and named RJ45 and sometimes
 called Cat5/Cat6. In order to communicate with this network, you must
@@ -147,7 +147,7 @@ RJ485 to standard serial adaptor
 
 There are two tested adaptors.
 
-|image9|\ An RS245 to USB dongle. These are very cheap and readily
+|image9|\ An RS485 to USB dongle. These are very cheap and readily
 available from Amazon and eBay. It requires no software configurations
 changes but does use a USB port. Connect the two wires to the two
 terminals. If you bought a unit with more than two terminals use the
@@ -216,7 +216,7 @@ The HAT is made by
 `Waveshare <https://www.waveshare.com/rs485-can-hat.htm>`__ but is sold
 by many Raspberry Pi providers including amazon.
 
-RS495 / USB device
+RS485 / USB device
 
 There are many sources for this device. Prices very wildly. Since the
 unit is very cheap, I recommend you buy 2 as they may fail, and you will
