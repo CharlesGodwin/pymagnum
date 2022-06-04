@@ -22,4 +22,4 @@ __Visual Studio Code development__
 If you are developing in VS Code, You need to do this to ensure the debug environment picks up the right program code. You do not need to install the package in this environment, but make sure you run the same version of Python as VS code is using.
 
 `python setup.py develop` or
-`sudo python3 setup.py develop`
+`sudo python setup.py develop`

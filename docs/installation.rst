@@ -6,13 +6,11 @@ Setup
 
 `The Python package site <https://pypi.org/project/pymagnum/>`_
 
-Installation info
-=================
+Installation Detail
+===================
 
-Throughout this documentation, ``python``
-and its installer ``pip`` are
-referred to using the default convention of a python.
-If you are using an older OS, such as Buster on a Raspberry Pi, Use ``python3`` and ``pip3``to  refer to Python 3 versions of the programs. This software requires a minimum of
+Throughout this documentation, ``python`` and its installer ``pip`` are referred to using the default convention of a python.
+If you are using an older OS, such as Buster on a Raspberry Pi, Use ``python3`` and ``pip3`` to  refer to Python 3 versions of the programs. This software requires a minimum of
 version 3.7 of Python.
 
 | You will need pip installed. On a Pi use:
