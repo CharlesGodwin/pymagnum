@@ -1,10 +1,11 @@
 .vscode
 magnum/.vscode
-magnum/tools/__pycache__
+magnum/tools
 magnum/__pycache__
 __pycache__
-build
-dist
+build/**
+docs/_build
+dist/**
 install.log
 magnum.egg-info
 pymagnum.egg-info
@@ -15,3 +16,6 @@ source/_build
 docs/_build
 testdata
 .pymodhis
+logs/**
+./pymagnum.opt
+publish_doc.ps1

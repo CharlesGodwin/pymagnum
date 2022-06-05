@@ -3,11 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+============================
 Magnum Energy Network Reader
 ============================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    introduction
    installation
@@ -15,8 +16,5 @@ Magnum Energy Network Reader
    pymagnum-api
    examples
    building_an_adaptor
+   ME_network_overview
    feedback
-
-Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
-
-SPDX-License-Identifier: BSD-3-Clause

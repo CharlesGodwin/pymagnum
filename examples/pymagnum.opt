@@ -1,0 +1,17 @@
+# Alter these to suit
+--device /dev/ttyUSB0
+--interval 60
+--packets 50
+--timeout 0.005
+# Remove # to enable the following
+#--verbose
+#--trace
+#--nocleanup
+#
+# Following for magserver example
+--port 17223
+--listen ALL
+#
+# Following for mqttlogger
+--broker localhost:1883
+--topic magnum/

@@ -1,8 +1,15 @@
 Examples
 --------
 
+.. BUILDINFO
+
+.. production
+
 Example programs are available in `this repository <https://github.com/CharlesGodwin/pymagnum/tree/master/examples>`_.
 
-Copyright (c) 2018-2020 Charles Godwin magnum@godwin.ca
+..
+ Example programs are available in `this repository <https://github.com/CharlesGodwin/pymagnum/tree/Pre-release-2.0/examples>`_.
 
-SPDX-License-Identifier: BSD-3-Clause
+These programs support use of the `configuration file <tools.html#configuration-options-file>`_.
+
+These programs support defining multiple RS485 devices.

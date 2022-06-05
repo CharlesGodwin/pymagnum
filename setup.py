@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018-2020 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
@@ -17,8 +17,8 @@ setup(name='pymagnum',
       description='Magnum Energy Network Interface (read-only)',
       author='Charles Godwin',
       author_email='magnum@godwin.ca',
-      py_modules=['magnum.tools.magtest',
-                  'magnum.tools.magdump', 'magnum.tools.test_packets'],
+      py_modules=['magnum.magtest',
+                  'magnum.magdump'],
       long_description=long_description,
       long_description_content_type="text/x-rst",
       license="BSD",
@@ -29,12 +29,12 @@ setup(name='pymagnum',
           "License :: OSI Approved :: BSD License",
           "Operating System :: OS Independent"
       ],
-      install_requires=['pyserial', 'tzlocal'],
+      install_requires=['pyserial', 'tzlocal', 'uptime'],
       python_requires='>=3.5',
       entry_points={
           'console_scripts': [
-              'magdump = magnum.tools.magdump:main',
-              'magtest = magnum.tools.magtest:main'
+              'magdump = magnum.magdump:main',
+              'magtest = magnum.magtest:main'
           ],
       },
       keywords='Magnum Energy Renewable Solar Network RS485 IoT'

@@ -7,7 +7,7 @@ This project is for a program that reads the packets of data transmitted
 by Magnum Energy (ME) networks. This data is transmitted between ME
 components using a serial protocol called RS485. ME interconnects all
 its devices using four conductor cable with a plug at each end that is
-the same as a North American conventional phone jack. This is called
+the same as a North American conventional phone jack. This is called an
 RJ11 connector. It is NOT the same as the 8-conductor cable and
 connector used for internet connection and named RJ45 and sometimes
 called Cat5/Cat6. In order to communicate with this network, you must
@@ -65,7 +65,8 @@ splitter like this one.
 
 |image3|\ **ME ARTR Advanced Remote**
 
-Use P5 or P6 only
+Use P5 or P6 only. The ARTR, does not communicate well when just a RS-485 reader is connected to a port.
+The solution is to use a splitter and share a port with another Magnum device like BMK, PT100 or AGS-N
 
 This photo shows the connection for an AGS unit.
 
@@ -146,7 +147,7 @@ RJ485 to standard serial adaptor
 
 There are two tested adaptors.
 
-|image9|\ An RS245 to USB dongle. These are very cheap and readily
+|image9|\ An RS485 to USB dongle. These are very cheap and readily
 available from Amazon and eBay. It requires no software configurations
 changes but does use a USB port. Connect the two wires to the two
 terminals. If you bought a unit with more than two terminals use the
@@ -215,7 +216,7 @@ The HAT is made by
 `Waveshare <https://www.waveshare.com/rs485-can-hat.htm>`__ but is sold
 by many Raspberry Pi providers including amazon.
 
-RS495 / USB device
+RS485 / USB device
 
 There are many sources for this device. Prices very wildly. Since the
 unit is very cheap, I recommend you buy 2 as they may fail, and you will
@@ -236,46 +237,31 @@ and Amazon
 
 .. |image0| image:: media/image1.png
    :width: 5.03611in
-   :height: 2.5in
 .. |image1| image:: media/image2.png
    :width: 1.26712in
-   :height: 0.98099in
 .. |image2| image:: media/image3.png
    :width: 3.92083in
-   :height: 2.93403in
 .. |image3| image:: media/image4.png
    :width: 4.25195in
-   :height: 3.32184in
 .. |image4| image:: media/image5.jpg
    :width: 3.83056in
-   :height: 2.18194in
 .. |image5| image:: media/image6.png
    :width: 1.23944in
-   :height: 1.57313in
 .. |image6| image:: media/image7.png
    :width: 1.58333in
-   :height: 1.09722in
 .. |image7| image:: media/image8.png
    :width: 1.44016in
-   :height: 0.99425in
 .. |image8| image:: media/image9.png
    :width: 3.33194in
-   :height: 2.21806in
 .. |image9| image:: media/image10.jpg
    :width: 1.34722in
-   :height: 1.34722in
 .. |image10| image:: media/image11.jpeg
    :width: 1.36944in
-   :height: 0.87778in
 .. |image11| image:: media/image12.jpeg
    :width: 2.76875in
-   :height: 2.15347in
 .. |image12| image:: media/image13.png
    :width: 2.1125in
-   :height: 2.20417in
 .. |image13| image:: media/image14.jpeg
    :width: 3.24893in
-   :height: 1.82752in
 .. |A circuit board Description automatically generated| image:: media/image15.jpeg
    :width: 3.2217in
-   :height: 1.81221in
