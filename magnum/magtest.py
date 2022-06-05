@@ -44,7 +44,6 @@ def sigint_handler(signal, frame):
     sys.exit(0)
 
 def main():
-    exit_code = 0
     signal.signal(signal.SIGINT, sigint_handler)
     parser = MagnumArgumentParser(
         description="Magnum RS485 Reader Test", prog="Magnum Test",
@@ -68,6 +67,10 @@ def main():
     args = parser.magnum_parse_args()
     # Only supports one device
     args.device = args.device[0]
+    if args.log:
+        logfile = os.path.join(os.getcwd(), "magtest_" + time.strftime("%Y-%m-%d_%H%M%S") + ".txt")
+        print(f"Output is being logged to {logfile}")
+        sys.stdout = Logger(logname=logfile)
     print('Magnum Test Version:{0}'.format(magnum.__version__))
     print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
     try:
@@ -76,10 +79,6 @@ def main():
     except Exception as e:
         print("{0} {1}".format(args.device, str(e)))
         exit(2)
-    if args.log:
-        logfile = os.path.join(os.getcwd(), "magtest_" +
-                            time.strftime("%Y-%m-%d_%H%M%S") + ".txt")
-    sys.stdout = Logger(logname=logfile)
     try:
         start = time.time()
         packets = reader.getPackets()
@@ -159,21 +158,17 @@ def main():
                 elif value == False:
                     print(f"{key} not connected")
                 else:
-                    print("{0} Detected".format(key))
+                    print(f"{key} Detected")
             if device_list[magnum.PT100] == True:
-                print("{0} has limited support, contact the author.".format(
-                    magnum.PT100))
+                print(f"{magnum.PT100} has limited support, contact the author.")
             if device_list[magnum.ACLD] == True:
-                print("{0} is not currently supported, contact the author.".format(
-                    magnum.ACLD))
-
+                print("f{magnum.ACLD} is not currently supported, contact the author.")
+        if args.log:
+            print(f"Output was logged to {logfile}")
     except Exception as e:
         print("{0} {1}".format(reader.getComm_Device(), str(e)))
         print("Error detected attempting to read network data - test failed.")
-        exit_code = 2
-    if args.log:
-        print("Output was logged to {}".format(logfile))
-    exit(exit_code)
+        exit(2)
 
 if __name__ == '__main__':
     main()
