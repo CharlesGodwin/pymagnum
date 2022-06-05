@@ -138,6 +138,7 @@ while True:
         print("{0} {1}".format(comm_device, str(e)))
     if args.interval == 0:
         break
+
     interval = time.time() - start
     sleep = args.interval - interval
     if sleep > 0:
