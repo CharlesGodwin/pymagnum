@@ -16,6 +16,4 @@ source/_build
 docs/_build
 testdata
 .pymodhis
-logs/**
-./pymagnum.opt
-publish_doc.ps1
+examples/mqttlogger_2.py
