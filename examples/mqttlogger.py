@@ -67,25 +67,28 @@ parser = MagnumArgumentParser(description="Magnum Data MQTT Publisher", fromfile
                               epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
 logger = parser.add_argument_group("MQTT publish")
 reader = parser.add_argument_group("Magnum reader")
-seldom = parser.add_argument_group("Seldom used")
 logger.add_argument("-t", "--topic", default='magnum/',
                     help="Topic prefix (default: %(default)s)")
 logger.add_argument("-b", "--broker", default='localhost:1883',
                     help="MQTT Broker address and (optional port)(default: %(default)s)")
 logger.add_argument("-i", "--interval", default=60, type=int, dest='interval',
-                    help="Interval, in seconds, between publishing (default: %(default)s)"
-parser.add_argument("-d", "--device", nargs='*', action='append', default=[],
+                    help="Interval, in seconds, between publishing (default: %(default)s)")
+logger.add_argument("--username", default='None',
+                    help="MQTT User name, if needed (default: %(default)s)")
+logger.add_argument("--password", default='None',
+                    help="MQTT User password, if needed (default: %(default)s)")
+reader.add_argument("-d", "--device", nargs='*', action='append', default=[],
                     help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")
-seldom.add_argument("--packets", default=50, type=int,
+reader.add_argument("--packets", default=50, type=int,
                     help="Number of packets to generate in reader (default: %(default)s)")
-seldom.add_argument("--timeout", default=0.005, type=float,
+reader.add_argument("--timeout", default=0.005, type=float,
                     help="Timeout for serial read (default: %(default)s)")
-seldom.add_argument("--trace", action="store_true",
+reader.add_argument("--trace", action="store_true",
                     help="Add raw packet info to data (default: %(default)s)")
-seldom.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets',
+reader.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets',
                     help="Suppress clean up of unknown packets (default: False)")
 args = parser.magnum_parse_args()
-if args.interval < 10 or args.interval > (60*60):
+if args.interval < 10 or args.interval > 3600:
     parser.error(
         "argument -i/--interval: must be between 10 seconds and 3600 (1 hour)")
 if args.topic[-1] != "/":
@@ -108,6 +111,8 @@ print("Publishing to broker:{0} Every:{2} seconds. Using: {1} ".format(
     args.broker, list(magnumReaders.keys()), args.interval))
 uuidstr = str(uuid.uuid1())
 client = mqtt.Client(client_id=uuidstr, clean_session=False)
+if args.username != 'None':
+    client.username_pw_set(username=args.username, password=args.password)
 brokerinfo = args.broker.split(':')
 if len(brokerinfo) == 1:
     brokerinfo.append(1883)
