@@ -7,6 +7,8 @@ Examples
 
 Example programs are available in `this repository <https://github.com/CharlesGodwin/pymagnum/tree/master/examples>`_.
 
+These programs are provided as examples only. Although we will try to help with bugs or other support, consider these programs unsupported.
+
 ..
  Example programs are available in `this repository <https://github.com/CharlesGodwin/pymagnum/tree/Pre-release-2.0/examples>`_.
 

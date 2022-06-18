@@ -1,1 +1,1 @@
-__NOTE__ The examples directory is NOT installed as part of the pip install process. Files in this folder must be downloaded.
+__NOTE__ The examples directory is NOT installed as part of the pip install process. Files in this folder must be downloaded. These programs are provided as examples only. Although we will try to help with bugs or other support, consider these programs unsupported.

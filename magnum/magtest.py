@@ -130,7 +130,7 @@ def main():
             ):
                 device_list[magnum.REMOTE] = True
                 if device_list[magnum.PT100] != True:
-                    device_list[magnum.magnumPT100] = False
+                    device_list[magnum.PT100] = False
             elif packetType == magnum.REMOTE_D0:
                 device_list[magnum.REMOTE] = True
                 if device_list[magnum.ACLD] != True:

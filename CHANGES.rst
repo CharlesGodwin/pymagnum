@@ -1,9 +1,13 @@
 =======================
  pyMagnum Release Notes
 =======================
+Version 2.0.1 2022/06/18
+- Enhancement: Added MQTT username and password support to examples/mqttlogger.py (issue #38)
+- Fixed bug in magtest related to PT100
+- Fixed bug in example mqttlogger.py
 
 Version 2.0   2022/06/06
----------------------
+------------------------
 - Added: The ability to define all options in a configuration file. For example ``magdump @pymagnum.opt``. See documentation.
 - Added: ``magdump`` and examples programs support use of configuration file.
 - Added: A new method ``getComm_Device()`` in the Magnum class to retrieve name of device.
