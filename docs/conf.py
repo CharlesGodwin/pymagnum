@@ -27,7 +27,7 @@ author = 'Charles Godwin'
 
 # The full version, including alpha/beta/rc tags
 release = '2.0'
-version = '2.0'
+version = '2.0.2'
 
 # -- General configuration ---------------------------------------------------
 
