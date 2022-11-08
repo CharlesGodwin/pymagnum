@@ -36,20 +36,21 @@ class PT100Device:
         # check page 14 for fan on and Day
         self.data["fan_on"] = 0
         self.data["day"] = 0
-        # 
+        #
         self.data["battery_temperature"] = 0.0
         self.data["inductor_temperature"] = 0.0
         self.data["fet_temperature"] = 0.0
         # Start of C2
-        self.data["lifetime_kwhrs"] = math.nan
-        self.data["resettable_kwhrs"] = math.nan
-        self.data["ground_fault_current"] = math.nan
-        self.data["nominal_battery_voltage"] = 12.0
-        self.data["stacker_info"] = 0
-        self.data['dip_switches'] = '00000000'
-        self.data["model"] = ''
-        self.data["output_current_rating"] = math.nan
-        self.data["input_voltage_rating"] = math.nan
+        # 2022-11-08 09:18:48 data only generated if a C2 packet is received
+        # self.data["lifetime_kwhrs"] = math.nan
+        # self.data["resettable_kwhrs"] = math.nan
+        # self.data["ground_fault_current"] = math.nan
+        # self.data["nominal_battery_voltage"] = 12.0
+        # self.data["stacker_info"] = 0
+        # self.data['dip_switches'] = '00000000'
+        # self.data["model"] = ''
+        # self.data["output_current_rating"] = math.nan
+        # self.data["input_voltage_rating"] = math.nan
         # Start of C3
         # self.data["daily_kwh"] = math.nan
         # self.data["max_daily_pv_volts"] = math.nan
@@ -91,7 +92,7 @@ class PT100Device:
             self.data['alarm_state'] = (byte_value >> 1) & 0x01
             self.data["fan_on"] = (byte_value >> 3) & 0x01
             self.data["day"] = (byte_value  >> 4) & 0x01
-            
+
             byte_value = unpacked[10]
             if byte_value == 0X97 or byte_value == 0X98:
                 self.data['battery_temperature'] = None # Short or open
