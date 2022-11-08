@@ -2,8 +2,11 @@
  pyMagnum Release Notes
 =======================
 Version 2.0.2 2022/11/09
+------------------------
 - Fixed bug in issue #44 https://github.com/CharlesGodwin/pymagnum/issues/44
+
 Version 2.0.1 2022/06/18
+------------------------
 - Enhancement: Added MQTT username and password support to examples/mqttlogger.py (issue #38)
 - Fixed bug in magtest related to PT100
 - Fixed bug in example mqttlogger.py

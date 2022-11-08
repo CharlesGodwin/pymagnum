@@ -3,7 +3,7 @@ Introduction
 ============
 
 pymagnum is a Python implementation of a read only interface to the
-Magnum Energy network. Version:|version| Release:|release|
+Magnum Energy network. Version:|version|
 
 This software is not endorsed nor supported by `Magnum Energy <https://www.magnum-dimensions.com/>`_, a product
 of Sensata Technologies.
