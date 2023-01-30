@@ -56,6 +56,12 @@ from magnum.magnum import Magnum
 from magnum.magparser import MagnumArgumentParser
 from tzlocal import get_localzone
 
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        global Connected                #Use global variable
+        Connected = True                #Signal connection
+    else:
+        raise Exception("Connection failed.")
 
 def sigint_handler(signal, frame):
     print('Interrupted. Shutting down.')
@@ -116,10 +122,14 @@ if args.username != 'None':
 brokerinfo = args.broker.split(':')
 if len(brokerinfo) == 1:
     brokerinfo.append(1883)
+Connected = False
 while True:
     start = time.time()
     try:
         client.connect(brokerinfo[0], port=int(brokerinfo[1]))
+        client.loop_start()  # start the loop
+        while Connected != True:  # Wait for connection
+            time.sleep(0.1)
         for comm_device, magnumReader in magnumReaders.items():
             try:
                 devices = magnumReader.getDevices()
@@ -135,12 +145,13 @@ while True:
                         data["data"] = device["data"]
                         payload = json.dumps(
                             data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
-                        client.publish(topic, payload=payload)
+                        publish_result = client.publish(topic, payload=payload)
+                        publish_result.wait_for_publish()
             except Exception as e:
                 print("{0} {1}".format(comm_device, str(e)))
         client.disconnect()
     except Exception as e:
-        print("{0} {1}".format(comm_device, str(e)))
+        print( str(e))
     if args.interval == 0:
         break
 
