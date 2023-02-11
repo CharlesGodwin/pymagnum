@@ -56,6 +56,22 @@ from magnum.magnum import Magnum
 from magnum.magparser import MagnumArgumentParser
 from tzlocal import get_localzone
 
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        global args
+        global Connected                #Use global variable
+        Connected = True                #Signal connection
+        if args.trace:
+            print("Connected")
+        pass
+    else:
+        raise Exception("Connection failed.")
+
+def on_publish (client, userdata, result):
+    global args
+    if args.trace:
+        print (f"Message {result} published\n")
+    pass
 
 def sigint_handler(signal, frame):
     print('Interrupted. Shutting down.')
@@ -110,16 +126,22 @@ if len(magnumReaders) == 0:
 print("Publishing to broker:{0} Every:{2} seconds. Using: {1} ".format(
     args.broker, list(magnumReaders.keys()), args.interval))
 uuidstr = str(uuid.uuid1())
-client = mqtt.Client(client_id=uuidstr, clean_session=False)
-if args.username != 'None':
-    client.username_pw_set(username=args.username, password=args.password)
 brokerinfo = args.broker.split(':')
 if len(brokerinfo) == 1:
     brokerinfo.append(1883)
+
 while True:
     start = time.time()
     try:
+        client=mqtt.Client(client_id=uuidstr,
+                            clean_session=False)
+        if args.username != 'None':
+            client.username_pw_set( username=args.username, password=args.password)
+        client.on_connect=on_connect
+        if args.trace:
+            client.on_publish=on_publish
         client.connect(brokerinfo[0], port=int(brokerinfo[1]))
+        client.loop_start()  # start the loop
         for comm_device, magnumReader in magnumReaders.items():
             try:
                 devices = magnumReader.getDevices()
@@ -133,14 +155,20 @@ while True:
                         topic = args.topic + device["device"].lower()
                         data["device"] = device["device"]
                         data["data"] = device["data"]
-                        payload = json.dumps(
-                            data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
-                        client.publish(topic, payload=payload)
+                        payload = json.dumps(data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
+                        publish_result = client.publish(topic, payload=payload)
+                        if args.trace:
+                            print(f"Publishing {publish_result.mid}\n")
+                        if publish_result.rc != 0:
+                            if args.trace:
+                                print(f"Waiting for {publish_result.mid}\n")
+                            publish_result.wait_for_publish()
             except Exception as e:
                 print("{0} {1}".format(comm_device, str(e)))
         client.disconnect()
+
     except Exception as e:
-        print("{0} {1}".format(comm_device, str(e)))
+        print( str(e))
     if args.interval == 0:
         break
 
