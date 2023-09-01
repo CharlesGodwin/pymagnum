@@ -174,11 +174,7 @@ client.loop_start()
 while True:
     start = time.time()
     publish_data()
-    if args.interval == 0:
-        break
     sleep = args.interval - (time.time() - start)
     if sleep > 0:
         time.sleep(sleep)
-client.disconnect()
-client.loop_stop()
-sys.exit(0)
+
