@@ -29,8 +29,8 @@ setup(name='pymagnum',
           "License :: OSI Approved :: BSD License",
           "Operating System :: OS Independent"
       ],
-      install_requires=['pyserial', 'tzlocal', 'uptime'],
-      python_requires='>=3.5',
+      install_requires=['pyserial', 'uptime'],
+      python_requires='>=3.7',
       entry_points={
           'console_scripts': [
               'magdump = magnum.magdump:main',

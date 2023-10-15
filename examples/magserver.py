@@ -10,7 +10,7 @@ import signal
 import sys
 
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
@@ -51,8 +51,8 @@ class magServer(BaseHTTPRequestHandler):
         response = []
         code = None
         message = None
-        timestamp = datetime.now(get_localzone()).replace(
-            microsecond=0).isoformat()
+        timestamp = datetime.now(timezone.utc).replace(
+            microsecond=0).astimezone().isoformat()
         devices = []
         for comm_device, magnumReader in magnumReaders.items():
             try:

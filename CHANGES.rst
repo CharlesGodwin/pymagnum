@@ -1,6 +1,10 @@
 =======================
  pyMagnum Release Notes
 =======================
+Version 2.0.3 2023/10/15
+- Fixed problem with installing tzlocal on some system
+- Changed minimum Python version to 3.7
+
 Version 2.0.2 2022/11/09
 ------------------------
 - Fixed bug in issue #44 https://github.com/CharlesGodwin/pymagnum/issues/44

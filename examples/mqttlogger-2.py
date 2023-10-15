@@ -51,12 +51,12 @@ import sys
 import time
 import uuid
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 
 import paho.mqtt.client as mqtt
 from magnum.magnum import Magnum
 from magnum.magparser import MagnumArgumentParser
-from tzlocal import get_localzone
+# from tzlocal import get_localzone
 
 
 def on_connect(client, userdata, flags, rc):
@@ -96,8 +96,8 @@ def publish_data():
                 if len(devices) != 0:
                     data = OrderedDict()
                     now = int(time.time())
-                    data["datetime"] = datetime.now(
-                        get_localzone()).replace(microsecond=0).isoformat()
+                    data["datetime"] = datetime.now(timezone.utc).replace(
+                        microsecond=0).astimezone().isoformat()
                     data['comm_device'] = comm_device
                     for device in devices:
                         topic = args.topic + device["device"].lower()
@@ -177,4 +177,3 @@ while True:
     sleep = args.interval - (time.time() - start)
     if sleep > 0:
         time.sleep(sleep)
-
