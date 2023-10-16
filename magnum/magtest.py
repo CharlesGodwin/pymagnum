@@ -68,7 +68,7 @@ def main():
     # Only supports one device
     args.device = args.device[0]
     if args.log:
-        logfile = os.path.join(os.getcwd(), "magtest_" + time.strftime("%Y-%m-%d_%H%M%S") + ".txt")
+        logfile = os.path.join(os.getcwd(), "magtest_" + time.strftime("%Y-%m-%dT%H-%M-%S") + ".txt")
         print(f"Output is being logged to {logfile}")
         sys.stdout = Logger(logname=logfile)
     print(f"Magnum Test Version:{magnum.__version__}")
