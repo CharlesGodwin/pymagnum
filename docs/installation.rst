@@ -19,6 +19,10 @@ version 3.7 of Python.
 | Then install or upgrade this software package using:
 | ``sudo pip install --upgrade pymagnum``
 
+If you are using Python 3.11 or higher, you may be greeted by ``error: externally-managed-environment``.
+You can install ``pymagnum`` in a virtual environment to avoid this message, but then you can only use magnum program when you enable this virtualenv first.
+If you want to ignore this annoyance, you can just add the ``--break-system-packages`` flag and go on with your day.
+
 If you want to check which version is have installed on your system, run this command:
 ``sudo pip show pymagnum``
 

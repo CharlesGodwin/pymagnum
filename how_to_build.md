@@ -2,7 +2,7 @@ __How to Build pyMagnum for Testing__
 
 This is a simple description of the steps needed to build a version locally.
 
-**NOTE** you must be using Python 3 for all this. In windows use `pip` and `python` and in Linux use `sudo pip3` and `python3`. If you have experience with Python Virtual Environments, you can use one of those too.
+**NOTE** you must be using Python 3 for all this. In windows use `pip` and `python` and in Linux use `sudo pip3` and `python3` **. If you have experience with Python Virtual Environments, you can use one of those too.
 
 Clone the repository from https://github.com/CharlesGodwin/pymagnum
 
@@ -23,3 +23,7 @@ If you are developing in VS Code, You need to do this to ensure the debug enviro
 
 `python setup.py develop` or
 `sudo python setup.py develop`
+
+** __NOTE:__ Some linux versions don't have a `python` or `pip` defined, just `python3` and `pip3`. In that case use the commands to get things working:
+`alias python=python3`
+`alias pip=pip3`
