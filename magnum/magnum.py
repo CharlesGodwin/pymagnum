@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2023 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
@@ -7,9 +7,6 @@
 #
 
 import os
-import sys
-from collections import OrderedDict
-from struct import error as unpack_error
 from struct import unpack
 from time import sleep
 
@@ -34,12 +31,11 @@ try:
 except:
     MAGNUM_DELAY = 30.0
 # delay serial startup until system settles down - at least MAGNUM_DELAY seconds
-delay = MAGNUM_DELAY - uptime()
+delay = MAGNUM_DELAY - uptime() # type: ignore
 if delay > 0.0:
     sleep(delay)
 # This must be after the sleep(delay)
 import serial  # noqa
-
 
 class Magnum:
     '''
@@ -202,12 +198,12 @@ class Magnum:
         # wait to see if there is any traffic on the device
         #
         sleep(0.25)
-        if self.reader.inWaiting() == 0:
+        if self.reader.in_waiting == 0:
             self.reader.close()
             self.reader = None
             raise ConnectionError("There doesn't seem to be a network")
         packetsleft = self.packetcount
-        self.reader.flushInput()
+        self.reader.reset_input_buffer()
         #
         # Start of packet reads into a list of bytearray()
         # This is a tight loop
@@ -432,7 +428,7 @@ class Magnum:
             elif packetType == ACLD_D1:
                 if self.acld == None:
                     self.acld = ACLDDevice(trace=self.trace)
-                self.rtr.parse(packet)
+                self.acld.parse(packet)
         if self.remote:
             #
             # remove extraneous REMOTE fields if corresponding device is not present

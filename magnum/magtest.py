@@ -68,11 +68,11 @@ def main():
     # Only supports one device
     args.device = args.device[0]
     if args.log:
-        logfile = os.path.join(os.getcwd(), "magtest_" + time.strftime("%Y-%m-%d_%H%M%S") + ".txt")
+        logfile = os.path.join(os.getcwd(), "magtest_" + time.strftime("%Y-%m-%dT%H-%M-%S") + ".txt")
         print(f"Output is being logged to {logfile}")
         sys.stdout = Logger(logname=logfile)
-    print('Magnum Test Version:{0}'.format(magnum.__version__))
-    print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
+    print(f"Magnum Test Version:{magnum.__version__}")
+    print(f"Options:{str(args)[10:-1]}")
     try:
         reader = Magnum(device=args.device, packets=args.packets, trace=args.trace,
                         timeout=args.timeout, cleanpackets=args.cleanpackets)

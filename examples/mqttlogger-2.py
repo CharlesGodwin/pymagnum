@@ -1,9 +1,11 @@
 #
-# Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2023 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
-# This code is provided as an example of a JSON logger that writers to MQTT
+# This code is provided as an example of a JSON logger that writes to MQTT
+# The data is published at every interval seconds
+# If you publish the subtopic 'refresh' (i.e magnum/refresh) this will publish data immediately
 # run the program with --help for details of options.
 # Each device is a separate JSON record new-line delimited
 # The JSON Record is like this:
@@ -56,26 +58,57 @@ from magnum.magnum import Magnum
 from magnum.magparser import MagnumArgumentParser
 # from tzlocal import get_localzone
 
+
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         global args
-        global Connected                #Use global variable
-        Connected = True                #Signal connection
+        client.subscribe(f"{args.topic}refresh")
         if args.trace:
             print("Connected")
-        pass
     else:
         raise Exception("Connection failed.")
 
-def on_publish (client, userdata, result):
+
+def on_message(client, userdata, msg):
     global args
-    if args.trace:
-        print (f"Message {result} published\n")
-    pass
+    if msg.topic == f"{args.topic}refresh":
+        publish_data()
+
+
+def on_publish(client, userdata, result):
+    print(f"Message {result} published\n")
+
 
 def sigint_handler(signal, frame):
     print('Interrupted. Shutting down.')
+    global client
+    client.disconnect()
+    client.loop_stop()
     sys.exit(0)
+
+
+def publish_data():
+    global magnumReaders, client, args
+    try:
+        for comm_device, magnumReader in magnumReaders.items():
+            try:
+                devices = magnumReader.getDevices()
+                if len(devices) != 0:
+                    data = OrderedDict()
+                    now = int(time.time())
+                    data["datetime"] = datetime.now(timezone.utc).replace(
+                        microsecond=0).astimezone().isoformat()
+                    data['comm_device'] = comm_device
+                    for device in devices:
+                        topic = args.topic + device["device"].lower()
+                        data["device"] = device["device"]
+                        data["data"] = device["data"]
+                        payload = json.dumps(data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
+                        client.publish(topic, payload=payload)
+            except Exception as e:
+                print(f"{comm_device} {str(e)}")
+    except Exception as e:
+        print(str(e))
 
 
 signal.signal(signal.SIGINT, sigint_handler)
@@ -104,12 +137,12 @@ reader.add_argument("--trace", action="store_true",
 reader.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets',
                     help="Suppress clean up of unknown packets (default: False)")
 args = parser.magnum_parse_args()
-if args.interval < 10 or args.interval > 3600:
+if args.interval < 10 or args.interval > (60*60):
     parser.error(
         "argument -i/--interval: must be between 10 seconds and 3600 (1 hour)")
 if args.topic[-1] != "/":
     args.topic += "/"
-print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
+print(f"Options:{str(args)[10:-1]}")
 magnumReaders = dict()
 for device in args.device:
     try:
@@ -118,61 +151,29 @@ for device in args.device:
         magnumReader.getDevices()  # test read to see if all's good
         magnumReaders[magnumReader.getComm_Device()] = magnumReader
     except Exception as e:
-        print("{0} {1}".format(device, str(e)))
+        print(f"{device} {device}")
 if len(magnumReaders) == 0:
     print("Error: There are no usable devices connected.")
     exit(2)
 
-print("Publishing to broker:{0} Every:{2} seconds. Using: {1} ".format(
-    args.broker, list(magnumReaders.keys()), args.interval))
+print(
+    f"Publishing to broker:{args.broker} Every:{args.interval} seconds. Using: {list(magnumReaders.keys())}")
 uuidstr = str(uuid.uuid1())
 brokerinfo = args.broker.split(':')
 if len(brokerinfo) == 1:
     brokerinfo.append(1883)
-
+client = mqtt.Client(client_id=uuidstr, clean_session=False)
+if args.username != 'None':
+    client.username_pw_set(username=args.username, password=args.password)
+client.on_connect = on_connect
+client.on_message = on_message
+if args.trace:
+    client.on_publish = on_publish
+client.connect(brokerinfo[0], port=int(brokerinfo[1]))
+client.loop_start()
 while True:
     start = time.time()
-    try:
-        client=mqtt.Client(client_id=uuidstr,
-                            clean_session=False)
-        if args.username != 'None':
-            client.username_pw_set( username=args.username, password=args.password)
-        client.on_connect=on_connect
-        if args.trace:
-            client.on_publish=on_publish
-        client.connect(brokerinfo[0], port=int(brokerinfo[1]))
-        client.loop_start()  # start the loop
-        for comm_device, magnumReader in magnumReaders.items():
-            try:
-                devices = magnumReader.getDevices()
-                if len(devices) != 0:
-                    data = OrderedDict()
-                    now = int(time.time())
-                    data["datetime"] = datetime.now(timezone.utc).replace(
-                        microsecond=0).astimezone().isoformat()
-                    data['comm_device'] = comm_device
-                    for device in devices:
-                        topic = args.topic + device["device"].lower()
-                        data["device"] = device["device"]
-                        data["data"] = device["data"]
-                        payload = json.dumps(data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
-                        publish_result = client.publish(topic, payload=payload)
-                        if args.trace:
-                            print(f"Publishing {publish_result.mid}\n")
-                        if publish_result.rc != 0:
-                            if args.trace:
-                                print(f"Waiting for {publish_result.mid}\n")
-                            publish_result.wait_for_publish()
-            except Exception as e:
-                print("{0} {1}".format(comm_device, str(e)))
-        client.disconnect()
-
-    except Exception as e:
-        print( str(e))
-    if args.interval == 0:
-        break
-
-    interval = time.time() - start
-    sleep = args.interval - interval
+    publish_data()
+    sleep = args.interval - (time.time() - start)
     if sleep > 0:
         time.sleep(sleep)

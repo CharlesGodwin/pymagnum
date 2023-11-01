@@ -44,13 +44,9 @@ seldom.add_argument("--nocleanup", action="store_true", default=False, dest='cle
                     help="Suppress clean up of unknown packets (default: False)")
 args = parser.magnum_parse_args()
 if args.verbose:
-    print('Magnum Sample Version:{0}'.format(magnum.__version__))
-    print("Options:{0}".format(str(args)
-                               .replace("Namespace(", "")
-                               .replace(")", "")
-                               .replace('[', '')
-                               .replace("'", "")
-                               .replace(']', '')))
+    print(f"Magnum Sample Version:{magnum.__version__}")
+    print(f"Options:{str(args)[10:-1]}")
+
 magnumReaders = dict()
 for device in args.device:
     try:
