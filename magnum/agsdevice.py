@@ -45,7 +45,7 @@ class AGSDevice:
         self.deviceData = OrderedDict()
         self.deviceData["device"] = AGS
         self.deviceData["data"] = self.data
-        self.data["revision"] = '0.0'
+        self.data["revision"] = str('0.0')
         self.data["status"] = 0
         self.data["status_text"] = ""
         self.data["running"] = False

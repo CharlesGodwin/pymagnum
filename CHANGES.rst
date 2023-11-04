@@ -1,6 +1,15 @@
 =======================
  pyMagnum Release Notes
 =======================
+Version 2.0.4 2023/11/05
+------------------------
+- Fixed bug in emitted JSON when using multiple devices
+- Cleaned up code when using dummy data files instead of RS485 serial device
+- Provided a complete dummy test file testdata/allpackets.txt
+- Provided a JSON file testdata/allpackets.JSON
+- Enhancement added --pretty option to magdump for formatted JSON output
+
+
 Version 2.0.3 2023/10/20
 ------------------------
 - Fixed problem with installing tzlocal on some system

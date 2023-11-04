@@ -101,34 +101,36 @@ class Magnum:
         self.acld = None
         self.inverter_revision = -1
         self.inverter_model = -1
-        if device[0:1] == '!':
-            self.stored_packets = self._load_packets(device[1:])
+        if device.find("!") >= 0:
+            self.stored_packets = self._load_packets(device)
         else:
             self.stored_packets = None
         return
+
     def getComm_Device(self):
         return self.comm_device
 
-    def _load_packets(self, filename):
-        ix = filename.find('!')
-        if ix > 0:
-            self.comm_device = filename[0:ix]
-            filename = filename[ix+1:]
-        else:
-            self.comm_device = filename
+    def _load_packets(self, device):
+        ix = device.rfind('!')
+        if ix == -1:
+            return None
+        self.comm_device = device
+        filename = device[ix+1:]
         packets = []
         with open(filename) as file:
             lines = file.readlines()
         for line in lines:
-            ix = line.find("=>")
-            decode = line.find("decode:")
+            line = line.strip()
+            ix = line.find("#")
             if ix >= 0:
-                decode = line.find("decode:")  # supports traced packets
-                if decode > ix:
-                    stop = decode
-                else:
-                    stop = len(line)
-                data = bytes.fromhex(line[ix+2:stop].strip())
+                line = line[0:ix].strip()
+            ix = line.find("=>")
+            if ix >= 0:
+                line = line[ix+2:]
+                ix = line.find(' ')
+                if ix >= 0:
+                    line = line[0:ix]
+                data = bytes.fromhex(line)
                 packets.append(data)
         if len(packets) == 0:
             raise ValueError(f"There were no valid records in {filename}")
@@ -168,7 +170,6 @@ class Magnum:
         #
 
     #  raw read of packets to bytes[]
-    #  This can be overridden for tests
     #
 
     def readPackets(self):
@@ -176,7 +177,7 @@ class Magnum:
         packets = []
         if self.stored_packets != None:
             for ix in range(self.packetcount):
-                packet = self.stored_packets.pop()
+                packet = self.stored_packets.pop(0)
                 packets.append(packet)
                 self.stored_packets.append(packet)
             return packets
