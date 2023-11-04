@@ -12,36 +12,7 @@
 # the data object is pertinent to each device
 # The current devices are INVERTER, REMOTE, AGS, BMK, and PT100
 # topic =  magnum/inverter
-# payload
-# {
-# 	"datetime": "2019-10-08 12:49:14-04:00",
-# 	"device": "INVERTER",
-# 	"data": {
-# 		"revision": "5.1",
-# 		"mode": 64,
-# 		"mode_text": "INVERT",
-# 		"fault": 0,
-# 		"fault_text": "None",
-# 		"vdc": 24.6,
-# 		"adc": 2,
-# 		"VACout": 119,
-# 		"VACin": 0,
-# 		"invled": 1,
-# 		"invled_text": "On",
-# 		"chgled": 0,
-# 		"chgled_text": "Off",
-# 		"bat": 17,
-# 		"tfmr": 36,
-# 		"fet": 30,
-# 		"model": 107,
-# 		"model_text": "MS4024PAE",
-# 		"stackmode": 0,
-# 		"stackmode_text": "Stand Alone",
-# 		"AACin": 0,
-# 		"AACout": 1,
-# 		"Hz": 60.0
-# 	}
-# }
+# payload - refer to testdata/allpackets.json
 
 import json
 import signal

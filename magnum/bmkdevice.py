@@ -11,7 +11,7 @@ class BMKDevice:
         self.deviceData = OrderedDict()
         self.deviceData["device"] = BMK
         self.deviceData["data"] = self.data
-        self.data["revision"] = ""
+        self.data["revision"] = str(0.0)
         self.data["soc"] = 0
         self.data["vdc"] = 0.0
         self.data["adc"] = 0.0
