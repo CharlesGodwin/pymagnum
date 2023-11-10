@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
@@ -7,8 +6,8 @@ class ACLDDevice:
     def __init__(self, trace=False):
         # self.trace = trace
         self.trace = True # force packet dump
-        self.data = OrderedDict()
-        self.deviceData = OrderedDict()
+        self.data = {}
+        self.deviceData = {}
         self.deviceData["device"] = ACLD
         self.deviceData["data"] = self.data
         if self.trace:

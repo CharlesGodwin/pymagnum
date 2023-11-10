@@ -11,7 +11,6 @@ import signal
 import sys
 import time
 
-from collections import OrderedDict
 from datetime import datetime, timezone
 
 # from tzlocal import get_localzone
@@ -85,13 +84,13 @@ def main():
             try:
                 devices = magnumReader.getDevices()
                 if len(devices) != 0:
-                    alldata = OrderedDict()
+                    alldata = {}
                     alldata["datetime"] = timestamp
                     alldata["device"] = 'MAGNUM'
                     alldata['comm_device'] = comm_device
                     magnumdata = []
                     for device in devices:
-                        data = OrderedDict()
+                        data = {}
                         data["device"] = device["device"]
                         data["data"] = device["data"]
                         magnumdata.append(data)
