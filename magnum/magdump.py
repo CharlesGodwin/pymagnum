@@ -48,7 +48,11 @@ def main():
                         help="Add most recent raw packet(s) info to data (default: %(default)s)")
     seldom.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets',
                         help="Suppress clean up of unknown packets (default: False)")
+    seldom.add_argument("--allinone", action="store_true", default=False,
+                        help="Process data as a flat single row (default: %(default)s)")
     args = parser.magnum_parse_args()
+    if hasattr(args, 'v1') and args.v1:
+        args.allinone = True
     if args.verbose:
         print('Magnum Dump Version:{0}'.format(magnum.__version__))
         print("Options:{0}".format(str(args)
@@ -57,7 +61,7 @@ def main():
                                    .replace('[', '')
                                    .replace('\'', '')
                                    .replace(']', '')))
-    magnumReaders = dict()
+    magnumReaders = {}
     for device in args.device:
         try:
             magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
@@ -95,6 +99,8 @@ def main():
                         data["data"] = device["data"]
                         magnumdata.append(data)
                     alldata["data"] = magnumdata
+                    if args.allinone:
+                        alldata = magnumReader.allinone(alldata)
                     commdevices.append(alldata)
             except Exception as e:
                 print("{0} {1}".format(comm_device, str(e)))

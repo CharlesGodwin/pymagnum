@@ -79,7 +79,7 @@ class Magnum:
         REMOTE_C2: default_remote + '7B',  # PT100  not used
         REMOTE_C3: default_remote + '7B',  # PT100  not used
         REMOTE_D0: default_remote + '7B',  # ACLD Needs work
-        ACLD_D1: '7B',                    # ACLD Needs work
+        ACLD_D1: '7B',                     # ACLD Needs work
         RTR_91: 'BB',
         UNKNOWN: ''
     }
@@ -442,3 +442,48 @@ class Magnum:
                 if deviceinfo:
                     devices.append(deviceinfo)
         return devices
+
+# 2023-11-08 15:22:24 Added
+
+# This merges all device data into one long dictionary. Each variable is prefixed with device name
+# consistent with the values used in the old Java based magnum software (v1)
+#
+    def allinone(self, devices):
+        returndata = []
+
+        deviceprefixes = {"INVERTER": "INV",
+                        "AGS": "AGS",
+                        "BMK": "BMK",
+                        "RTR": "RTR",
+                        "PT100": "PT",
+                        "REMOTE": "ARC",
+                        "RTR": "RTR"
+                        }
+
+        if (type(devices) != list):
+            devices = [devices]
+        for device in devices:
+            newdata = {}
+            newdata['datetime'] = device['datetime']
+            newdata['comm_device'] = device['comm_device']
+            newdata['device'] = device["device"]
+            data = []
+            itemdata={}
+            for item in device['data']:
+                if item['device'] in deviceprefixes:
+                    deviceprefix = deviceprefixes[item['device']]
+                else:
+                    deviceprefix = item['device']
+                itemstuff = item['data']
+                for itemkey, itemvalue in itemstuff.items():
+                    key = f"{deviceprefix}_{itemkey}"
+                    itemdata[key] = itemvalue
+            newblock = {}
+            newblock['device'] = "log_data"
+            newblock['data'] = dict(sorted(itemdata.items()))
+            newdata['data'] = [newblock]
+            returndata.append(newdata)
+        if len(returndata) == 1:
+            return returndata[0]
+        else:
+            return returndata
