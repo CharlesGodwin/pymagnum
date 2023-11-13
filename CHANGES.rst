@@ -1,12 +1,12 @@
 =======================
  pyMagnum Release Notes
 ========================
-Version 2.0.5 2023/11
+Version 2.0.5 2023/11/13
 ------------------------
 - Enhancement added ``allinone`` method to Magnum class. This creates a single record instead of one per device.
 - ``magdump`` has been enhanced to support ``--allinone`` option
 - A new example program ``magsql.py`` is available to log data to MariaDB/MySQL. Read the program comments for more information.
-- A new tool  ``mag2sql`` is available to convert JSON from ``magdump`` output to a MySQL schema definition.
+- A new tool ``mag2sql`` is available to convert JSON from ``magdump`` output to a MySQL schema definition.
 
 Version 2.0.4 2023/11/05
 ------------------------
