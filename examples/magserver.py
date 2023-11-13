@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
@@ -9,7 +10,6 @@ import json
 import signal
 import sys
 
-from collections import OrderedDict
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -27,7 +27,7 @@ def sigint_handler(signal, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
-magnumReaders = dict()
+magnumReaders = {}
 
 
 class magServer(BaseHTTPRequestHandler):
@@ -59,10 +59,10 @@ class magServer(BaseHTTPRequestHandler):
                 devices = magnumReader.getDevices()
                 if len(devices) != 0:
                     self._set_headers(contenttype="application/json")
-                    data = OrderedDict()
+                    data = {}
                     data["datetime"] = timestamp
                     data["devices"] = devices
-                    device = dict()
+                    device = {}
                     device['comm_device'] = comm_device
                     device['data'] = data
                     response.append(device)

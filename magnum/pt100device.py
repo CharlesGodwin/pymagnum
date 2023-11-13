@@ -1,6 +1,5 @@
 
 import math
-from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
@@ -10,8 +9,8 @@ class PT100Device:
     def __init__(self, trace=False):
         # self.trace = trace
         self.trace = True # force packet dump for now
-        self.data = OrderedDict()
-        self.deviceData = OrderedDict()
+        self.data = {}
+        self.deviceData = {}
         self.deviceData["device"] = PT100
         self.deviceData["data"] = self.data
         if self.trace:

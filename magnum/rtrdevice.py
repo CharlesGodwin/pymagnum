@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
@@ -6,13 +5,13 @@ from magnum import *
 class RTRDevice:
     def __init__(self, trace=False):
         self.trace = trace
-        self.data = OrderedDict()
-        self.deviceData = OrderedDict()
+        self.data = {}
+        self.deviceData = {}
         self.deviceData["device"] = RTR
         self.deviceData["data"] = self.data
         if self.trace:
             self.deviceData["trace"] = []
-        self.data["revision"] = "0.0"        
+        self.data["revision"] = "0.0"
 
     def parse(self, packet):
         packetType = packet[0]

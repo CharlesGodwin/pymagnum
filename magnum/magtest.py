@@ -66,6 +66,8 @@ def main():
                        help="Write copy of program output to log file in current directory (default: %(default)s)")
     args = parser.magnum_parse_args()
     # Only supports one device
+    if len(args.device) > 1:
+        parser.error("magdump only supports 1 device at a time.")
     args.device = args.device[0]
     if args.log:
         logfile = os.path.join(os.getcwd(), "magtest_" + time.strftime("%Y-%m-%dT%H-%M-%S") + ".txt")
@@ -85,7 +87,7 @@ def main():
         duration = time.time() - start
         unknown = 0
         formatstring = "Length:{0:2} {1:10}=>{2}"
-        device_list = dict()
+        device_list = {}
         for item in [magnum.INVERTER, magnum.REMOTE, magnum.RTR, magnum.BMK, magnum.AGS, magnum.PT100, magnum.ACLD]:
             device_list[item] = 'NA'
         device_list[magnum.RTR] = False
