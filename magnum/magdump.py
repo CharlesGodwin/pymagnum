@@ -51,7 +51,7 @@ def main():
     seldom.add_argument("--allinone", action="store_true", default=False,
                         help="Process data as a flat single row (default: %(default)s)")
     args = parser.magnum_parse_args()
-    if hasattr(args, 'v1') and args.v1:
+    if hasattr(args, 'v1'): # a relic but not harmful
         args.allinone = True
     if args.verbose:
         print('Magnum Dump Version:{0}'.format(magnum.__version__))

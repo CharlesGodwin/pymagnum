@@ -79,7 +79,7 @@ def main():
     # Only supports one device
     if len(args.device) > 1:
         parser.error("magsql only supports 1 device at a time.")
-    if hasattr(args, 'v1') and args.v1: # just in case
+    if hasattr(args, 'v1'): # a relic but not harmful
         args.allinone = True
     if args.verbose:
         savepw = args.db_password
