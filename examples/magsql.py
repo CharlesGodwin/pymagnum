@@ -184,8 +184,8 @@ def post_data(alldata):
     global args, cursor, db_columns
     if type(alldata) == list:
         alldata = alldata[0]
-    inserts = {}
     for data in alldata['data']:
+        inserts = {}
         db_table = data['device']
         if db_table not in db_columns:
             return
@@ -195,10 +195,11 @@ def post_data(alldata):
             inserts['timestamp'] = f"\"{timestamp}\""
         elif 'datetime' in db_columns[db_table]:
             inserts['datetime'] = f"\"{timestamp}\""
+        rowdata = data['data']
         for field in db_columns[db_table]:
-            if field in data:
-                if data[field] != None:
-                    value = data[field]
+            if field in rowdata:
+                if rowdata[field] != None:
+                    value = rowdata[field]
                     if type(value) == bool:
                         if value:
                             value = str(1)
