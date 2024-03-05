@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2023 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
@@ -7,9 +7,6 @@
 #
 
 import os
-import sys
-from collections import OrderedDict
-from struct import error as unpack_error
 from struct import unpack
 from time import sleep
 
@@ -34,12 +31,11 @@ try:
 except:
     MAGNUM_DELAY = 30.0
 # delay serial startup until system settles down - at least MAGNUM_DELAY seconds
-delay = MAGNUM_DELAY - uptime()
+delay = MAGNUM_DELAY - uptime() # type: ignore
 if delay > 0.0:
     sleep(delay)
 # This must be after the sleep(delay)
 import serial  # noqa
-
 
 class Magnum:
     '''
@@ -83,7 +79,7 @@ class Magnum:
         REMOTE_C2: default_remote + '7B',  # PT100  not used
         REMOTE_C3: default_remote + '7B',  # PT100  not used
         REMOTE_D0: default_remote + '7B',  # ACLD Needs work
-        ACLD_D1: '7B',                    # ACLD Needs work
+        ACLD_D1: '7B',                     # ACLD Needs work
         RTR_91: 'BB',
         UNKNOWN: ''
     }
@@ -105,34 +101,36 @@ class Magnum:
         self.acld = None
         self.inverter_revision = -1
         self.inverter_model = -1
-        if device[0:1] == '!':
-            self.stored_packets = self._load_packets(device[1:])
+        if device.find("!") >= 0:
+            self.stored_packets = self._load_packets(device)
         else:
             self.stored_packets = None
         return
+
     def getComm_Device(self):
         return self.comm_device
 
-    def _load_packets(self, filename):
-        ix = filename.find('!')
-        if ix > 0:
-            self.comm_device = filename[0:ix]
-            filename = filename[ix+1:]
-        else:
-            self.comm_device = filename
+    def _load_packets(self, device):
+        ix = device.rfind('!')
+        if ix == -1:
+            return None
+        self.comm_device = device
+        filename = device[ix+1:]
         packets = []
         with open(filename) as file:
             lines = file.readlines()
         for line in lines:
-            ix = line.find("=>")
-            decode = line.find("decode:")
+            line = line.strip()
+            ix = line.find("#")
             if ix >= 0:
-                decode = line.find("decode:")  # supports traced packets
-                if decode > ix:
-                    stop = decode
-                else:
-                    stop = len(line)
-                data = bytes.fromhex(line[ix+2:stop].strip())
+                line = line[0:ix].strip()
+            ix = line.find("=>")
+            if ix >= 0:
+                line = line[ix+2:]
+                ix = line.find(' ')
+                if ix >= 0:
+                    line = line[0:ix]
+                data = bytes.fromhex(line)
                 packets.append(data)
         if len(packets) == 0:
             raise ValueError(f"There were no valid records in {filename}")
@@ -172,7 +170,6 @@ class Magnum:
         #
 
     #  raw read of packets to bytes[]
-    #  This can be overridden for tests
     #
 
     def readPackets(self):
@@ -180,7 +177,7 @@ class Magnum:
         packets = []
         if self.stored_packets != None:
             for ix in range(self.packetcount):
-                packet = self.stored_packets.pop()
+                packet = self.stored_packets.pop(0)
                 packets.append(packet)
                 self.stored_packets.append(packet)
             return packets
@@ -202,12 +199,12 @@ class Magnum:
         # wait to see if there is any traffic on the device
         #
         sleep(0.25)
-        if self.reader.inWaiting() == 0:
+        if self.reader.in_waiting == 0:
             self.reader.close()
             self.reader = None
             raise ConnectionError("There doesn't seem to be a network")
         packetsleft = self.packetcount
-        self.reader.flushInput()
+        self.reader.reset_input_buffer()
         #
         # Start of packet reads into a list of bytearray()
         # This is a tight loop
@@ -231,9 +228,12 @@ class Magnum:
     #
 
     def _parsePacket(self, packet):
-        # Needs work
-        if self.flip:
-            pass
+        # Needs work 2023-12-28
+        if self.flip and len(packet) > 0:
+            new_packet = []
+            for i in range(len(packet)):
+                new_packet.append((~packet[i]) & 0xff)
+            packet = bytearray(new_packet)
         if len(packet) == 22:
             packet = packet[:21]
         elif len(packet) == 17:  # takes care of classic
@@ -432,7 +432,7 @@ class Magnum:
             elif packetType == ACLD_D1:
                 if self.acld == None:
                     self.acld = ACLDDevice(trace=self.trace)
-                self.rtr.parse(packet)
+                self.acld.parse(packet)
         if self.remote:
             #
             # remove extraneous REMOTE fields if corresponding device is not present
@@ -445,3 +445,48 @@ class Magnum:
                 if deviceinfo:
                     devices.append(deviceinfo)
         return devices
+
+# 2023-11-08 15:22:24 Added
+
+# This merges all device data into one long dictionary. Each variable is prefixed with device name
+# consistent with the values used in the old Java based magnum software (v1)
+#
+    def allinone(self, devices):
+        returndata = []
+
+        deviceprefixes = {"INVERTER": "INV",
+                        "AGS": "AGS",
+                        "BMK": "BMK",
+                        "RTR": "RTR",
+                        "PT100": "PT",
+                        "REMOTE": "ARC",
+                        "RTR": "RTR"
+                        }
+
+        if (type(devices) != list):
+            devices = [devices]
+        for device in devices:
+            newdata = {}
+            newdata['datetime'] = device['datetime']
+            newdata['comm_device'] = device['comm_device']
+            newdata['device'] = device["device"]
+            data = []
+            itemdata={}
+            for item in device['data']:
+                if item['device'] in deviceprefixes:
+                    deviceprefix = deviceprefixes[item['device']]
+                else:
+                    deviceprefix = item['device']
+                itemstuff = item['data']
+                for itemkey, itemvalue in itemstuff.items():
+                    key = f"{deviceprefix}_{itemkey}"
+                    itemdata[key] = itemvalue
+            newblock = {}
+            newblock['device'] = "log_data"
+            newblock['data'] = dict(sorted(itemdata.items()))
+            newdata['data'] = [newblock]
+            returndata.append(newdata)
+        if len(returndata) == 1:
+            return returndata[0]
+        else:
+            return returndata

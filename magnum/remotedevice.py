@@ -1,5 +1,4 @@
 
-from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
@@ -20,13 +19,13 @@ class RemoteDevice:
 
     def __init__(self, trace=False):
         self.trace = trace
-        self.data = OrderedDict()
-        self.deviceData = OrderedDict()
+        self.data = {}
+        self.deviceData = {}
         self.deviceData["device"] = REMOTE
         self.deviceData["data"] = self.data
         if self.trace:
             self.deviceData["trace"] = []
-        self.data["revision"] = "0.0"
+        self.data["revision"] = str("0.0")
         # self.data["action"] = 0
         self.data["searchwatts"] = 0
         self.data["batterysize"] = 0
@@ -123,7 +122,7 @@ class RemoteDevice:
             self.data["battype"] = value
         self.data["chargeramps"] = unpacked[4]
         self.data["ainput"] =  unpacked[5]
-        self.data["revision"] = unpacked[6] / 10
+        self.data["revision"] = str(unpacked[6] / 10)
         value = unpacked[7]
         self.data["parallel"] = (value & 0x0f) * 10
         # self.data["force_charge"] = value & 0xf0

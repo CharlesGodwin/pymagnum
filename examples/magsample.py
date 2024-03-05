@@ -1,4 +1,5 @@
-#
+#!/usr/bin/env python3
+# 
 # Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
@@ -44,14 +45,9 @@ seldom.add_argument("--nocleanup", action="store_true", default=False, dest='cle
                     help="Suppress clean up of unknown packets (default: False)")
 args = parser.magnum_parse_args()
 if args.verbose:
-    print('Magnum Sample Version:{0}'.format(magnum.__version__))
-    print("Options:{0}".format(str(args)
-                               .replace("Namespace(", "")
-                               .replace(")", "")
-                               .replace('[', '')
-                               .replace("'", "")
-                               .replace(']', '')))
-magnumReaders = dict()
+    print(f"Magnum Sample Version:{magnum.__version__}")
+    print(f"Options:{str(args)[10:-1]}")
+magnumReaders = {}
 for device in args.device:
     try:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
@@ -69,7 +65,7 @@ while True:
         try:
             devices = magnumReader.getDevices()
             if len(magnumReaders) > 1:
-                data = dict()
+                data = {}
                 data['comm_device'] = comm_device
                 data["data"] = devices
                 print(json.dumps(data, indent=2))

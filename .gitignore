@@ -13,7 +13,9 @@ pymagnum.code-workspace
 *.bak
 credentials.txt
 source/_build
-docs/_build
-testdata
+testdata/**
+testing/**
 .pymodhis
-examples/mqttlogger_2.py
+!testdata/allpackets.txt
+!testdata/allpackets.json
+!testdata/allpackets.sql

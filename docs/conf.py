@@ -10,8 +10,6 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
 from datetime import date
 # sys.path.insert(0, os.path.abspath('../magnum'))
 # sys.path.insert(0, os.path.abspath('../'))
@@ -21,21 +19,19 @@ from datetime import date
 # -- Project information -----------------------------------------------------
 # BUILDINFO
 project = 'Magnum Energy'
-year = date.today().year
-copyright = f"2018-{year}, Charles Godwin magnum@godwin.ca"
+copyright = f"2018-{date.today().year}, Charles Godwin magnum@godwin.ca"
 author = 'Charles Godwin'
 
 # The full version, including alpha/beta/rc tags
 release = '2.0'
-version = '2.0.2'
+version = '2.0.5'
 
 # -- General configuration ---------------------------------------------------
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-]
+extensions = []
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

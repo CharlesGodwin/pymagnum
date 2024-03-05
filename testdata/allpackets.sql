@@ -1,0 +1,136 @@
+create schema if not exists MAGNUM;
+use MAGNUM;
+create table if not exists INVERTER (
+	`datetime` datetime DEFAULT now(),
+	`revision` varchar(25) default NULL,
+	`mode` integer default NULL,
+	`mode_text` varchar(25) default NULL,
+	`fault` integer default NULL,
+	`fault_text` varchar(25) default NULL,
+	`vdc` float default NULL,
+	`adc` float default NULL,
+	`VACout` float default NULL,
+	`VACin` float default NULL,
+	`invled` integer default NULL,
+	`invled_text` varchar(25) default NULL,
+	`chgled` integer default NULL,
+	`chgled_text` varchar(25) default NULL,
+	`bat` float default NULL,
+	`tfmr` float default NULL,
+	`fet` float default NULL,
+	`model` integer default NULL,
+	`model_text` varchar(25) default NULL,
+	`stackmode` integer default NULL,
+	`stackmode_text` varchar(25) default NULL,
+	`AACin` float default NULL,
+	`AACout` float default NULL,
+	`Hz` float default NULL,
+	PRIMARY KEY (`datetime`)
+	) ENGINE=InnoDB;
+
+create table if not exists REMOTE (
+	`datetime` datetime DEFAULT now(),
+	`revision` varchar(25) default NULL,
+	`searchwatts` integer default NULL,
+	`batterysize` integer default NULL,
+	`battype` integer default NULL,
+	`absorb` integer default NULL,
+	`chargeramps` integer default NULL,
+	`ainput` integer default NULL,
+	`parallel` integer default NULL,
+	`lbco` float default NULL,
+	`vaccutout` float default NULL,
+	`vsfloat` float default NULL,
+	`vEQ` float default NULL,
+	`absorbtime` float default NULL,
+	`runtime` float default NULL,
+	`starttemp` float default NULL,
+	`startvdc` float default NULL,
+	`quiettime` integer default NULL,
+	`begintime` integer default NULL,
+	`stoptime` integer default NULL,
+	`vdcstop` float default NULL,
+	`voltstartdelay` integer default NULL,
+	`voltstopdelay` integer default NULL,
+	`maxrun` float default NULL,
+	`socstart` integer default NULL,
+	`socstop` integer default NULL,
+	`ampstart` float default NULL,
+	`ampsstartdelay` integer default NULL,
+	`ampstop` integer default NULL,
+	`ampsstopdelay` integer default NULL,
+	`quietbegintime` integer default NULL,
+	`quietendtime` integer default NULL,
+	`exercisedays` integer default NULL,
+	`exercisestart` integer default NULL,
+	`exerciseruntime` integer default NULL,
+	`topoff` integer default NULL,
+	`warmup` integer default NULL,
+	`cool` integer default NULL,
+	`batteryefficiency` integer default NULL,
+	PRIMARY KEY (`datetime`)
+	) ENGINE=InnoDB;
+
+create table if not exists BMK (
+	`datetime` datetime DEFAULT now(),
+	`revision` varchar(25) default NULL,
+	`soc` integer default NULL,
+	`vdc` float default NULL,
+	`adc` float default NULL,
+	`vmin` float default NULL,
+	`vmax` float default NULL,
+	`amph` integer default NULL,
+	`amphtrip` float default NULL,
+	`amphout` integer default NULL,
+	`Fault` integer default NULL,
+	`Fault_Text` varchar(25) default NULL,
+	PRIMARY KEY (`datetime`)
+	) ENGINE=InnoDB;
+
+create table if not exists AGS (
+	`datetime` datetime DEFAULT now(),
+	`revision` varchar(25) default NULL,
+	`status` integer default NULL,
+	`status_text` varchar(25) default NULL,
+	`running` integer(1) default NULL,
+	`temp` float default NULL,
+	`runtime` float default NULL,
+	`gen_last_run` integer default NULL,
+	`last_full_soc` integer default NULL,
+	`gen_total_run` integer default NULL,
+	`vdc` float default NULL,
+	PRIMARY KEY (`datetime`)
+	) ENGINE=InnoDB;
+
+create table if not exists RTR (
+	`datetime` datetime DEFAULT now(),
+	`revision` varchar(25) default NULL,
+	PRIMARY KEY (`datetime`)
+	) ENGINE=InnoDB;
+
+create table if not exists PT100 (
+	`datetime` datetime DEFAULT now(),
+	`revision` varchar(25) default NULL,
+	`address` integer default NULL,
+	`mode` integer default NULL,
+	`mode_text` varchar(25) default NULL,
+	`mode_hex` varchar(25) default NULL,
+	`regulation` integer default NULL,
+	`regulation_text` varchar(25) default NULL,
+	`fault` integer default NULL,
+	`fault_text` varchar(25) default NULL,
+	`battery` float default NULL,
+	`battery_amps` float default NULL,
+	`pv_voltage` float default NULL,
+	`charge_time` float default NULL,
+	`target_battery_voltage` float default NULL,
+	`relay_state` integer default NULL,
+	`alarm_state` integer default NULL,
+	`fan_on` integer default NULL,
+	`day` integer default NULL,
+	`battery_temperature` float default NULL,
+	`inductor_temperature` float default NULL,
+	`fet_temperature` float default NULL,
+	PRIMARY KEY (`datetime`)
+	) ENGINE=InnoDB;
+

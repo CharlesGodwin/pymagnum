@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
@@ -9,8 +10,7 @@ import json
 import signal
 import sys
 
-from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
@@ -27,7 +27,7 @@ def sigint_handler(signal, frame):
 
 signal.signal(signal.SIGINT, sigint_handler)
 
-magnumReaders = dict()
+magnumReaders = {}
 
 
 class magServer(BaseHTTPRequestHandler):
@@ -38,8 +38,9 @@ class magServer(BaseHTTPRequestHandler):
         #
         if isinstance(code, HTTPStatus):
             code = code.value
-        if code < 200 or code >= 300:
-            super().log_request(code=code, size=size)
+        if type(code) is int:
+            if code < 200 or code >= 300:
+                super().log_request(code=code, size=size)
 
     def _set_headers(self, contenttype="text/html"):
         self.send_response(200)
@@ -50,23 +51,23 @@ class magServer(BaseHTTPRequestHandler):
         response = []
         code = None
         message = None
-        timestamp = datetime.now(get_localzone()).replace(
-            microsecond=0).isoformat()
+        timestamp = datetime.now(timezone.utc).replace(
+            microsecond=0).astimezone().isoformat()
         devices = []
         for comm_device, magnumReader in magnumReaders.items():
             try:
                 devices = magnumReader.getDevices()
                 if len(devices) != 0:
                     self._set_headers(contenttype="application/json")
-                    data = OrderedDict()
+                    data = {}
                     data["datetime"] = timestamp
                     data["devices"] = devices
-                    device = dict()
+                    device = {}
                     device['comm_device'] = comm_device
                     device['data'] = data
                     response.append(device)
                 else:
-                    message = "No data avaliable"
+                    message = "No data available"
                     code = HTTPStatus.NO_CONTENT
             except Exception as e:
                 message = "Exception detected attempting to read network data - {0} {1}".format(comm_device, str(e))
@@ -75,7 +76,7 @@ class magServer(BaseHTTPRequestHandler):
             jsonString = json.dumps(response)
             self.wfile.write(jsonString.encode("utf8"))
             return
-        self.send_error(code, message=message)
+        self.send_error(code, message=message) # type: ignore
 
 
 def run(server_class=HTTPServer, handler_class=magServer, addr="", port=17223):
@@ -109,7 +110,7 @@ seldom.add_argument("--nocleanup", action="store_true", default=False, dest='cle
 args = parser.magnum_parse_args()
 if args.listen.upper() == 'ALL':
     args.listen = ''
-print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
+print(f"Options:{str(args)[10:-1]}")
 for device in args.device:
     try:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,

@@ -11,10 +11,9 @@ import signal
 import sys
 import time
 
-from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 
-from tzlocal import get_localzone
+# from tzlocal import get_localzone
 
 import magnum
 from magnum.magnum import Magnum
@@ -36,6 +35,8 @@ def main():
                         help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
     parser.add_argument('-v', "--verbose", action="store_true", default=False,
                         help="Display options at runtime (default: %(default)s)")
+    parser.add_argument("--pretty", action="store_true", default=False,
+                        help="Show JSON in pretty format (default: %(default)s)")
     seldom = parser.add_argument_group("Seldom used")
     seldom.add_argument('--version', action='version',
                         version="%(prog)s Version:{}".format(magnum.__version__))
@@ -47,7 +48,11 @@ def main():
                         help="Add most recent raw packet(s) info to data (default: %(default)s)")
     seldom.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets',
                         help="Suppress clean up of unknown packets (default: False)")
+    seldom.add_argument("--allinone", action="store_true", default=False,
+                        help="Process data as a flat single row (default: %(default)s)")
     args = parser.magnum_parse_args()
+    if hasattr(args, 'v1'): # a relic but not harmful
+        args.allinone = True
     if args.verbose:
         print('Magnum Dump Version:{0}'.format(magnum.__version__))
         print("Options:{0}".format(str(args)
@@ -56,7 +61,7 @@ def main():
                                    .replace('[', '')
                                    .replace('\'', '')
                                    .replace(']', '')))
-    magnumReaders = dict()
+    magnumReaders = {}
     for device in args.device:
         try:
             magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
@@ -71,28 +76,40 @@ def main():
     if args.interval != 0 and args.verbose == True:
         print("Dumping every:{1} seconds. Using: {0} ".format(
             list(magnumReaders.keys()), args.interval))
+    if args.pretty:
+        indent = 2
+    else:
+        indent = None
     while True:
         start = time.time()
+        commdevices = []
+        timestamp = datetime.now(timezone.utc).replace(microsecond=0).astimezone().isoformat()
         for comm_device, magnumReader in magnumReaders.items():
             try:
                 devices = magnumReader.getDevices()
                 if len(devices) != 0:
-                    alldata = OrderedDict()
-                    alldata["datetime"] = datetime.now(
-                        get_localzone()).replace(microsecond=0).isoformat()
+                    alldata = {}
+                    alldata["datetime"] = timestamp
                     alldata["device"] = 'MAGNUM'
                     alldata['comm_device'] = comm_device
                     magnumdata = []
                     for device in devices:
-                        data = OrderedDict()
+                        data = {}
                         data["device"] = device["device"]
                         data["data"] = device["data"]
                         magnumdata.append(data)
                     alldata["data"] = magnumdata
-                    print(json.dumps(
-                        alldata, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':')))
+                    if args.allinone:
+                        alldata = magnumReader.allinone(alldata)
+                    commdevices.append(alldata)
             except Exception as e:
                 print("{0} {1}".format(comm_device, str(e)))
+        if len(commdevices) == 1:
+            outputdata = commdevices [0]
+        else:
+            outputdata = commdevices
+        print(json.dumps(
+            outputdata, indent=indent, ensure_ascii=True, allow_nan=True, separators=(',', ':')))
         if args.interval == 0:
             break
         interval = time.time() - start
