@@ -101,6 +101,7 @@ def main():
                     alldata["data"] = magnumdata
                     if args.allinone:
                         alldata = magnumReader.allinone(alldata)
+
                     commdevices.append(alldata)
             except Exception as e:
                 print("{0} {1}".format(comm_device, str(e)))
