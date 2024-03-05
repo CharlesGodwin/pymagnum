@@ -21,6 +21,7 @@ import signal
 import sys
 import time
 import uuid
+
 from datetime import datetime, timezone
 
 import paho.mqtt.client as mqtt
@@ -62,6 +63,7 @@ def publish_data():
             try:
                 devices = magnumReader.getDevices()
                 if len(devices) != 0:
+
                     data = {}
                     now = int(time.time())
                     data["datetime"] = datetime.now(timezone.utc).replace(
