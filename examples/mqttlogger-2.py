@@ -26,8 +26,6 @@ from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
 from magnum.magnum import Magnum
 from magnum.magparser import MagnumArgumentParser
-# from tzlocal import get_localzone
-
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:

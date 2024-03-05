@@ -228,9 +228,12 @@ class Magnum:
     #
 
     def _parsePacket(self, packet):
-        # Needs work
-        if self.flip:
-            pass
+        # Needs work 2023-12-28
+        if self.flip and len(packet) > 0:
+            new_packet = []
+            for i in range(len(packet)):
+                new_packet.append((~packet[i]) & 0xff)
+            packet = bytearray(new_packet)
         if len(packet) == 22:
             packet = packet[:21]
         elif len(packet) == 17:  # takes care of classic
