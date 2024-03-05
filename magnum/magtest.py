@@ -11,6 +11,7 @@ import os
 import signal
 import sys
 import time
+import argparse
 
 import magnum
 from magnum.magnum import Magnum
@@ -43,6 +44,7 @@ def sigint_handler(signal, frame):
     print('Interrupted. Shutting down.')
     sys.exit(0)
 
+
 def main():
     signal.signal(signal.SIGINT, sigint_handler)
     parser = MagnumArgumentParser(
@@ -59,25 +61,31 @@ def main():
     seldom.add_argument('--version', action='version',
                         version="%(prog)s Version:{}".format(magnum.__version__))
     seldom.add_argument("--trace", action="store_true", default=False,
-                       help="Add most recent raw packet(s) info to data (default: %(default)s)")
+                        help="Add most recent raw packet(s) info to data (default: %(default)s)")
     seldom.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets',
-                         help="Suppress clean up of unknown packets (default: False)")
+                        help="Suppress clean up of unknown packets (default: False)")
     seldom.add_argument("--log", action="store_true", default=False,
-                       help="Write copy of program output to log file in current directory (default: %(default)s)")
+                        help="Write copy of program output to log file in current directory (default: %(default)s)")
+    seldom.add_argument("--flip", action="store_true", default=False,
+                        #    help="Flips bit in RS485 data stream (default: %(default)s)")
+                        help=argparse.SUPPRESS)
     args = parser.magnum_parse_args()
     # Only supports one device
     if len(args.device) > 1:
         parser.error("magdump only supports 1 device at a time.")
+    if args.flip:
+        args.cleanpackets = False
     args.device = args.device[0]
+    logfile = os.path.join(os.getcwd(), "magtest_" + time.strftime("%Y-%m-%dT%H-%M-%S") + ".txt")
     if args.log:
-        logfile = os.path.join(os.getcwd(), "magtest_" + time.strftime("%Y-%m-%dT%H-%M-%S") + ".txt")
+
         print(f"Output is being logged to {logfile}")
         sys.stdout = Logger(logname=logfile)
     print(f"Magnum Test Version:{magnum.__version__}")
     print(f"Options:{str(args)[10:-1]}")
     try:
         reader = Magnum(device=args.device, packets=args.packets, trace=args.trace,
-                        timeout=args.timeout, cleanpackets=args.cleanpackets)
+                        timeout=args.timeout, cleanpackets=args.cleanpackets, flip=args.flip)
     except Exception as e:
         print("{0} {1}".format(args.device, str(e)))
         exit(2)
@@ -164,13 +172,15 @@ def main():
             if device_list[magnum.PT100] == True:
                 print(f"{magnum.PT100} has limited support, contact the author.")
             if device_list[magnum.ACLD] == True:
-                print("f{magnum.ACLD} is not currently supported, contact the author.")
+                print(
+                    "f{magnum.ACLD} is not currently supported, contact the author.")
         if args.log:
             print(f"Output was logged to {logfile}")
     except Exception as e:
         print("{0} {1}".format(reader.getComm_Device(), str(e)))
         print("Error detected attempting to read network data - test failed.")
         exit(2)
+
 
 if __name__ == '__main__':
     main()

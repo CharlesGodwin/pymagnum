@@ -4,11 +4,13 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
-# This code is provided as an example of generating MySQL schema definition from a JSON file generate by magdump
+# This code is provided to print a MySQL schema definition from a JSON file generate by magdump
 # run the program with --help for details of options.
-#  python3 mag2sql.py --help
+#  mag2sql --help
 #
-#  magdump|python3 mag2sql
+#  magdump|mag2sql
+#  or
+#  magdump|mag2sql>[filename].sql
 #
 import sys
 import json

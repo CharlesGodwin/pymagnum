@@ -3,6 +3,9 @@
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
+# This is no longer needed, refer to using magtest output files instead
+# DO NOT USE THIS ON A REAL MAGNUM NETWORK
+# 
 import serial
 import time
 import argparse
