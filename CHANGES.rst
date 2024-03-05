@@ -1,11 +1,14 @@
 =======================
  pyMagnum Release Notes
+
 Version 2.0.4 2023/11/05
 ------------------------
 - Fixed bug in emitted JSON when using multiple devices
 - Cleaned up code when using dummy data files instead of RS485 serial device
 - Provided a complete dummy test file testdata/allpackets.txt
 - Provided a JSON file testdata/allpackets.JSON
+- Fixed All revision values are defined as string. It used to be mixed
+- Enhancement --pretty option to magdump for formatted JSON output
 
 - Fixed All revision values are defined as string. It used to be mixed
 - Enhancement --pretty option to magdump for formatted JSON output

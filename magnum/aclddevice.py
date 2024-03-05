@@ -8,7 +8,6 @@ class ACLDDevice:
         self.trace = True # force packet dump
         self.data = {}
         self.deviceData = {}
-
         self.deviceData["device"] = ACLD
         self.deviceData["data"] = self.data
         if self.trace:

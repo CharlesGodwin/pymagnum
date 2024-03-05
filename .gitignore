@@ -13,7 +13,6 @@ pymagnum.code-workspace
 *.bak
 credentials.txt
 source/_build
-docs/_build
 testdata/**
 testing/**
 .pymodhis

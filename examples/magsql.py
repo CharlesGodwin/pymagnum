@@ -200,6 +200,7 @@ def post_data(alldata):
             if field in rowdata:
                 if rowdata[field] != None:
                     value = rowdata[field]
+
                     if type(value) == bool:
                         if value:
                             value = str(1)

@@ -47,10 +47,7 @@ args = parser.magnum_parse_args()
 if args.verbose:
     print(f"Magnum Sample Version:{magnum.__version__}")
     print(f"Options:{str(args)[10:-1]}")
-
-
 magnumReaders = {}
-
 for device in args.device:
     try:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
