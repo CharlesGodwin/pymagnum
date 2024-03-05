@@ -19,4 +19,4 @@ testing/**
 .pymodhis
 !testdata/allpackets.txt
 !testdata/allpackets.json
-examples/mqttlogger_2.py
+!testdata/allpackets.sql

@@ -21,14 +21,11 @@ import signal
 import sys
 import time
 import uuid
-from collections import OrderedDict
 from datetime import datetime, timezone
 
 import paho.mqtt.client as mqtt
 from magnum.magnum import Magnum
 from magnum.magparser import MagnumArgumentParser
-# from tzlocal import get_localzone
-
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -65,7 +62,7 @@ def publish_data():
             try:
                 devices = magnumReader.getDevices()
                 if len(devices) != 0:
-                    data = OrderedDict()
+                    data = {}
                     now = int(time.time())
                     data["datetime"] = datetime.now(timezone.utc).replace(
                         microsecond=0).astimezone().isoformat()
@@ -114,7 +111,7 @@ if args.interval < 10 or args.interval > (60*60):
 if args.topic[-1] != "/":
     args.topic += "/"
 print(f"Options:{str(args)[10:-1]}")
-magnumReaders = dict()
+magnumReaders = {}
 for device in args.device:
     try:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,

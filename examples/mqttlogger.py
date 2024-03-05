@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
@@ -19,7 +20,6 @@ import signal
 import sys
 import time
 import uuid
-from collections import OrderedDict
 from datetime import datetime, timezone
 
 import paho.mqtt.client as mqtt
@@ -81,7 +81,7 @@ if args.interval < 10 or args.interval > 3600:
 if args.topic[-1] != "/":
     args.topic += "/"
 print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
-magnumReaders = dict()
+magnumReaders = {}
 for device in args.device:
     try:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
@@ -117,7 +117,7 @@ while True:
             try:
                 devices = magnumReader.getDevices()
                 if len(devices) != 0:
-                    data = OrderedDict()
+                    data = {}
                     now = int(time.time())
                     data["datetime"] = datetime.now(timezone.utc).replace(
                         microsecond=0).astimezone().isoformat()

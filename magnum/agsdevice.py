@@ -1,5 +1,4 @@
 
-from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
@@ -41,8 +40,8 @@ class AGSDevice:
 
     def __init__(self, trace=False):
         self.trace = trace
-        self.data = OrderedDict()
-        self.deviceData = OrderedDict()
+        self.data = {}
+        self.deviceData = {}
         self.deviceData["device"] = AGS
         self.deviceData["data"] = self.data
         self.data["revision"] = str('0.0')
