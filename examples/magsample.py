@@ -1,4 +1,5 @@
-#
+#!/usr/bin/env python3
+# 
 # Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
@@ -47,7 +48,9 @@ if args.verbose:
     print(f"Magnum Sample Version:{magnum.__version__}")
     print(f"Options:{str(args)[10:-1]}")
 
-magnumReaders = dict()
+
+magnumReaders = {}
+
 for device in args.device:
     try:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
@@ -65,7 +68,7 @@ while True:
         try:
             devices = magnumReader.getDevices()
             if len(magnumReaders) > 1:
-                data = dict()
+                data = {}
                 data['comm_device'] = comm_device
                 data["data"] = devices
                 print(json.dumps(data, indent=2))

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #
 # Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
@@ -12,49 +13,19 @@
 # the data object is pertinent to each device
 # The current devices are INVERTER, REMOTE, AGS, BMK, and PT100
 # topic =  magnum/inverter
-# payload
-# {
-# 	"datetime": "2019-10-08 12:49:14-04:00",
-# 	"device": "INVERTER",
-# 	"data": {
-# 		"revision": "5.1",
-# 		"mode": 64,
-# 		"mode_text": "INVERT",
-# 		"fault": 0,
-# 		"fault_text": "None",
-# 		"vdc": 24.6,
-# 		"adc": 2,
-# 		"VACout": 119,
-# 		"VACin": 0,
-# 		"invled": 1,
-# 		"invled_text": "On",
-# 		"chgled": 0,
-# 		"chgled_text": "Off",
-# 		"bat": 17,
-# 		"tfmr": 36,
-# 		"fet": 30,
-# 		"model": 107,
-# 		"model_text": "MS4024PAE",
-# 		"stackmode": 0,
-# 		"stackmode_text": "Stand Alone",
-# 		"AACin": 0,
-# 		"AACout": 1,
-# 		"Hz": 60.0
-# 	}
-# }
+# payload - refer to testdata/allpackets.json
 
 import json
 import signal
 import sys
 import time
 import uuid
-from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timezone
 
 import paho.mqtt.client as mqtt
 from magnum.magnum import Magnum
 from magnum.magparser import MagnumArgumentParser
-from tzlocal import get_localzone
+# from tzlocal import get_localzone
 
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -110,7 +81,7 @@ if args.interval < 10 or args.interval > 3600:
 if args.topic[-1] != "/":
     args.topic += "/"
 print("Options:{}".format(str(args).replace("Namespace(", "").replace(")", "")))
-magnumReaders = dict()
+magnumReaders = {}
 for device in args.device:
     try:
         magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
@@ -146,10 +117,10 @@ while True:
             try:
                 devices = magnumReader.getDevices()
                 if len(devices) != 0:
-                    data = OrderedDict()
+                    data = {}
                     now = int(time.time())
-                    data["datetime"] = datetime.now(
-                        get_localzone()).replace(microsecond=0).isoformat()
+                    data["datetime"] = datetime.now(timezone.utc).replace(
+                        microsecond=0).astimezone().isoformat()
                     data['comm_device'] = comm_device
                     for device in devices:
                         topic = args.topic + device["device"].lower()

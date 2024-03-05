@@ -1,5 +1,4 @@
 
-from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
@@ -7,11 +6,11 @@ from magnum import *
 class BMKDevice:
     def __init__(self, trace=False):
         self.trace = trace
-        self.data = OrderedDict()
-        self.deviceData = OrderedDict()
+        self.data = {}
+        self.deviceData = {}
         self.deviceData["device"] = BMK
         self.deviceData["data"] = self.data
-        self.data["revision"] = ""
+        self.data["revision"] = str(0.0)
         self.data["soc"] = 0
         self.data["vdc"] = 0.0
         self.data["adc"] = 0.0

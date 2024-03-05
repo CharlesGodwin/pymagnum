@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from copy import deepcopy
 
 from magnum import *
@@ -7,13 +6,14 @@ class ACLDDevice:
     def __init__(self, trace=False):
         # self.trace = trace
         self.trace = True # force packet dump
-        self.data = OrderedDict()
-        self.deviceData = OrderedDict()
-        self.deviceData["device"] = RTR
+        self.data = {}
+        self.deviceData = {}
+
+        self.deviceData["device"] = ACLD
         self.deviceData["data"] = self.data
         if self.trace:
             self.deviceData["trace"] = []
-        self.data["revision"] = "0.0"
+        self.data["revision"] = str("0.0")
 
     def parse(self, packet):
         packetType = packet[0]
