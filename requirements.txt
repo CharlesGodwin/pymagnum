@@ -3,3 +3,5 @@ sphinx_rtd_theme
 setuptools
 uptime
 twine
+mariadb
+paho.mqtt

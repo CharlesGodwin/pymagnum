@@ -15,7 +15,8 @@
 # The current devices are INVERTER, REMOTE, AGS, BMK, and PT100
 # topic =  magnum/inverter
 # payload - refer to testdata/allpackets.json
-
+#  NOTE This will only work with paho.mqtt Version 2.0 and newer
+#
 import json
 import signal
 import sys
@@ -24,27 +25,31 @@ import uuid
 from datetime import datetime, timezone
 
 import paho.mqtt.client as mqtt
+from paho.mqtt.enums import CallbackAPIVersion
+from paho.mqtt.reasoncodes import ReasonCode
 from magnum.magnum import Magnum
 from magnum.magparser import MagnumArgumentParser
 
-def on_connect(client, userdata, flags, rc):
-    if rc == 0:
+
+def on_connect(client: mqtt.Client, userdata, connect_flags: mqtt.ConnectFlags, reason_code: ReasonCode, properties):
+    if reason_code.is_failure:
+        raise Exception(f"Connection failed. {
+                        ReasonCode.getName(reason_code)}")
+    else:
         global args
         client.subscribe(f"{args.topic}refresh")
         if args.trace:
             print("Connected")
-    else:
-        raise Exception("Connection failed.")
 
 
-def on_message(client, userdata, msg):
+def on_message(client: mqtt.Client, userdata, message: mqtt.MQTTMessage):
     global args
-    if msg.topic == f"{args.topic}refresh":
+    if message.topic == f"{args.topic}refresh":
         publish_data()
 
 
-def on_publish(client, userdata, result):
-    print(f"Message {result} published\n")
+def on_publish(client: mqtt.Client, userdata, mid: int, reason_code: ReasonCode, properties):
+    print(f"Message {mid} published\n")
 
 
 def sigint_handler(signal, frame):
@@ -71,7 +76,8 @@ def publish_data():
                         topic = args.topic + device["device"].lower()
                         data["device"] = device["device"]
                         data["data"] = device["data"]
-                        payload = json.dumps(data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
+                        payload = json.dumps(
+                            data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
                         client.publish(topic, payload=payload)
             except Exception as e:
                 print(f"{comm_device} {str(e)}")
@@ -110,7 +116,10 @@ if args.interval < 10 or args.interval > (60*60):
         "argument -i/--interval: must be between 10 seconds and 3600 (1 hour)")
 if args.topic[-1] != "/":
     args.topic += "/"
+savepw = args.password
+args.password = "******"
 print(f"Options:{str(args)[10:-1]}")
+args.password = savepw
 magnumReaders = {}
 for device in args.device:
     try:
@@ -130,7 +139,7 @@ uuidstr = str(uuid.uuid1())
 brokerinfo = args.broker.split(':')
 if len(brokerinfo) == 1:
     brokerinfo.append(1883)
-client = mqtt.Client(client_id=uuidstr, clean_session=False)
+client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2, client_id=uuidstr, clean_session=False)
 if args.username != 'None':
     client.username_pw_set(username=args.username, password=args.password)
 client.on_connect = on_connect
