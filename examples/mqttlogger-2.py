@@ -33,8 +33,7 @@ from magnum.magparser import MagnumArgumentParser
 
 def on_connect(client: mqtt.Client, userdata, connect_flags: mqtt.ConnectFlags, reason_code: ReasonCode, properties):
     if reason_code.is_failure:
-        raise Exception(f"Connection failed. {
-                        ReasonCode.getName(reason_code)}")
+        raise Exception(f"Connection failed. {ReasonCode.getName(reason_code)}")
     else:
         global args
         client.subscribe(f"{args.topic}refresh")
@@ -76,8 +75,7 @@ def publish_data():
                         topic = args.topic + device["device"].lower()
                         data["device"] = device["device"]
                         data["data"] = device["data"]
-                        payload = json.dumps(
-                            data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
+                        payload = json.dumps(data, indent=None, ensure_ascii=True, allow_nan=True, separators=(',', ':'))
                         client.publish(topic, payload=payload)
             except Exception as e:
                 print(f"{comm_device} {str(e)}")
@@ -90,30 +88,19 @@ parser = MagnumArgumentParser(description="Magnum Data MQTT Publisher", fromfile
                               epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
 logger = parser.add_argument_group("MQTT publish")
 reader = parser.add_argument_group("Magnum reader")
-logger.add_argument("-t", "--topic", default='magnum/',
-                    help="Topic prefix (default: %(default)s)")
-logger.add_argument("-b", "--broker", default='localhost:1883',
-                    help="MQTT Broker address and (optional port)(default: %(default)s)")
-logger.add_argument("-i", "--interval", default=60, type=int, dest='interval',
-                    help="Interval, in seconds, between publishing (default: %(default)s)")
-logger.add_argument("--username", default='None',
-                    help="MQTT User name, if needed (default: %(default)s)")
-logger.add_argument("--password", default='None',
-                    help="MQTT User password, if needed (default: %(default)s)")
-reader.add_argument("-d", "--device", nargs='*', action='append', default=[],
-                    help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")
-reader.add_argument("--packets", default=50, type=int,
-                    help="Number of packets to generate in reader (default: %(default)s)")
-reader.add_argument("--timeout", default=0.005, type=float,
-                    help="Timeout for serial read (default: %(default)s)")
-reader.add_argument("--trace", action="store_true",
-                    help="Add raw packet info to data (default: %(default)s)")
-reader.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets',
-                    help="Suppress clean up of unknown packets (default: False)")
+logger.add_argument("-t", "--topic", default='magnum/', help="Topic prefix (default: %(default)s)")
+logger.add_argument("-b", "--broker", default='localhost:1883', help="MQTT Broker address and (optional port)(default: %(default)s)")
+logger.add_argument("-i", "--interval", default=60, type=int, dest='interval', help="Interval, in seconds, between publishing (default: %(default)s)")
+logger.add_argument("-u", "--username", default='None', help="MQTT User name, if needed (default: %(default)s)")
+logger.add_argument("-p", "--password", default='None', help="MQTT User password, if needed (default: %(default)s)")
+reader.add_argument("-d", "--device", nargs='*', action='append', default=[], help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")
+reader.add_argument("--packets", default=50, type=int, help="Number of packets to generate in reader (default: %(default)s)")
+reader.add_argument("--timeout", default=0.005, type=float, help="Timeout for serial read (default: %(default)s)")
+reader.add_argument("--trace", action="store_true", help="Add raw packet info to data (default: %(default)s)")
+reader.add_argument("--nocleanup", action="store_true", default=False, dest='cleanpackets', help="Suppress clean up of unknown packets (default: False)")
 args = parser.magnum_parse_args()
 if args.interval < 10 or args.interval > (60*60):
-    parser.error(
-        "argument -i/--interval: must be between 10 seconds and 3600 (1 hour)")
+    parser.error("Argument -i/--interval: Must be between 10 seconds and 3600 (1 hour)")
 if args.topic[-1] != "/":
     args.topic += "/"
 savepw = args.password
@@ -123,18 +110,15 @@ args.password = savepw
 magnumReaders = {}
 for device in args.device:
     try:
-        magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,
-                              timeout=args.timeout, cleanpackets=args.cleanpackets)
+        magnumReader = Magnum(device=device, packets=args.packets, trace=args.trace,timeout=args.timeout, cleanpackets=args.cleanpackets)
         magnumReader.getDevices()  # test read to see if all's good
         magnumReaders[magnumReader.getComm_Device()] = magnumReader
     except Exception as e:
-        print(f"{device} {device}")
+        print(f"{e} {device}")
 if len(magnumReaders) == 0:
     print("Error: There are no usable devices connected.")
     exit(2)
 
-print(
-    f"Publishing to broker:{args.broker} Every:{args.interval} seconds. Using: {list(magnumReaders.keys())}")
 uuidstr = str(uuid.uuid1())
 brokerinfo = args.broker.split(':')
 if len(brokerinfo) == 1:
@@ -146,7 +130,13 @@ client.on_connect = on_connect
 client.on_message = on_message
 if args.trace:
     client.on_publish = on_publish
-client.connect(brokerinfo[0], port=int(brokerinfo[1]))
+try:
+    client.connect(brokerinfo[0], port=int(brokerinfo[1]))
+except Exception as e:
+    print(f"Failed to connect to broker {brokerinfo[0]}:{brokerinfo[1]}, exiting")
+    print(f"Reason: {e}")
+    exit(2)
+print(f"Publishing to broker:{brokerinfo[0]}:{brokerinfo[1]} Every:{args.interval} seconds. Using: {list(magnumReaders.keys())}")
 client.loop_start()
 while True:
     start = time.time()
