@@ -17,8 +17,6 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import magnum
 from magnum.magnum import Magnum
 from magnum.magparser import MagnumArgumentParser
-from tzlocal import get_localzone
-
 
 def sigint_handler(signal, frame):
     print('Interrupted. Shutting down.')
@@ -28,7 +26,6 @@ def sigint_handler(signal, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 
 magnumReaders = {}
-
 
 class magServer(BaseHTTPRequestHandler):
 

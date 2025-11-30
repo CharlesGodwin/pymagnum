@@ -1,5 +1,13 @@
 =======================
  pyMagnum Release Notes
+ ========================
+Version 2.0.6 2025/12/01
+------------------------
+- New Added reference to a docker example. See the examples on the github site. 
+- Fixed bug --trace was not generating HEX packet data in JSON output
+- Fixed --allinone bug in magdump
+- Fixed Revised owner information for Magnum
+
 ========================
 Version 2.0.5 2023/11/13
 ------------------------

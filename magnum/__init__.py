@@ -1,10 +1,10 @@
 #
-# Copyright (c) 2018-2023 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2025 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #
 #  BUILDINFO
-__version__="2.0.5"
+__version__="2.0.6"
 #
 # names of devices
 #

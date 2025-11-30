@@ -27,7 +27,7 @@ def sigint_handler(signal, frame):
 
 def main():
     signal.signal(signal.SIGINT, sigint_handler)
-    parser = MagnumArgumentParser(description="Magnum Data Dump", prog="Magnum Dump", fromfile_prefix_chars='@',
+    parser = MagnumArgumentParser(description="Magnum Data Dump", prog="magdump", fromfile_prefix_chars='@',
                                   epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
     parser.add_argument("-d", "--device", nargs='*', action='append', default=[],
                         help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")

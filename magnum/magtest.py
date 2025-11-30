@@ -48,7 +48,7 @@ def sigint_handler(signal, frame):
 def main():
     signal.signal(signal.SIGINT, sigint_handler)
     parser = MagnumArgumentParser(
-        description="Magnum RS485 Reader Test", prog="Magnum Test",
+        description="Magnum RS485 Reader Test", prog="magtest",
         epilog="Use `python -m serial.tools.list_ports` to identify devices. This program does NOT support use of options @file.")
     parser.add_argument("-d", "--device", default=[],
                         help="Serial device name (default: /dev/ttyUSB0). MUST be only one device.")
