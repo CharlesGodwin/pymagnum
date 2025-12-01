@@ -1,11 +1,13 @@
 =======================
  pyMagnum Release Notes
  ========================
-Version 2.0.6 2025/12/01
+Version 2.0.6 2025/12/05
 ------------------------
-- New Added reference to a docker example. See the examples on the github site. 
-- Fixed bug --trace was not generating HEX packet data in JSON output
-- Fixed --allinone bug in magdump
+- New Added reference to a docker example. See the examples on the github site.
+- New Added `--device all` option to access all serial devices
+- Enhanced `magtest` to test all serial ports using `--device all`
+- Fixed bug `--trace` was not generating HEX packet data in JSON output
+- Fixed `--allinone` bug in magdump
 - Fixed Revised owner information for Magnum
 
 ========================

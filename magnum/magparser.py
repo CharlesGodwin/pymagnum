@@ -24,6 +24,12 @@ class MagnumArgumentParser(argparse.ArgumentParser):
                         for item in subdev.split():
                             devices.append(item)
                 args.device = list(dict.fromkeys(devices))  # strips duplicates
+            if len(args.device) == 1 and args.device[0].lower() == "all":
+                from serial.tools.list_ports import comports
+                devices = []
+                for device in sorted(comports(include_links=True)):
+                    devices.append(device.device)
+                args.device = list(dict.fromkeys(devices))
             if len(args.device) == 0:
                 args.device = ['/dev/ttyUSB0']
         if hasattr(args, 'timeout'):

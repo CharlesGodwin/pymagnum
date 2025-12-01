@@ -21,4 +21,4 @@ testing/**
 !testdata/allpackets.sql
 examples/test-mqtt.py
 docs/troubleshooting.rst
-
+.magdebug/**
