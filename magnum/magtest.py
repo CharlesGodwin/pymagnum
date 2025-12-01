@@ -48,10 +48,10 @@ def sigint_handler(signal, frame):
 def main():
     signal.signal(signal.SIGINT, sigint_handler)
     parser = MagnumArgumentParser(
-        description="Magnum RS485 Reader Test", prog="Magnum Test",
+        description="Magnum RS485 Reader Test", prog="magtest",
         epilog="Use `python -m serial.tools.list_ports` to identify devices. This program does NOT support use of options @file.")
-    parser.add_argument("-d", "--device", default=[],
-                        help="Serial device name (default: /dev/ttyUSB0). MUST be only one device.")
+    parser.add_argument("-d", "--device", default="All",
+                        help="Serial device name (default: All serial devices.")
     parser.add_argument("--packets", default=50, type=int,
                         help="Number of packets to generate in reader (default: %(default)s)")
     parser.add_argument("--timeout", default=0.005, type=float,
@@ -70,117 +70,112 @@ def main():
                         #    help="Flips bit in RS485 data stream (default: %(default)s)")
                         help=argparse.SUPPRESS)
     args = parser.magnum_parse_args()
-    # Only supports one device
-    if len(args.device) > 1:
-        parser.error("magdump only supports 1 device at a time.")
     if args.flip:
         args.cleanpackets = False
-    args.device = args.device[0]
     logfile = os.path.join(os.getcwd(), "magtest_" + time.strftime("%Y-%m-%dT%H-%M-%S") + ".txt")
     if args.log:
-
         print(f"Output is being logged to {logfile}")
         sys.stdout = Logger(logname=logfile)
     print(f"Magnum Test Version:{magnum.__version__}")
     print(f"Options:{str(args)[10:-1]}")
-    try:
-        reader = Magnum(device=args.device, packets=args.packets, trace=args.trace,
-                        timeout=args.timeout, cleanpackets=args.cleanpackets, flip=args.flip)
-    except Exception as e:
-        print("{0} {1}".format(args.device, str(e)))
-        exit(2)
-    try:
-        start = time.time()
-        packets = reader.getPackets()
-        duration = time.time() - start
-        unknown = 0
-        formatstring = "Length:{0:2} {1:10}=>{2}"
-        device_list = {}
-        for item in [magnum.INVERTER, magnum.REMOTE, magnum.RTR, magnum.BMK, magnum.AGS, magnum.PT100, magnum.ACLD]:
-            device_list[item] = 'NA'
-        device_list[magnum.RTR] = False
-        for packet in packets:
-            if packet[0] == magnum.UNKNOWN:
-                unknown += 1
-            if args.trace:
-                end = ' decode:'
-            else:
-                end = '\n'
-            print(formatstring.format(
-                len(packet[1]), packet[0], packet[1].hex().upper()), end=end)
-            if args.trace:
-                print(*packet[2], end=' ')
-                print(packet[3])
-            packetType = packet[0]
-            if packetType in (magnum.INV, magnum.INV_C):
-                device_list[magnum.INVERTER] = True
-            elif packetType in (magnum.REMOTE_C,
-                                magnum.REMOTE_00):
-                device_list[magnum.REMOTE] = True
-            elif packetType == magnum.REMOTE_11:
-                pass  # ignored
-            elif packetType == magnum.REMOTE_80:
-                device_list[magnum.REMOTE] = True
-                if device_list[magnum.BMK] != True:
-                    device_list[magnum.BMK] = False
-            elif packetType in (
-                    magnum.REMOTE_A0,
-                    magnum.REMOTE_A1,
-                    magnum.REMOTE_A2,
-                    magnum.REMOTE_A3,
-                    magnum.REMOTE_A4):
-                device_list[magnum.REMOTE] = True
-                if device_list[magnum.AGS] != True:
-                    device_list[magnum.AGS] = False
-            elif packetType in (
-                magnum.REMOTE_C0,
-                magnum.REMOTE_C1,
-                magnum.REMOTE_C2,
-                magnum.REMOTE_C3
-            ):
-                device_list[magnum.REMOTE] = True
-                if device_list[magnum.PT100] != True:
-                    device_list[magnum.PT100] = False
-            elif packetType == magnum.REMOTE_D0:
-                device_list[magnum.REMOTE] = True
-                if device_list[magnum.ACLD] != True:
-                    device_list[magnum.ACLD] = False
-            elif packetType == magnum.BMK_81:
-                device_list[magnum.BMK] = True
-            elif packetType in (magnum.AGS_A1, magnum.AGS_A2):
-                device_list[magnum.AGS] = True
-            elif packetType == magnum.RTR_91:
-                device_list[magnum.RTR] = True
-            elif packetType in (magnum.PT_C1, magnum.PT_C2, magnum.PT_C3):
-                device_list[magnum.PT100] = True
-            elif packetType == magnum.ACLD_D1:
-                device_list[magnum.ACLD] = True
-
-        format1 = "Packets:{0} of {1} with {2} UNKNOWN, in {3:2.2f} seconds"
-        format2 = "Packets:{0} in {3:2.2f} seconds"
-        format = format1 if unknown > 0 else format2
-        print(format.format(len(packets), args.packets, unknown, duration))
-    # Analyze packets
-        if len(packets) > unknown:
-            for key, value in device_list.items():
-                if value == 'NA':
-                    print(f"{key} not supported")
-                elif value == False:
-                    print(f"{key} not connected")
+    for comm_device in args.device:
+        try:
+            reader = Magnum(device=comm_device, packets=args.packets, trace=args.trace,
+                            timeout=args.timeout, cleanpackets=args.cleanpackets, flip=args.flip)
+        except Exception as e:
+            print(f"{comm_device} {str(e)}")
+            continue
+        try:
+            start = time.time()
+            packets = reader.getPackets()
+            duration = time.time() - start
+            unknown = 0
+            formatstring = "Length:{0:2} {1:10}=>{2}"
+            device_list = {}
+            for item in [magnum.INVERTER, magnum.REMOTE, magnum.RTR, magnum.BMK, magnum.AGS, magnum.PT100, magnum.ACLD]:
+                device_list[item] = 'NA'
+            device_list[magnum.RTR] = False
+            for packet in packets:
+                if packet[0] == magnum.UNKNOWN:
+                    unknown += 1
+                if args.trace:
+                    end = ' decode:'
                 else:
-                    print(f"{key} Detected")
-            if device_list[magnum.PT100] == True:
-                print(f"{magnum.PT100} has limited support, contact the author.")
-            if device_list[magnum.ACLD] == True:
-                print(
-                    "f{magnum.ACLD} is not currently supported, contact the author.")
-        if args.log:
-            print(f"Output was logged to {logfile}")
-    except Exception as e:
-        print("{0} {1}".format(reader.getComm_Device(), str(e)))
-        print("Error detected attempting to read network data - test failed.")
-        exit(2)
+                    end = '\n'
+                print(formatstring.format(
+                    len(packet[1]), packet[0], packet[1].hex().upper()), end=end)
+                if args.trace:
+                    print(*packet[2], end=' ')
+                    print(packet[3])
+                packetType = packet[0]
+                if packetType in (magnum.INV, magnum.INV_C):
+                    device_list[magnum.INVERTER] = True
+                elif packetType in (magnum.REMOTE_C,
+                                    magnum.REMOTE_00):
+                    device_list[magnum.REMOTE] = True
+                elif packetType == magnum.REMOTE_11:
+                    pass  # ignored
+                elif packetType == magnum.REMOTE_80:
+                    device_list[magnum.REMOTE] = True
+                    if device_list[magnum.BMK] != True:
+                        device_list[magnum.BMK] = False
+                elif packetType in (
+                        magnum.REMOTE_A0,
+                        magnum.REMOTE_A1,
+                        magnum.REMOTE_A2,
+                        magnum.REMOTE_A3,
+                        magnum.REMOTE_A4):
+                    device_list[magnum.REMOTE] = True
+                    if device_list[magnum.AGS] != True:
+                        device_list[magnum.AGS] = False
+                elif packetType in (
+                    magnum.REMOTE_C0,
+                    magnum.REMOTE_C1,
+                    magnum.REMOTE_C2,
+                    magnum.REMOTE_C3
+                ):
+                    device_list[magnum.REMOTE] = True
+                    if device_list[magnum.PT100] != True:
+                        device_list[magnum.PT100] = False
+                elif packetType == magnum.REMOTE_D0:
+                    device_list[magnum.REMOTE] = True
+                    if device_list[magnum.ACLD] != True:
+                        device_list[magnum.ACLD] = False
+                elif packetType == magnum.BMK_81:
+                    device_list[magnum.BMK] = True
+                elif packetType in (magnum.AGS_A1, magnum.AGS_A2):
+                    device_list[magnum.AGS] = True
+                elif packetType == magnum.RTR_91:
+                    device_list[magnum.RTR] = True
+                elif packetType in (magnum.PT_C1, magnum.PT_C2, magnum.PT_C3):
+                    device_list[magnum.PT100] = True
+                elif packetType == magnum.ACLD_D1:
+                    device_list[magnum.ACLD] = True
 
+            format1 = "Packets:{0} of {1} with {2} UNKNOWN, in {3:2.2f} seconds"
+            format2 = "Packets:{0} in {3:2.2f} seconds"
+            format = format1 if unknown > 0 else format2
+            print(format.format(len(packets), args.packets, unknown, duration))
+        # Analyze packets
+            if len(packets) > unknown:
+                for key, value in device_list.items():
+                    if value == 'NA':
+                        print(f"{key} not supported")
+                    elif value == False:
+                        print(f"{key} not connected")
+                    else:
+                        print(f"{key} Detected")
+                if device_list[magnum.PT100] == True:
+                    print(f"{magnum.PT100} has limited support, contact the author.")
+                if device_list[magnum.ACLD] == True:
+                    print(
+                        "f{magnum.ACLD} is not currently supported, contact the author.")
+            if args.log:
+                print(f"Output was logged to {logfile}")
+        except Exception as e:
+            print(f"{reader.getComm_Device()} {str(e)}")
+            print(f"Error detected attempting to read network data on {comm_device} - test failed.")
+            continue
 
 if __name__ == '__main__':
     main()

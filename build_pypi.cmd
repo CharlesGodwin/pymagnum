@@ -2,6 +2,6 @@ python setup.py clean
 rd /s /q dist
 rd /s /q pymagnum.egg-info
 python setup.py sdist bdist_wheel
-python -m twine upload -u CharlesGodwin dist/*
+python -m twine upload dist/*
 @echo Use this to install
 @echo sudo pip install --upgrade pymagnum==VERSION

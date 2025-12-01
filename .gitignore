@@ -11,7 +11,7 @@ magnum.egg-info
 pymagnum.egg-info
 pymagnum.code-workspace
 *.bak
-credentials.txt
+credentials/*
 source/_build
 testdata/**
 testing/**
@@ -19,3 +19,6 @@ testing/**
 !testdata/allpackets.txt
 !testdata/allpackets.json
 !testdata/allpackets.sql
+examples/test-mqtt.py
+docs/troubleshooting.rst
+.magdebug/**

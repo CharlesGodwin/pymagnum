@@ -24,7 +24,7 @@ class RemoteDevice:
         self.deviceData["device"] = REMOTE
         self.deviceData["data"] = self.data
         if self.trace:
-            self.deviceData["trace"] = []
+            self.data["trace"]  = []
         self.data["revision"] = str("0.0")
         # self.data["action"] = 0
         self.data["searchwatts"] = 0
@@ -44,8 +44,8 @@ class RemoteDevice:
         self.data["absorbtime"] = 0
         # end of core info
         # A0
-        # self.data["remotetimehours"] = 0
-        # self.data["remotetimemins"] = 0
+        self.data["remotetimehours"] = 0
+        self.data["remotetimemins"] = 0
         self.data["runtime"] = 0
         self.data["starttemp"] = 0.0
         self.data["startvdc"] = 0.0
@@ -138,7 +138,8 @@ class RemoteDevice:
         packetType = packet[0]
         unpacked = packet[2]
         if self.trace:
-            self.deviceData["trace"].append([packetType,  packet[1].hex().upper()])
+            self.data["trace"] .append((packetType,  packet[1].hex().upper()))
+            self.data["trace"]= list(set(self.data["trace"]))
         if packetType == REMOTE_C:
             self.setBaseValues(unpacked)
             #
@@ -153,14 +154,14 @@ class RemoteDevice:
             self.setBaseValues(unpacked)
             # batterysize is ill defined in documentation
             self.data["batterysize"] = (unpacked[2] * 10)
-            # self.data["remotetimehours"] = unpacked[14]
-            # self.data["remotetimemins"] = unpacked[15]
+            self.data["remotetimehours"] = unpacked[14]
+            self.data["remotetimemins"] = unpacked[15]
             self.data["batteryefficiency"] = unpacked[16]
             # self.data["resetbmk"] = unpacked[17]
         elif packetType == REMOTE_A0:
             self.setBaseValues(unpacked)
-            # self.data["remotetimehours"] = unpacked[14]
-            # self.data["remotetimemins"] = unpacked[15]
+            self.data["remotetimehours"] = unpacked[14]
+            self.data["remotetimemins"] = unpacked[15]
             self.data["runtime"] = unpacked[16] / 10
             self.data["starttemp"] = float(unpacked[17])
             self.data["starttemp"] = round((self.data["starttemp"] - 32) * 5 / 9, 1)
@@ -246,5 +247,5 @@ class RemoteDevice:
     def getDevice(self):
         device = deepcopy(self.deviceData)
         if self.trace:
-            self.deviceData["trace"] = []
+            self.data["trace"]  = []
         return device

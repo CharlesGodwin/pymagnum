@@ -55,14 +55,14 @@ class AGSDevice:
         self.data["gen_total_run"] = 0
         self.data["vdc"] = 0.0
         if self.trace:
-            self.deviceData["trace"] = []
+            self.data["trace"]  = []
 
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
         if self.trace:
-            self.deviceData["trace"].append(
-                [packetType,  packet[1].hex().upper()])
+            self.data["trace"].append((packetType,  packet[1].hex().upper()))
+            self.data["trace"]= list(set(self.data["trace"]))
         if packetType == AGS_A1:
             self.data["status"] = unpacked[1]
             if self.data["status"] in (3, 6, 7, 8, 12, 13, 14, 18, 19, 26, 27):
@@ -88,5 +88,5 @@ class AGSDevice:
     def getDevice(self):
         device = deepcopy(self.deviceData)
         if self.trace:
-            self.deviceData["trace"] = []
+            self.data["trace"]  = []
         return device

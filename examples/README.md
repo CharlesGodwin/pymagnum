@@ -3,4 +3,6 @@ __NOTE__ The examples directory is NOT installed as part of the pip install proc
 __WARNING__ There have been changes to the `paho.mqtt` package that is used by `mqttlogger.py` and `mqttlogger-2.py`. This is causing this message to be emitted at program startup.
 `DeprecationWarning: Callback API version 1 is deprecated, update to latest version`
 
-This is a benign warning message. mqttlogger-2.py has been revised to work ONLY with Version 2.0.
+This is a benign warning message. `mqttlogger-2.py` has been revised to work ONLY with Version 2.0. `mqttlogger.py` has been deprecated.
+
+__DOCKER EXAMPLE__ [This is a git project](https://github.com/kevinherzig/pymagnumdocker) that show how to configure `magserver.py` to run in a docker container.It has not been tested by this author.

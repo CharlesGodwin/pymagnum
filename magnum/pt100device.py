@@ -14,7 +14,7 @@ class PT100Device:
         self.deviceData["device"] = PT100
         self.deviceData["data"] = self.data
         if self.trace:
-            self.deviceData["trace"] = []
+            self.data["trace"]  = []
         self.data['revision'] = '1.x' # from 0xC2
         # Start of C1
         self.data["address"] = 0
@@ -67,10 +67,11 @@ class PT100Device:
         packetType = packet[0]
         unpacked = packet[2]
         if self.trace:
-            self.deviceData["trace"].append([packetType,  packet[1].hex().upper()])
+            self.data["trace"] .append((packetType,  packet[1].hex().upper()))
+            self.data["trace"]= list(set(self.data["trace"]))
         address = unpacked[1] & 0X07
         if packetType == PT_C1 and address == 0:
-            self.data['address'] == address
+            self.data['address'] = address
             #  skip header
             byte_value = unpacked[2]
             #  byte 2 assumes lower 4 bits and upper 4 bits
@@ -185,5 +186,5 @@ class PT100Device:
     def getDevice(self):
         device = deepcopy(self.deviceData)
         if self.trace:
-            self.deviceData["trace"] = []
+            self.data["trace"]  = []
         return device

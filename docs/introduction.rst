@@ -6,9 +6,9 @@ pymagnum is a Python implementation of a read only interface to the
 Magnum Energy network. Version:|version|
 
 This software is not endorsed nor supported by `Magnum Energy <https://www.magnum-dimensions.com/>`_, a product
-of Sensata Technologies.
+of DMX Power LLC.
 
-**Note:** Although this software has been tested, it is new. Please report all
+**Note:** This software has been tested, but stuff happens. Please report all
 success and failure via :ref:`feedback`.
 
 To use this software you need to have a RS485 adaptor connected to a

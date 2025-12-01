@@ -22,13 +22,14 @@ class BMKDevice:
         self.data["Fault"] = 0
         self.data["Fault_Text"] = ""
         if self.trace:
-            self.deviceData["trace"] = []
+            self.data["trace"]  = []
 
     def parse(self, packet):
         packetType = packet[0]
         unpacked = packet[2]
         if self.trace:
-            self.deviceData["trace"].append([packetType,  packet[1].hex().upper()])
+            self.data["trace"] .append((packetType,  packet[1].hex().upper()))
+            self.data["trace"]= list(set(self.data["trace"]))
         if packetType == BMK_81:
             self.data["soc"] = unpacked[1]
             self.data["vdc"] = round(unpacked[2] / 100, 2)
@@ -50,5 +51,5 @@ class BMKDevice:
     def getDevice(self):
         device = deepcopy(self.deviceData)
         if self.trace:
-            self.deviceData["trace"] = []
+            self.data["trace"]  = []
         return device

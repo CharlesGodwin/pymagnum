@@ -43,7 +43,7 @@ db_columns = {}
 def main():
     global first_time, cursor, args
     signal.signal(signal.SIGINT, sigint_handler)
-    parser = MagnumArgumentParser(description="Magnum SQL Load", prog="Magnum SQL", fromfile_prefix_chars='@',
+    parser = MagnumArgumentParser(description="Magnum SQL Load", prog="magsql", fromfile_prefix_chars='@',
                                   epilog="Refer to https://github.com/CharlesGodwin/pymagnum for details")
     parser.add_argument("-d", "--device", nargs='*', action='append', default=[],
                         help="Serial device name (default: /dev/ttyUSB0). You can specify ONLY one.")

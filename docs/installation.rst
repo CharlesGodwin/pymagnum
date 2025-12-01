@@ -33,16 +33,10 @@ Testing
 
 Once this software is installed, test the interconnect hardware:
 
-| First determine your serial device by running
-| ``python -m serial.tools.list_ports``
-| Normally a USB device will show up as ``/dev/ttyUSB0`` and a HAT as ``/dev/ttyAMA0`` or ``/dev/ttyS0``
+| First determine your serial device.
 
-| Next run the provided test program
-| ``magtest --help``
-| will tell you choices.
+Usually just run ``magtest --device all`` and it will iterate over all serial devices. The serial port(s) connected to Magnum network will show results.
 
-Usually you just need to run
-``magtest --device /dev/ttyUSB0`` or other device name.
 This should show up to 50 packets with names. such as:
 
 .. code-block:: text
@@ -69,7 +63,7 @@ If nothing happens or you get a lot of UNKNOWN lines, try these trouble shooting
 
 One problem is that the default settings for determining the end of a packet
 is not right for your setup. try increasing the timeout by adding this to your test
-``magtest --timeout 0.005 -d /dev/ttyUSB0``
+``magtest --timeout 0.005 --device /dev/ttyUSB0``
 
 Increase the value if necessary.
 
