@@ -18,7 +18,7 @@ class ACLDDevice:
         packetType = packet[0]
         unpacked = packet[2]
         if self.trace:
-            self.data["trace"].append((packetType,  packet[1].hex().upper()))
+            self.data["trace"].append((packetType, packet[1].hex().upper()))
             self.data["trace"]=list(set(self.data["trace"]))
         # if packetType == ACLD_D1:
         #     pass

@@ -39,7 +39,6 @@ class Logger(object):
         if self.log:
             self.log.close()
 
-
 def sigint_handler(signal, frame):
     print('Interrupted. Shutting down.')
     sys.exit(0)
@@ -50,8 +49,8 @@ def main():
     parser = MagnumArgumentParser(
         description="Magnum RS485 Reader Test", prog="magtest",
         epilog="Use `python -m serial.tools.list_ports` to identify devices. This program does NOT support use of options @file.")
-    parser.add_argument("-d", "--device", default="All",
-                        help="Serial device name (default: All serial devices.")
+    parser.add_argument("--device", "-d", default="all",nargs='+',
+                        help="Serial device name (default: All serial devices.)")
     parser.add_argument("--packets", default=50, type=int,
                         help="Number of packets to generate in reader (default: %(default)s)")
     parser.add_argument("--timeout", default=0.005, type=float,
@@ -82,6 +81,8 @@ def main():
         try:
             reader = Magnum(device=comm_device, packets=args.packets, trace=args.trace,
                             timeout=args.timeout, cleanpackets=args.cleanpackets, flip=args.flip)
+            print(f"Testing:{comm_device}")
+
         except Exception as e:
             print(f"{comm_device} {str(e)}")
             continue

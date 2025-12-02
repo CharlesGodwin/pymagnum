@@ -138,7 +138,7 @@ class RemoteDevice:
         packetType = packet[0]
         unpacked = packet[2]
         if self.trace:
-            self.data["trace"] .append((packetType,  packet[1].hex().upper()))
+            self.data["trace"] .append((packetType, packet[1].hex().upper()))
             self.data["trace"]= list(set(self.data["trace"]))
         if packetType == REMOTE_C:
             self.setBaseValues(unpacked)
