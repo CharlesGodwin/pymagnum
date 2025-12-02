@@ -67,7 +67,7 @@ class PT100Device:
         packetType = packet[0]
         unpacked = packet[2]
         if self.trace:
-            self.data["trace"] .append((packetType,  packet[1].hex().upper()))
+            self.data["trace"] .append((packetType, packet[1].hex().upper()))
             self.data["trace"]= list(set(self.data["trace"]))
         address = unpacked[1] & 0X07
         if packetType == PT_C1 and address == 0:

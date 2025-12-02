@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# 
+#
 # Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
@@ -26,11 +26,11 @@ def sigint_handler(signal, frame):
 signal.signal(signal.SIGINT, sigint_handler)
 parser = MagnumArgumentParser(
     description="Magnum Data Extractor Example", fromfile_prefix_chars='@')
-parser.add_argument("-d", "--device", nargs='*', action='append', default=[],
-                    help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")
-parser.add_argument("-i", "--interval", default=0, type=int, dest='interval',
+parser.add_argument("--device", "-d", nargs='+', default=f"{'/dev/ttyUSB0' if parser.isPosix else 'COM1'}",
+                    help="Serial device name (default: %(default)s). You can specify more than one.")
+parser.add_argument("--interval", "-i", default=0, type=int, dest='interval',
                     help="Interval, in seconds, between dump records, in seconds. 0 means once and exit. (default: %(default)s)")
-parser.add_argument('-v', "--verbose", action="store_true", default=False,
+parser.add_argument( "--verbose",'-v', action="store_true", default=False,
                     help="Display options at runtime (default: %(default)s)")
 seldom = parser.add_argument_group("Seldom used")
 seldom.add_argument('--version', action='version',

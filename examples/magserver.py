@@ -85,16 +85,16 @@ def run(server_class=HTTPServer, handler_class=magServer, addr="", port=17223):
 
 signal.signal(signal.SIGINT, sigint_handler)
 parser = MagnumArgumentParser(description="Magnum Network Reader",fromfile_prefix_chars='@',)
-parser.add_argument("-p", "--port", type=int, default=17223,
+parser.add_argument("--port", "-p", type=int, default=17223,
                     help="Port on which the server listens (default: %(default)s)")
-parser.add_argument("-d", "--device", nargs='*', action='append', default=[],
-                    help="Serial device name (default: /dev/ttyUSB0). You can specify more than one.")
-parser.add_argument('-v', "--verbose", action="store_true", default=False,
+parser.add_argument("--device", "-d", nargs='+', default=f"{'/dev/ttyUSB0' if parser.isPosix else 'COM1'}",
+                    help="Serial device name (default: %(default)s). You can specify more than one.")
+parser.add_argument("--verbose", '-v', action="store_true", default=False,
                     help="Display options at runtime (default: %(default)s)")
 seldom = parser.add_argument_group("Seldom used")
 seldom.add_argument('--version', action='version',
                     version="%(prog)s Version:{}".format(magnum.__version__))
-seldom.add_argument("-l", "--listen", default="ALL",
+seldom.add_argument("--listen", "-l", default="ALL",
                     help="IP address on which the server listens (default: %(default)s)")
 seldom.add_argument("--packets", default=50, type=int,
                     help="Number of packets to generate in reader (default: %(default)s)")

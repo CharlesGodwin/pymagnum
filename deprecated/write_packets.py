@@ -5,7 +5,7 @@
 #
 # This is no longer needed, refer to using magtest output files instead
 # DO NOT USE THIS ON A REAL MAGNUM NETWORK
-# 
+#
 import serial
 import time
 import argparse
@@ -17,7 +17,7 @@ parser.add_argument("--device", default="/dev/ttyUSB0",
                     help="Serial device (default: %(default)s)")
 parser.add_argument("filename", type=argparse.FileType("r", encoding="UTF-8"),
                     help="File name with dummy packets" )
-parser.add_argument("--timeout",  default=0.005, type=float,
+parser.add_argument("--timeout", default=0.005, type=float,
                     help="Interpacket sleep time. (default: %(default)s seconds)")
 parser.add_argument("--useall", dest='useall', default=False,
                     action='store_true', help="Use UNKNOWN packets. (default: %(default)s)")

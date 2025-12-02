@@ -45,7 +45,7 @@ class Magnum:
     :type packets: int, optional
     :param cleanpackets: Allow system to try to fixup adjacent packets by merging them, defaults to True
     :type cleanpackets: boolean, optional
-    :param timeout: How much time delay, in fractions of second,  to trigger end of packet, defaults to 0.001 second
+    :param timeout: How much time delay, in fractions of second, to trigger end of packet, defaults to 0.001 second
     :type timeout: float, optional
     :param trace: Enable adding last of every packet type processed. The packets, as HEX strings, are appended to data object, Defaults to False
     :type trace: boolean, optional
@@ -61,13 +61,13 @@ class Magnum:
         AGS_A2: 'BBBHB',
         BMK_81: 'BbHhHHhHHBB',
         INV:   'BBhhBBBBBBBBBBBBhb',
-        INV_C: "BBhhBBBBBBBBBB",  # old style inverter
+        INV_C: "BBhhBBBBBBBBBB", # old style inverter
         PT_C1: 'BBBBHhHBBBBBB',
         PT_C2: 'BBHHBBBBBBB',
         PT_C3: '15B',  # double check documentation
-        REMOTE_C:  default_remote + 'BB',  # old style remote
+        REMOTE_C:  default_remote + 'BB', # old style remote
         REMOTE_00: default_remote + '7B',
-        REMOTE_11: default_remote + '7B',  # just the first 2 bytes count
+        REMOTE_11: default_remote + '7B', # just the first 2 bytes count
         REMOTE_80: default_remote + 'bbbb3B',
         REMOTE_A0: default_remote + 'BBBbBBB',
         REMOTE_A1: default_remote + '7B',
@@ -89,7 +89,6 @@ class Magnum:
         self.timeout = timeout
         self.cleanpackets = cleanpackets
         self.trace = trace
-        self.comm_device = device
         self.flip = flip
         self.reader = None
         self.inverter = None
@@ -101,21 +100,18 @@ class Magnum:
         self.acld = None
         self.inverter_revision = -1
         self.inverter_model = -1
-        if device.find("!") >= 0:
+        if device.startswith("!"):
+            self.comm_device = device[1:]
             self.stored_packets = self._load_packets(device)
         else:
             self.stored_packets = None
+            self.comm_device = device
         return
 
     def getComm_Device(self):
         return self.comm_device
 
-    def _load_packets(self, device):
-        ix = device.rfind('!')
-        if ix == -1:
-            return None
-        self.comm_device = device
-        filename = device[ix+1:]
+    def _load_packets(self, filename):
         packets = []
         with open(filename) as file:
             lines = file.readlines()
