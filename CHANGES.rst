@@ -1,15 +1,8 @@
 =======================
  pyMagnum Release Notes
  ========================
-
- Version 2.0.8 2025/12/08
- ------------------------
-- New magtest.sh script to test and leave no artifacts
-- Updated the PyPi publishing process and install to use pyproject.toml
-- Fixed copyright notices
-
  Version 2.0.7 2025/12/05
--------------------------
+------------------------
 - Fixed use of multiple devices
 - Fixed --device parser now checks for available device(s) before running
 - Fixed Tidied up parameter help texts.
