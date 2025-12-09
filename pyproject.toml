@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools >= 77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pymagnum"
+dynamic = ["version"]
+readme = { file = 'README.rst', content-type = 'text/x-rst' }
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "LICENSE"]
+keywords = ['Magnum Energy', 'Renewable', 'Solar', 'Network', 'RS485', 'IoT']
+
+dependencies = ['pyserial', 'uptime']
+requires-python = ">=3.7"
+authors = [{ name = "Charles Godwin", email = "magnum@godwin.ca" }]
+maintainers = [{ name = "Charles Godwin", email = "magnum@godwin.ca" }]
+description = "'Magnum Energy Network Interface (read-only)'"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Operating System :: OS Independent",
+]
+[project.urls]
+Documentation = "https://pymagnum.readthedocs.io/"
+Repository = "https://github.com/CharlesGodwin/pymagnum"
+Issues = "https://github.com/CharlesGodwin/pymagnum/issues"
+Changelog = "https://github.com/CharlesGodwin/pymagnum/blob/master/CHANGES.rst"
+
+[project.scripts]
+magdump = 'magnum.magdump:main'
+magtest = 'magnum.magtest:main'
+mag2sql = 'magnum.mag2sql:main'
+
+[tool.setuptools]
+py-modules = [
+    "magnum",
+]
+
+[tool.setuptools.dynamic]
+version = { attr = "magnum.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["magnum"]

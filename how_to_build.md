@@ -19,10 +19,9 @@ One time, run:
 
 __Visual Studio Code development__
 
-If you are developing in VS Code, You need to do this to ensure the debug environment picks up the right program code. You do not need to install the package in this environment, but make sure you run the same version of Python as VS code is using.
+If you are developing in VS Code, You need to do this to ensure the debug environment picks up the right program code. You do not need to install the package in this environment, but make sure you run the same version of Python as VS code is using. The author has had mixed results with this and the magnum module is not always detected.
 
-`python setup.py develop` or
-`sudo python setup.py develop`
+`pip install --editable .`
 
 ** __NOTE:__ Some linux versions don't have a `python` or `pip` defined, just `python3` and `pip3`. In that case use the commands to get things working:
 `alias python=python3`

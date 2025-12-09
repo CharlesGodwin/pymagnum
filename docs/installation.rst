@@ -10,7 +10,7 @@ Installation Detail
 ===================
 
 Throughout this documentation, ``python`` and its installer ``pip`` are referred to using the default convention of a python.
-If you are using an older OS, such as Buster on a Raspberry Pi, Use ``python3`` and ``pip3`` to  refer to Python 3 versions of the programs. This software requires a minimum of
+If you are using an older OS, such as Buster on a Raspberry Pi or Ubuntu, Use ``python3`` and ``pip3`` to  refer to Python 3 versions of the programs. This software requires a minimum of
 version 3.7 of Python.
 
 | You will need pip installed. On a Pi use:
@@ -57,6 +57,11 @@ Troubleshooting
 ===============
 
 If nothing happens or you get a lot of UNKNOWN lines, try these trouble shooting routines.
+
+**Wrong Device**
+
+Sometimes a serial device will get disconnected or change its device address, so that `/dev/ttyUSB0` may become `/dev/ttyUSB1`. You can easily
+thest this by running `magtest --device all`. The software will scan and test all serial devices.
 
 **Timeout is too short**
 
