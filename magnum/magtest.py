@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2018-2022 Charles Godwin <magnum@godwin.ca>
+# Copyright (c) 2018-2025 Charles Godwin <magnum@godwin.ca>
 #
 # SPDX-License-Identifier:    BSD-3-Clause
 #

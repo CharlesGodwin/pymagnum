@@ -17,7 +17,3 @@ If you have installed version 1.1.3 and it is working, there is no reason to upg
 .. BUILDINFO
 
     production
-
-`Documentation <https://pymagnum.readthedocs.io/>`_
-
-`Changes <https://github.com/CharlesGodwin/pymagnum/blob/master/CHANGES.rst>`_
